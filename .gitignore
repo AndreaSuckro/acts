@@ -1,3 +1,12 @@
+# Project specific files and folders
+/data/*
+!/data/README.md
+.idea
+.ipynb_checkpoints/
+
+
+# GitHub Suggestions for Python Projects
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
