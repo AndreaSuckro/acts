@@ -99,7 +99,7 @@
 	<div>
       <ul>
       	<li> roughly 140 images per patient (depending on slicing) </li>
-        <li> 2.0 mm - 2.5 mm between slices </li> 
+        <li> 0.6 mm - 5 mm between slices </li> 
         <li> doi format contains additional meta information</li>
       </ul>
     </div>
@@ -148,7 +148,7 @@ Everything related to improving the quality of thi images for the detection
     </div>
 </div>
 
-<span style="line-height: 1.1;font-size: 12pt; display:block"> 1) Xujiong Ye et al. Shape-based computer-aided detection of lung nodules in thoracic ct images. IEEE Transactions on Biomedical Engineering, 56(7):1810–1820, 2009</span>
+<span style="line-height: 1.1;font-size: 12pt; display:block"> 1) Xujiong Ye et al. Shape-based computer-aided detection of lung nodules in thoracic ct images. IEEE Transactions on Biomedical Engineering, 56(7):1810â€“1820, 2009</span>
 
 ---
 
@@ -175,7 +175,7 @@ Everything related to improving the quality of thi images for the detection
 
 ---
 
-# Deep Networks?
+# Deep Networks
 
 ---
 
@@ -187,6 +187,19 @@ Everything related to improving the quality of thi images for the detection
 
 ---
 
+# Advantages
+
+- The whole process of nodule detection could be represented in one network
+- New features that differ from the hand-crafted ones could be learned
+
+---
+# Aspects for a thesis
+
+- Although papers have been published that use deep networks they only focus on the performance and comparison to more established methods
+- They never take a closer look at the developed features
+
+---
 # Open Questions
 
-- Since the field is pretty extensively covered the open question remains what could be _worth_ a thesis
+- Would feature extraction from a deep neural network be a good idea?
+
