@@ -1,5 +1,5 @@
 # Aided Nodule Detection in CT Scans
-## Possible Master Thesis
+## Master Thesis Brainstorming
 ### Andrea Suckro
 
 ---
@@ -11,17 +11,17 @@
 # Overview
 
 - Open Dataset [LIDC-IDRI](https://wiki.cancerimagingarchive.net/display/Public/LIDC-IDRI#a30bbaec74ea46a094b9f85ae3700255) for the evaluation and training of CAD methods for lung cancer detection
-- contains 1018 cases (total of 124GB of data, 244,527 images)
-- annotation independently performed by 4 thoratic radiologists
+- Contains 1018 cases (total of 124GB of data, 244,527 images)
+- Annotation available for each case independently performed by 4 thoratic radiologists
 
 ---
 
 # Nodule
 
-- a lesion in the tissue with a specific morphology
-- nodules with a diameter between 3-30mm no more than 6
-- nodules may represent primary lung cancer, metastatic disease or non-cancerous processes
-- three different classes of structures are annotated in the data
+- A lesion in the tissue with a specific morphology
+- Dataset contains nodules with a diameter between 3-30mm no more than 6 per patient
+- Nodules may represent primary lung cancer, metastatic disease or non-cancerous processes
+- Three different classes of structures are annotated in the data
 
 ---
 
@@ -61,11 +61,11 @@
 	<roi>
 	<imageZposition>-227.535004</imageZposition>
         <imageSOP_UID>1.3.6.1.4...</imageSOP_UID>
-		<inclusion>TRUE</inclusion>
-		<edgeMap>
-			<xCoord>127</xCoord>
-		  	<yCoord>370</yCoord>
-	    </edgeMap>
+	<inclusion>TRUE</inclusion>
+	<edgeMap>
+	   <xCoord>127</xCoord>
+	   <yCoord>370</yCoord>
+	</edgeMap>
 	</roi>
 </unblindedReadNodule>
 ```
@@ -74,7 +74,7 @@
 
 # Non-Nodules > 3mm  diameter
 
-- stored to locate structures that might be confused with nodules
+- Stored to locate structures that might be confused with nodules
 
 ```
 <nonNodule>
@@ -100,14 +100,14 @@
       <ul>
       	<li> roughly 140 images per patient (depending on slicing) </li>
         <li> 0.6 mm - 5 mm between slices </li> 
-        <li> doi format contains additional meta information</li>
+        <li> DICOM format contains additional meta information</li>
       </ul>
     </div>
 </div>
 
 ---
 
-# Processing
+# Current Approaches
 
 ---
 
@@ -148,7 +148,7 @@ Everything related to improving the quality of thi images for the detection
     </div>
 </div>
 
-<span style="line-height: 1.1;font-size: 12pt; display:block"> 1) Xujiong Ye et al. Shape-based computer-aided detection of lung nodules in thoracic ct images. IEEE Transactions on Biomedical Engineering, 56(7):1810â€“1820, 2009</span>
+<span style="line-height: 1.1;font-size: 12pt; display:block"> Image: Xujiong Ye et al. Shape-based computer-aided detection of lung nodules in thoracic ct images. IEEE Transactions on Biomedical Engineering, 56(7):1810-1820, 2009</span>
 
 ---
 
@@ -181,7 +181,7 @@ Everything related to improving the quality of thi images for the detection
 
 # Deep Neural Networks
 
-- Apart from the had crafted pipeline of algorithms an aaproach with convolutional neural networks is possible
+- Apart from the had crafted pipeline of algorithms an aproach with convolutional neural networks is possible
 - Some papers in this direction have already been published:
 <div align='center'><img src="deep_paper.png" width="600"/></div>
 
@@ -199,7 +199,12 @@ Everything related to improving the quality of thi images for the detection
 - They never take a closer look at the developed features
 
 ---
-# Open Questions
+# Aspects for a thesis
 
-- Would feature extraction from a deep neural network be a good idea?
+- Feature extraction and comparison from a trained deep network
+- Do the learned features relate to traditional methods?
+- Are the features stable for randomly initialized networks?
+- ... ?
 
+---
+# Open Discussion / Ideas welcome!
