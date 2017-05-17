@@ -11,34 +11,37 @@ TRAIN_PATH = "../../data/train/"
 TEST_PATH = "../../data/test/"
 
 
-def get_train_data(patch_number=100, tumor_rate=0.3):
+def get_train_data(patch_number=100, patch_size=[50, 50, 3], tumor_rate=0.3):
     """
     Reads all training data as specified in the training data.
     
     :param patch_number: the number of patches per patient that should be retrieved
+    :param patch_size: the 3d extend of the scan patches
     :param tumor_rate: the fraction of tumors that should be contained in the patches
     :return: data with nodules and without
     """
-    return get_data(TRAIN_PATH, patch_number, tumor_rate)
+    return get_data(TRAIN_PATH, patch_number, patch_size, tumor_rate)
 
 
-def get_test_data(patch_number=100, tumor_rate=0.3):
+def get_test_data(patch_number=100, patch_size=[50, 50, 3], tumor_rate=0.3):
     """
     Returns all data under the test directory.
     
     :param patch_number: the number of patches per patient that should be retrieved
+    :param patch_size: the 3d extend of the scan patches
     :param tumor_rate: the fraction of tumors that should be contained in the patches
     :return: data with nodules and without
     """
-    return get_data(TEST_PATH, patch_number, tumor_rate)
+    return get_data(TEST_PATH, patch_number, patch_size, tumor_rate)
 
 
-def get_data(path, patch_number=100, tumor_rate=0.3):
+def get_data(path, patch_number=100, patch_size=[50, 50, 3], tumor_rate=0.3):
     """
     Reads all CT-Scans from a folder with several patients in it.
     
     :param path: the path to the folder with the patient files
     :param patch_number: the number of patches per patient that should be retrieved
+    :param patch_size: the 3d extend of the scan patches
     :param tumor_rate: the fraction of tumors that should be contained in the patches
     :return: datacubes and their labels
     """
@@ -55,6 +58,7 @@ def get_data(path, patch_number=100, tumor_rate=0.3):
                 array_patient = conv2array(scans)
                 data_nod, data_health = slice_patient(array_patient,
                                                       annots,
+                                                      patch_size=patch_size,
                                                       number_of_patches=patch_number,
                                                       tumor_rate=tumor_rate)
                 data_nod_all += data_nod
@@ -101,7 +105,7 @@ def read_annotation(path, scan_files):
     
     :param path: the path to the patient directory
     :param scan_files: the already read in slice data
-    :return: a list of all nodule locations
+    :return: a list of all nodule locations in x y z locations
     """
 
     nodule_locations = []
@@ -164,7 +168,7 @@ def conv2array(scan_files):
     return normalize(array_imgs)
 
 
-def slice_patient(all_scans, annotation, patch_size=[15, 15, 3], number_of_patches=100, tumor_rate=0.3):
+def slice_patient(all_scans, annotation, patch_size=[50, 50, 3], number_of_patches=100, tumor_rate=0.3):
     """
     Generates cubes from a complete CT-Scan with a fixed size and a given distribution of
     tumor containing patches.
