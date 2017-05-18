@@ -1,7 +1,12 @@
-# install dependencies for the project
+# install dependencies for the project with pip
 .PHONY: install
 install: src/requirements.txt
 	pip3 install -r src/requirements.txt -U
+
+# install dependencies for the project with conda environment
+.PHONY: conda-env
+conda-env: src/acts-env.yml
+	conda env create -f src/acts-env.yml
 
 # build documentation from md and tex
 .PHONY: doc-pres
