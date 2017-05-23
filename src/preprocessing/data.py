@@ -7,39 +7,36 @@ import time
 import random
 
 
-# Todo: think about making this paths absolute in the sense that it doesn't matter from where they are called
-TRAIN_PATH = "../data/train/"
-TEST_PATH = "../data/test/"
-
-
-def get_train_data(patch_number=100, patch_size=[50, 50, 3], tumor_rate=0.3):
+def get_train_data(data_dir, *, patch_number=100, patch_size=[50, 50, 3], tumor_rate=0.3):
     """
     Reads all training data as specified in the training data.
-    
+
+    :param data_dir: the directory that contains a folder for the train data
     :param patch_number: the number of patches per patient that should be retrieved
     :param patch_size: the 3d extend of the scan patches
     :param tumor_rate: the fraction of tumors that should be contained in the patches
     :return: data with nodules and without
     """
-    return get_data(TRAIN_PATH, patch_number, patch_size, tumor_rate)
+    return get_data(os.path.join(data_dir, 'train'), patch_number, patch_size, tumor_rate)
 
 
-def get_test_data(patch_number=100, patch_size=[50, 50, 3], tumor_rate=0.3):
+def get_test_data(data_dir, *, patch_number=100, patch_size=[50, 50, 3], tumor_rate=0.3):
     """
     Returns all data under the test directory.
-    
+
+    :param data_dir: the directory that contains a folder for the test data
     :param patch_number: the number of patches per patient that should be retrieved
     :param patch_size: the 3d extend of the scan patches
     :param tumor_rate: the fraction of tumors that should be contained in the patches
     :return: data with nodules and without
     """
-    return get_data(TEST_PATH, patch_number, patch_size, tumor_rate)
+    return get_data(os.path.join(data_dir, 'test'), patch_number, patch_size, tumor_rate)
 
 
 def get_data(path, patch_number=100, patch_size=[50, 50, 3], tumor_rate=0.3):
     """
     Reads all CT-Scans from a folder with several patients in it.
-    
+
     :param path: the path to the folder with the patient files
     :param patch_number: the number of patches per patient that should be retrieved
     :param patch_size: the 3d extend of the scan patches
@@ -86,7 +83,7 @@ def get_data(path, patch_number=100, patch_size=[50, 50, 3], tumor_rate=0.3):
 def read_patient(path):
     """
     Returns a sorted List of scans that are found in one specific folder.
-    
+
     :param path: the path to the patient directory
     :return: all scans of this patient in the anatomic order
     """
@@ -103,7 +100,7 @@ def read_patient(path):
 def read_annotation(path, scan_files):
     """
     Reads the xml file associated with one patient.
-    
+
     :param path: the path to the patient directory
     :param scan_files: the already read in slice data
     :return: a list of all nodule locations in x y z locations
@@ -141,7 +138,7 @@ def read_annotation(path, scan_files):
 def normalize(a):
     """
     Rescales the values of a given matrix to lie between 0 and 1.
-    
+
     :param a: the matrix to be normalized
     :return: the normalized matrix
     """
@@ -152,7 +149,7 @@ def normalize(a):
 
 def conv2array(scan_files):
     """
-    Converts the dicom files of one patient to a numpy array. 
+    Converts the dicom files of one patient to a numpy array.
     """
     ref_scan_first = scan_files[0]
 
@@ -173,7 +170,7 @@ def slice_patient(all_scans, annotation, patch_size=[50, 50, 3], number_of_patch
     """
     Generates cubes from a complete CT-Scan with a fixed size and a given distribution of
     tumor containing patches.
-    
+
     :param all_scans: a complete CT-Scan of a patient
     :param annotation: the annotation data for this patient
     :param patch_size: the size of the cubes in [x,y,z] format
