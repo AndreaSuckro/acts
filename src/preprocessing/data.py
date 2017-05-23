@@ -7,8 +7,9 @@ import time
 import random
 
 
-TRAIN_PATH = "../../data/train/"
-TEST_PATH = "../../data/test/"
+# Todo: think about making this paths absolute in the sense that it doesn't matter from where they are called
+TRAIN_PATH = "../data/train/"
+TEST_PATH = "../data/test/"
 
 
 def get_train_data(patch_number=100, patch_size=[50, 50, 3], tumor_rate=0.3):
@@ -132,7 +133,7 @@ def read_annotation(path, scan_files):
 
             ztransformed = np.abs(float(zPos) - slice_begin) // slice_distance
 
-            nodule_locations.append(np.array([yPos, xPos, ztransformed]))  # beware of switched x,y!
+            nodule_locations.append(np.array([xPos, yPos, ztransformed]))  # beware of switched x,y!
 
     return nodule_locations
 
@@ -227,27 +228,28 @@ if __name__ == "__main__":
     print(f'Shape of nodules: {len(data_nod)}x{data_nod[0].shape}, '
           f'Shape of health: {len(data_health)}x{data_health[0].shape}')
 
+    # create annotations for frames
+    formating = {'shape': 'RECT',
+                 'color': '#008000',
+                 'line': 2,
+                 'size': (20, 20)}
+
+    format_list = []
+
+    for anno in annos:
+        t = anno.tolist()
+        t.append(formating)
+        format_list.append(t)
+
     class Data:
-        def __init__(self, scans, annotations, mark_size=10):
+        def __init__(self, scans):
             self.scans = scans
-            self.annotations = annotations
-            self.mark_size = mark_size
             self.i = 0
 
         def read(self):
-            time.sleep(0.1)  # delays for 0.5 seconds
+            time.sleep(0.3)  # delays for 0.3 seconds
             self.i = self.i + 1 if self.i < self.scans.shape[2] - 1 else 0
             img = self.scans[:, :, self.i]
-            # is there a annotation available?
-            for anno in self.annotations:
-                if anno[2] == self.i:
-                    # draw rectangle!
-                    m2 = self.mark_size//2
-                    img[int(anno[0] - m2):int(anno[0] + m2), int(anno[1] - m2)] = 1
-                    img[int(anno[0] - m2):int(anno[0] + m2), int(anno[1] + m2)] = 1
-                    img[int(anno[0] - m2), int(anno[1] + m2):int(anno[1] + m2)] = 1
-                    img[int(anno[0] + m2), int(anno[1] + m2):int(anno[1] + m2)] = 1
-
             return True, img
 
-    cvloop(Data(array_patient, annos), print_info=True)
+    cvloop(Data(array_patient), annotations=format_list, print_info=True)
