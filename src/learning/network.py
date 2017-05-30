@@ -5,7 +5,7 @@ import numpy as np
 def network_model(data, labels, *, patch_size=[20, 20, 3]):
     """
     The graph for the tensorflow model that is currently used.
-    
+
     :param data: the scan cubes as a list
     :param labels: the labels for the lung scan cubes (1 for nodule, 0 for healthy)
     :param patch_size: the patch_size of th lung scan
@@ -44,16 +44,16 @@ def network_model(data, labels, *, patch_size=[20, 20, 3]):
     return total_loss, optimizer, onehot_labels, nodule_class
 
 
-def train_network(train_data, train_labels, *, batch_size=5, epochs=10, patch_size=[20, 20, 3]):
+def train_network(train_data, train_labels, *, batch_size=5, epochs=1000, patch_size=[20, 20, 3]):
     """
     Trains the network with the given batchsize and for a certain amount of epochs.
-    
-    :param train_data: the data to be trained on 
+
+    :param train_data: the data to be trained on
     :param train_labels: the labels for the data
     :param batch_size: the batch_size (default is 20)
     :param epochs: the number of epochs (default is 100)
     :param patch_size: the patch_size of th lung scan
-    :return: 
+    :return:
     """
 
     train_data_ph = tf.placeholder(tf.float32, [batch_size, patch_size[0], patch_size[1], patch_size[2]])
@@ -74,7 +74,7 @@ def train_network(train_data, train_labels, *, batch_size=5, epochs=10, patch_si
             batch_scans, batch_labels = train_data[batch], train_labels[batch]
             _, realLabel, netThought = sess.run([optimizer, target, network_output], {train_data_ph: batch_scans, train_labels_ph: batch_labels})
 
-            if i % 1 == 0:
+            if i % 100 == 0:
                 loss_val = sess.run(loss, {train_data_ph: batch_scans, train_labels_ph: batch_labels})
                 epochs_val.append(i)
                 losses.append(loss_val)
