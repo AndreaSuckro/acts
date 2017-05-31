@@ -6,7 +6,7 @@ install: src/requirements.txt
 # install dependencies for the project with conda environment
 .PHONY: conda-env
 conda-env: src/acts-env.yml
-	conda env create -f src/acts-env.yml
+	conda env create python=3.6 -f src/acts-env.yml
 
 # build documentation from md and tex
 .PHONY: doc-pres
