@@ -20,6 +20,7 @@ def plot_loss(epochs, losses):
 
     plt.show()
 
+
 def plot_sample(train_data, train_label, number=1):
     """
     Plots a subplot with a random positive and negative case sample.

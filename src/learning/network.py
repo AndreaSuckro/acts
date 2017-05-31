@@ -53,7 +53,7 @@ def train_network(train_data, train_labels, *, batch_size=5, epochs=1000, patch_
     :param batch_size: the batch_size (default is 20)
     :param epochs: the number of epochs (default is 100)
     :param patch_size: the patch_size of th lung scan
-    :save_level: defines at how many epochs the performance is saved
+    :param save_level: defines at how many epochs the performance is saved
     :return: epochs and losses depending on the save_level
     """
 
