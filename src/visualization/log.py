@@ -1,5 +1,5 @@
-import os
 import datetime
+
 
 def log_results(epochs, losses, *, log_path='.'):
     """
