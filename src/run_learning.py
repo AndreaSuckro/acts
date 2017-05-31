@@ -1,5 +1,6 @@
 from preprocessing.data import get_train_data
 from visualization.network_visualiser import plot_loss, plot_sample
+from visualization.log import log_results
 from learning.network import train_network
 from optparse import OptionParser
 
@@ -19,6 +20,11 @@ if __name__ == "__main__":
                       help="number of samples per batch", type="int")
     parser.add_option("-p", "--plotSample", dest="plot_samp",
                       default=False, help="True if a sample of the data should be plotted")
+    parser.add_option("-l", "--logPath", dest="log",
+                      default=".", help="The directory to which the log shall be printed")
+    parser.add_option("-s", "--save_level", dest="save_level",
+                      default=100, help="At how many epochs the performance of the network is saved",
+                      type="int")
 
     (option, args) = parser.parse_args()
 
@@ -32,9 +38,11 @@ if __name__ == "__main__":
     train_labels_raw = np.asarray(train_labels_raw)
 
     if option.plot_samp:
-       plot_sample(train_data_raw, train_labels_raw)
+      plot_sample(train_data_raw, train_labels_raw)
 
-    epochs_val, losses = train_network(train_data_raw, train_labels_raw, batch_size=option.batchsize, epochs=option.epochs)
+    epochs_val, losses = train_network(train_data_raw, train_labels_raw, batch_size=option.batchsize, epochs=option.epochs, save_level=option.save_level)
 
-    #saveResults()
-    plot_loss(epochs_val, losses)
+    log_results(epochs_val, losses, log_path = option.log)
+
+    if option.plot_samp:
+      plot_loss(epochs_val, losses)
