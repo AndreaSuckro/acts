@@ -13,32 +13,38 @@ def network_model(data, labels, *, patch_size=[20, 20, 3]):
     """
     input_layer = tf.reshape(data, [-1, patch_size[0], patch_size[1], patch_size[2], 1])
 
+    # Convolutional layers with pooling
     conv1 = tf.layers.conv3d(
         inputs=input_layer,
-        filters=32,
-        kernel_size=[5, 5, 3],
+        filters=40,
+        kernel_size=[3, 3, 3],
         padding="same")
 
     pool1 = tf.layers.max_pooling3d(inputs=conv1, pool_size=[2, 2, 1], strides=1)
 
+    filter_num = 20
+
     conv2 = tf.layers.conv3d(
         inputs=pool1,
-        filters=64,
-        kernel_size=[5, 5, 3],
+        filters=filter_num,
+        kernel_size=[3, 3, 3],
         padding="same")
     pool2 = tf.layers.max_pooling3d(inputs=conv2, pool_size=[2, 2, 1], strides=1)
 
-    pool2_flat = tf.reshape(pool2, [-1, (patch_size[0]-2)*(patch_size[1]-2)*patch_size[2]*64])
+    pool2_flat = tf.reshape(pool2, [-1, (patch_size[0]-2)*(patch_size[1]-2)*patch_size[2]*filter_num])
 
-    dense = tf.layers.dense(inputs=pool2_flat, units=1024, activation=tf.nn.relu)
-    dropout = tf.layers.dropout(inputs=dense, rate=0.4)
+    # Fully conected Layers with dropout
+    dense1 = tf.layers.dense(inputs=pool2_flat, units=1024, activation=tf.nn.relu)
+    dropout1 = tf.layers.dropout(inputs=dense1, rate=0.4)
 
-    nodule_class = tf.layers.dense(inputs=dropout, units=2)
+    dense2 = tf.layers.dense(inputs=dropout1, units=1024, activation=tf.nn.relu)
+    dropout2 = tf.layers.dropout(inputs=dense2, rate=0.4)
 
+    nodule_class = tf.layers.dense(inputs=dropout2, units=2)
+
+    # Training labels and loss
     onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=2)
     total_loss = tf.losses.softmax_cross_entropy(onehot_labels=onehot_labels, logits=nodule_class)
-    #total_loss = tf.losses.mean_squared_error(labels=onehot_labels, predictions=nodule_class)
-
     optimizer = tf.train.AdamOptimizer().minimize(total_loss)
 
     return total_loss, optimizer, onehot_labels, nodule_class
