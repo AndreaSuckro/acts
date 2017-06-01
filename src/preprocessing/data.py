@@ -17,7 +17,10 @@ def get_train_data(data_dir, *, patch_number=100, patch_size=[50, 50, 3], tumor_
     :param tumor_rate: the fraction of tumors that should be contained in the patches
     :return: data with nodules and without
     """
-    return get_data(os.path.join(data_dir, 'train'), patch_number, patch_size, tumor_rate)
+    return get_data(os.path.join(data_dir, 'train'),
+                    patch_number=patch_number,
+                    patch_size=patch_size,
+                    tumor_rate=tumor_rate)
 
 
 def get_test_data(data_dir, *, patch_number=100, patch_size=[50, 50, 3], tumor_rate=0.3):
@@ -30,10 +33,13 @@ def get_test_data(data_dir, *, patch_number=100, patch_size=[50, 50, 3], tumor_r
     :param tumor_rate: the fraction of tumors that should be contained in the patches
     :return: data with nodules and without
     """
-    return get_data(os.path.join(data_dir, 'test'), patch_number, patch_size, tumor_rate)
+    return get_data(os.path.join(data_dir, 'test'),
+                    patch_number=patch_number,
+                    patch_size=patch_size,
+                    tumor_rate=tumor_rate)
 
 
-def get_data(path, patch_number=100, patch_size=[50, 50, 3], tumor_rate=0.3):
+def get_data(path, *, patch_number=100, patch_size=[50, 50, 3], tumor_rate=0.3):
     """
     Reads all CT-Scans from a folder with several patients in it.
 

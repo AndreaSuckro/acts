@@ -37,6 +37,7 @@ if __name__ == "__main__":
     print(os.path.dirname(os.path.realpath(__file__)))
 
     logging.config.fileConfig(os.path.dirname(os.path.realpath(__file__)) + os.path.sep + 'logging.ini')
+
     logger = logging.getLogger()
 
     (option, args) = get_commandline_args()
@@ -45,7 +46,7 @@ if __name__ == "__main__":
         raise ValueError('data_dir must be set to the correct folder path, use -d to specify the data location!')
 
     logger.info('Reading in the Lung CT data')
-    train_data_raw, train_labels_raw = get_train_data(option.data_dir, patch_number=20, patch_size=PATCH_SIZE)
+    train_data_raw, train_labels_raw = get_train_data(option.data_dir, patch_number=1000, patch_size=PATCH_SIZE)
     logger.info('Finished reading data')
 
     train_data_raw = np.asarray(train_data_raw)
