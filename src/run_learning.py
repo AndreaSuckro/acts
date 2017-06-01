@@ -3,14 +3,17 @@ from visualization.network_visualiser import plot_loss, plot_sample
 from visualization.log import log_results
 from learning.network import train_network
 from optparse import OptionParser
-
+import logging
+import logging.config
 import numpy as np
-
+import os
 
 PATCH_SIZE = [20, 20, 3]
 
-if __name__ == "__main__":
-    # parse commandline options
+def get_commandline_args():
+    """
+    Creates the command line arguments and returns their values.
+    """
     usage = "usage: python3 %prog [options]"
     parser = OptionParser(usage=usage)
     parser.add_option("-d", "--data", dest="data_dir", help="path to the data directory")
@@ -26,13 +29,24 @@ if __name__ == "__main__":
                       default=100, help="At how many epochs the performance of the network is saved",
                       type="int")
 
-    (option, args) = parser.parse_args()
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    # initialize logging
+    print(os.path.dirname(os.path.realpath(__file__)))
+
+    logging.config.fileConfig(os.path.dirname(os.path.realpath(__file__)) + os.path.sep + 'logging.ini')
+    logger = logging.getLogger()
+
+    (option, args) = get_commandline_args()
 
     if option.data_dir is None:
         raise ValueError('data_dir must be set to the correct folder path, use -d to specify the data location!')
 
-    # get the data
+    logger.info('Reading in the Lung CT data')
     train_data_raw, train_labels_raw = get_train_data(option.data_dir, patch_number=20, patch_size=PATCH_SIZE)
+    logger.info('Finished reading data')
 
     train_data_raw = np.asarray(train_data_raw)
     train_labels_raw = np.asarray(train_labels_raw)
@@ -40,7 +54,9 @@ if __name__ == "__main__":
     if option.plot_samp:
       plot_sample(train_data_raw, train_labels_raw)
 
+    logger.info('Start training of the network')
     epochs_val, losses = train_network(train_data_raw, train_labels_raw, batch_size=option.batchsize, epochs=option.epochs, save_level=option.save_level)
+    logger.info('Finished training! Saving results...')
 
     log_results(epochs_val, losses, log_path = option.log)
 

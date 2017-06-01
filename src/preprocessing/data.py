@@ -5,7 +5,7 @@ import os
 from cvloop import cvloop
 import time
 import random
-
+import logging
 
 def get_train_data(data_dir, *, patch_number=100, patch_size=[50, 50, 3], tumor_rate=0.3):
     """
@@ -43,6 +43,8 @@ def get_data(path, patch_number=100, patch_size=[50, 50, 3], tumor_rate=0.3):
     :param tumor_rate: the fraction of tumors that should be contained in the patches
     :return: datacubes and their labels
     """
+    logger = logging.getLogger()
+
     data_nod_all = []
     data_health_all = []
     count = 0
@@ -64,10 +66,10 @@ def get_data(path, patch_number=100, patch_size=[50, 50, 3], tumor_rate=0.3):
                 count += 1
             except AttributeError as e:
                 # ignore secondary folders for one patient
-                print(f'Something went wrong with reading files from folder {folder}: {e}')
+                logger.error('Something went wrong with reading files from folder %s: %s', folder, e)
                 continue
 
-    print(f'Read ct scan data from {count} patients in {time.time() - start_time} seconds.')
+    logger.info('Read ct scan data from %s patients in %d seconds.', count, time.time() - start_time)
     data = data_nod_all + data_health_all
     labels_nod = [1] * len(data_nod_all)
     labels_health = [0] * len(data_health_all)
@@ -75,7 +77,7 @@ def get_data(path, patch_number=100, patch_size=[50, 50, 3], tumor_rate=0.3):
 
     combined = list(zip(data, labels))
     random.shuffle(combined)
-    print(f'Successfully read in {len(data)} lung patches.')
+    logger.info('Successfully read in %s lung patches.', len(data))
 
     return zip(*combined)
 
