@@ -24,21 +24,17 @@ research topic [18]. One of the major difficulties is the detection of GGO nodul
 
 \section{Gaining insights from Deep Neural Networks}
 Neural networks are strong tools that recently have been shown to solve all kind of problems. They can play
-computer games and drive a car, they can create new art and play go to name only a few examples. Yet it seems
-like the solution they come up with is not intelligeble to humans. But
-in a scenario where medical decissions are based on the output of an algorithm it is crucial that
-the algorithm is reliable and the way it comes up with a decision is
-accepted by the people responsible. As long as this is not the case it might still happen that
-the network produces errornous results in some cases that did not occur during training.
+computer games and drive a car, they can create new art and play go to name only a few examples. Yet it seems like the solution they come up with is not intelligible to humans. But in a scenario where medical decisions are based on the output of an algorithm it is crucial that the algorithm is reliable and the way it comes up with a decision is accepted by the people responsible. As long as this is not the case it might still happen that the network produces erroneous results in some cases that did not occur during training.
 
 Strategies to cope with this problem include:
-- the assurance of the quality of the data. In this thesis an open dataset is used that was
+\begin{itemize}
+\item huge databases that contain a variety of samples. In this thesis an open dataset is used that was
 the result of a cooperative effort of many scientists and medical staff members and has proven
-it's worth in many publications
+it's worth in many publications. A possible downside is still that the patients in this database are all Americans
 
-- leaving the final decision up to a specialist. Makes sense in any case. But as the expert relies more and more
-on the assisting systems, hidden biases can influence the specialists decision - meaning that their combined
-performance might diminish over time.
+\item leaving the final decision up to a specialist. Makes sense in any case. But as the expert relies more and more on the assisting systems, hidden biases can influence the specialists decision - meaning that their combined performance might diminish over time.
+\end{itemize}
+
 
 But at the end of the day a neural network only stays to be a tool as long as no further insights into
 the problem can be gained through it's solution. This is why this thesis is concerned with extracting

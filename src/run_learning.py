@@ -8,7 +8,6 @@ import logging.config
 import numpy as np
 import os
 
-PATCH_SIZE = [20, 20, 3]
 
 def get_commandline_args():
     """
@@ -24,7 +23,7 @@ def get_commandline_args():
     parser.add_option("-p", "--plotSample", dest="plot_samp",
                       default=False, help="True if a sample of the data should be plotted")
     parser.add_option("-l", "--logPath", dest="log",
-                      default=".", help="The directory to which the log shall be printed")
+                      default=".", help="The directory to which the logged results shall be printed")
     parser.add_option("-s", "--save_level", dest="save_level",
                       default=100, help="At how many epochs the performance of the network is saved",
                       type="int")
@@ -46,7 +45,7 @@ if __name__ == "__main__":
         raise ValueError('data_dir must be set to the correct folder path, use -d to specify the data location!')
 
     logger.info('Reading in the Lung CT data')
-    train_data_raw, train_labels_raw = get_train_data(option.data_dir, patch_number=1000, patch_size=PATCH_SIZE)
+    train_data_raw, train_labels_raw = get_train_data(option.data_dir, patch_number=1000)
     logger.info('Finished reading data')
 
     train_data_raw = np.asarray(train_data_raw)
@@ -59,7 +58,7 @@ if __name__ == "__main__":
     epochs_val, losses = train_network(train_data_raw, train_labels_raw, batch_size=option.batchsize, epochs=option.epochs, save_level=option.save_level)
     logger.info('Finished training! Saving results...')
 
-    log_results(epochs_val, losses, log_path = option.log)
+    log_results(epochs_val, losses, log_path=option.log)
 
     if option.plot_samp:
       plot_loss(epochs_val, losses)
