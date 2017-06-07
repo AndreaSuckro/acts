@@ -55,7 +55,8 @@ if __name__ == "__main__":
       plot_sample(train_data_raw, train_labels_raw)
 
     logger.info('Start training of the network')
-    epochs_val, losses = train_network(train_data_raw, train_labels_raw, batch_size=option.batchsize, epochs=option.epochs, save_level=option.save_level)
+    epochs_val, losses = train_network(train_data_raw, train_labels_raw, batch_size=option.batchsize,
+                                       epochs=option.epochs, save_level=option.save_level)
     logger.info('Finished training! Saving results...')
 
     log_results(epochs_val, losses, log_path=option.log)

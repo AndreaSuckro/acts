@@ -12,3 +12,13 @@ conda-env: src/acts-env.yml
 .PHONY: doc-pres
 doc-pres: doc/presentation/overview.md
 	pandoc doc/presentation/overview.md -s -o presentation.pdf
+
+# preprocess data
+.PHONY: preprocess
+preprocess: src/preprocessing/
+	python3 src/preprocessing/create_samples.py $(ARGS)
+
+# learn network data
+.PHONY: learn
+learn: src/run_learning.py data/processed/train data/processed/test
+	python3 src/run_learning.py $(ARGS)

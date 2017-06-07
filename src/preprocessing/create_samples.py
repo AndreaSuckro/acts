@@ -7,7 +7,8 @@ import random
 import logging
 import shutil
 from cvloop import cvloop
-import math
+import argparse
+import sys
 
 PATCH_SIZE_DEFAULT = [50, 50, 3]
 
@@ -247,44 +248,79 @@ def slice_patient(all_scans, annotation, patch_size=[50, 50, 3], number_of_patch
     return [nodule_patches, healthy_patches]
 
 
-if __name__ == "__main__":
-    process_data('../../data/')
+def main(data_dir=None, target='all', patch_number=100, patch_size=PATCH_SIZE_DEFAULT, tumor_rate=0.5, show_case=False):
+    """
+    Processes the data and shows a sample if needed. See the documentation of process_data() for more information
+    on the parameters.
+    """
+    process_data(data_dir, target=target, patch_number=patch_number, patch_size=patch_size, tumor_rate=tumor_rate)
 
-    # show case the methods of the data module
-    testPatient = "../../data/raw/train/LIDC-IDRI-0666/"
-    scan_pat = read_patient(testPatient)
-    annos = read_annotation(testPatient, scan_pat)
-    array_patient = conv2array(scan_pat)
-    print(f'Shape of scan data: {array_patient.shape}')
+    if show_case:
+        # show case the methods of the data module
+        test_patient = os.path.join(data_dir, 'raw', 'train', 'LIDC-IDRI-0666')
+        scan_pat = read_patient(test_patient)
+        annos = read_annotation(test_patient, scan_pat)
+        array_patient = conv2array(scan_pat)
+        print(f'Shape of scan data: {array_patient.shape}')
 
-    data_nod, data_health = slice_patient(array_patient, annos)
-    print(f'Shape of nodules: {len(data_nod)}x{data_nod[0].shape}, '
-          f'Shape of health: {len(data_health)}x{data_health[0].shape}')
+        data_nod, data_health = slice_patient(array_patient, annos)
+        print(f'Shape of nodules: {len(data_nod)}x{data_nod[0].shape}, '
+              f'Shape of health: {len(data_health)}x{data_health[0].shape}')
 
-    # create annotations for frames
-    formating = {'shape': 'RECT',
-                 'color': '#008000',
-                 'line': 2,
-                 'size': (20, 20)}
+        # create annotations for frames
+        formating = {'shape': 'RECT',
+                     'color': '#008000',
+                     'line': 2,
+                     'size': (20, 20)}
 
-    format_list = []
+        format_list = []
 
-    for anno in annos:
-        t = anno.tolist()
-        t.append(formating)
-        format_list.append(t)
+        for anno in annos:
+            t = anno.tolist()
+            t.append(formating)
+            format_list.append(t)
+
+        class Data:
+            def __init__(self, scans):
+                self.scans = scans
+                self.i = 0
+
+            def read(self):
+                time.sleep(0.3)  # delays for 0.3 seconds
+                self.i = self.i + 1 if self.i < self.scans.shape[2] - 1 else 0
+                img = self.scans[:, :, self.i]
+                return True, img
+
+        cvloop(Data(array_patient), annotations=annos, print_info=True)
 
 
-    class Data:
-        def __init__(self, scans):
-            self.scans = scans
-            self.i = 0
+def parse_args():
+    """
+    Parses the arguments for the main call of this function.
+    :return: a dictionary of arguments
+    """
+    parser = argparse.ArgumentParser(description='Data processing for the lung CTs of patients.')
+    parser.add_argument('-d', '--data', dest='data_dir', help='Path to the data directory, this is required')
+    parser.add_argument('-p', '--patch_num', dest='patch_number',
+                        default=100, type=int, help='Number of patches to be loaded per patient')
+    parser.add_argument('-t', '--target', dest='target',
+                        default='all', help='Choose whether all, train, test or validation should be used')
+    parser.add_argument('-s', '--patch_size', dest='patch_size',
+                        default=PATCH_SIZE_DEFAULT, type=list, help='Size of the patches to be generated in [x,y,z]')
+    parser.add_argument('-r', '--tumor_rate', dest='tumor_rate',
+                        default=0.5, type=float, help='The fraction of the tumorous patches to be generated')
+    parser.add_argument('-f', '--plot_figure', dest='show_case',
+                        default=False, type=bool, help='True when a sample should be plotted')
+    args = parser.parse_args()
 
-        def read(self):
-            time.sleep(0.3)  # delays for 0.3 seconds
-            self.i = self.i + 1 if self.i < self.scans.shape[2] - 1 else 0
-            img = self.scans[:, :, self.i]
-            return True, img
+    if not args.data_dir:
+        sys.exit(parser.print_help())
+
+    return vars(args)
 
 
-    cvloop(Data(array_patient), annotations=format_list, print_info=True)
+if __name__ == '__main__':
+    """
+    Just calls the main method with the parameters defined over the commandline interface.
+    """
+    main(**parse_args())
