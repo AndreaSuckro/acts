@@ -51,7 +51,7 @@ def network_model(data, labels, *, patch_size=[20, 20, 3]):
     return total_loss, optimizer, onehot_labels, nodule_class
 
 
-def simple_network_model(data, labels, *, patch_size=[20, 20, 3]):
+def simple_network_model(data, labels, *, patch_size=[50, 50, 3]):
     """
     The graph for the tensorflow model that is currently used.
 
@@ -100,7 +100,7 @@ def simple_network_model(data, labels, *, patch_size=[20, 20, 3]):
 
 
 def train_network(train_data, train_labels, *, batch_size=5, epochs=1000,
-                  patch_size=[20, 20, 3], save_level=100, net_save_path='acts_network.tf'):
+                  patch_size=[50, 50, 3], save_level=100, net_save_path='acts_network.tf'):
     """
     Trains the network with the given batchsize and for a certain amount of epochs.
 

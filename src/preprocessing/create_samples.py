@@ -4,9 +4,8 @@ import dicom
 import os
 import time
 import random
-import logging
+import logging.config
 import shutil
-from cvloop import cvloop
 import argparse
 import sys
 
@@ -45,21 +44,22 @@ def process_data(data_dir, *, target='all', patch_number=100, patch_size=PATCH_S
         if os.path.isdir(os.path.join(data_dir, 'processed', target)):
             shutil.rmtree(os.path.join(data_dir, 'processed', target))
 
-        nodules, health = get_data(os.path.join(data_dir, 'raw', target),
-                                   patch_number=patch_number,
-                                   patch_size=patch_size,
-                                   tumor_rate=tumor_rate)
+        nodules, health, patient_info_health, patient_info_nodule = get_data(os.path.join(data_dir, 'raw', target),
+                                                                             patch_number=patch_number,
+                                                                             patch_size=patch_size,
+                                                                             tumor_rate=tumor_rate)
 
-        save_data(nodules, health, os.path.join(data_dir, 'processed', target))
+        save_data(nodules, health, os.path.join(data_dir, 'processed', target), patient_info_health, patient_info_nodule)
 
 
-def save_data(nodules, health, dir_path):
+def save_data(nodules, health, dir_path, patient_info_health, patient_info_nodule):
     """
     Puts the generated patches on disk separated for nodules and healthy patches
     
     :param nodules: the list of nodule patches
     :param health: the list of healthy patches
     :param dir_path: the target directory for the saved numpy arrays 
+    :param patient_info: number of the patient for each sample
     :return: 
     """
 
@@ -70,10 +70,10 @@ def save_data(nodules, health, dir_path):
     os.makedirs(health_path, exist_ok=True)
 
     for i, nodule in enumerate(nodules):
-        np.save(os.path.join(nod_path, str(i)), nodule)
+        np.save(os.path.join(nod_path, patient_info_nodule[i]+'_'+str(i)), nodule)
 
     for i, health_patch in enumerate(health):
-        np.save(os.path.join(health_path, str(i)), health_patch)
+        np.save(os.path.join(health_path, patient_info_health[i]+'_'+str(i)), health_patch)
 
 
 def get_data(path, *, patch_number=100, patch_size=PATCH_SIZE_DEFAULT, tumor_rate=0.5):
@@ -92,6 +92,8 @@ def get_data(path, *, patch_number=100, patch_size=PATCH_SIZE_DEFAULT, tumor_rat
 
     data_nod_all = []
     data_health_all = []
+    pat_info_health = []
+    pat_info_nodule = []
     count = 0
     start_time = time.time()
     for dirName in os.listdir(path):
@@ -101,6 +103,10 @@ def get_data(path, *, patch_number=100, patch_size=PATCH_SIZE_DEFAULT, tumor_rat
             try:
                 annots = read_annotation(folder, scans)
                 array_patient = conv2array(scans)
+
+                if annots is None or len(annots) == 0:
+                    raise AttributeError('Annotations contain no Nodules')
+
                 data_nod, data_health = slice_patient(array_patient,
                                                       annots,
                                                       patch_size=patch_size,
@@ -108,6 +114,8 @@ def get_data(path, *, patch_number=100, patch_size=PATCH_SIZE_DEFAULT, tumor_rat
                                                       tumor_rate=tumor_rate)
                 data_nod_all += data_nod
                 data_health_all += data_health
+                pat_info_health += [dirName] * len(data_nod)
+                pat_info_nodule += [dirName] * len(data_health)
                 count += 1
             except AttributeError as e:
                 # ignore secondary folders for one patient
@@ -116,7 +124,7 @@ def get_data(path, *, patch_number=100, patch_size=PATCH_SIZE_DEFAULT, tumor_rat
 
     logger.info('Read ct scan data from %s patients in %d seconds.', count, time.time() - start_time)
 
-    return data_nod_all, data_health_all
+    return data_nod_all, data_health_all, pat_info_health, pat_info_nodule
 
 
 def read_patient(path):
@@ -161,15 +169,29 @@ def read_annotation(path, scan_files):
 
     for session in xml_anno.findall('{http://www.nih.gov}readingSession'):
         for nodule in session.findall('{http://www.nih.gov}unblindedReadNodule'):
-            xPos = float(nodule.find('{http://www.nih.gov}roi').find('{http://www.nih.gov}edgeMap')
-                         .find('{http://www.nih.gov}xCoord').text)
-            yPos = float(nodule.find('{http://www.nih.gov}roi').find('{http://www.nih.gov}edgeMap')
-                         .find('{http://www.nih.gov}yCoord').text)
-            zPos = float(nodule.find('{http://www.nih.gov}roi').find('{http://www.nih.gov}imageZposition').text)
 
-            ztransformed = np.abs(float(zPos) - slice_begin) // slice_distance
+            mapCount = 0
+            roiCount = 0
+            xPosAll = 0
+            yPosAll = 0
+            zPosAll = 0
 
-            nodule_locations.append(np.array([xPos, yPos, ztransformed]))  # beware of switched x,y!
+            for roi in nodule.findall('{http://www.nih.gov}roi'):
+                roiCount = roiCount + 1
+                zPos_tmp = float(roi.find('{http://www.nih.gov}imageZposition').text)
+                ztransformed = np.abs(float(zPos_tmp) - slice_begin) // slice_distance
+                zPosAll = zPosAll + ztransformed
+
+                for edgeMap in roi.findall('{http://www.nih.gov}edgeMap'):
+                    mapCount = mapCount + 1
+                    xPosAll = xPosAll + float(edgeMap.find('{http://www.nih.gov}xCoord').text)
+                    yPosAll = yPosAll + float(edgeMap.find('{http://www.nih.gov}yCoord').text)
+
+            xPos = xPosAll/mapCount
+            yPos = yPosAll/mapCount
+            zPos = zPosAll/roiCount
+
+            nodule_locations.append(np.array([xPos, yPos, zPos]))  # beware of switched x,y!
 
     return nodule_locations
 
@@ -207,7 +229,9 @@ def slice_patient(all_scans, annotation, patch_size=[50, 50, 3], number_of_patch
     """
 
     # get all the tumor patches
+    logger = logging.getLogger()
     nodule_patches = []
+
     for i in range(int(number_of_patches*tumor_rate)):
         # pick a random tumor
         tumor = random.choice(annotation)
@@ -255,44 +279,6 @@ def main(data_dir=None, target='all', patch_number=100, patch_size=PATCH_SIZE_DE
     """
     process_data(data_dir, target=target, patch_number=patch_number, patch_size=patch_size, tumor_rate=tumor_rate)
 
-    if show_case:
-        # show case the methods of the data module
-        test_patient = os.path.join(data_dir, 'raw', 'train', 'LIDC-IDRI-0666')
-        scan_pat = read_patient(test_patient)
-        annos = read_annotation(test_patient, scan_pat)
-        array_patient = conv2array(scan_pat)
-        print(f'Shape of scan data: {array_patient.shape}')
-
-        data_nod, data_health = slice_patient(array_patient, annos)
-        print(f'Shape of nodules: {len(data_nod)}x{data_nod[0].shape}, '
-              f'Shape of health: {len(data_health)}x{data_health[0].shape}')
-
-        # create annotations for frames
-        formating = {'shape': 'RECT',
-                     'color': '#008000',
-                     'line': 2,
-                     'size': (20, 20)}
-
-        format_list = []
-
-        for anno in annos:
-            t = anno.tolist()
-            t.append(formating)
-            format_list.append(t)
-
-        class Data:
-            def __init__(self, scans):
-                self.scans = scans
-                self.i = 0
-
-            def read(self):
-                time.sleep(0.3)  # delays for 0.3 seconds
-                self.i = self.i + 1 if self.i < self.scans.shape[2] - 1 else 0
-                img = self.scans[:, :, self.i]
-                return True, img
-
-        cvloop(Data(array_patient), annotations=annos, print_info=True)
-
 
 def parse_args():
     """
@@ -323,4 +309,8 @@ if __name__ == '__main__':
     """
     Just calls the main method with the parameters defined over the commandline interface.
     """
+    # initialize logging
+    logging.config.fileConfig(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'logging.ini'))
+
+    logger = logging.getLogger()
     main(**parse_args())

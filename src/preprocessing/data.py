@@ -4,6 +4,7 @@ import time
 import random
 import logging
 from cvloop import cvloop
+import re
 
 
 def get_train_data(data_dir, *, patch_number=100, tumor_rate=0.5):
@@ -34,6 +35,29 @@ def get_test_data(data_dir, *, patch_number=100, tumor_rate=0.5):
                        tumor_rate=tumor_rate)
 
 
+def get_train_data_patient(data_dir, *, patient_num='LIDC-IDRI-0666', patch_number=100, tumor_rate=0.5):
+    """
+    Searches only in train data for a specific patient number
+    
+    :param data_dir: data directory
+    :param patient_num: the number of the patient to be read
+    :param patch_number: how many patches to get
+    :param tumor_rate: the rate of tumors in the combined data
+    :return: get training data for one patient
+    """
+    logger = logging.getLogger()
+
+    logger.info('Read train data for patient %s', patient_num)
+    full_path = os.path.join(data_dir, 'processed', 'train')
+
+    data_nod_all = get_patient_samples(os.path.join(full_path, 'nodules'),
+                                       int(patch_number*tumor_rate), patient_number=patient_num)
+    data_health_all = get_patient_samples(os.path.join(full_path, 'health'),
+                                          patch_number - int(patch_number*tumor_rate), patient_number=patient_num)
+
+    return create_labels(data_nod_all, data_health_all)
+
+
 def get_patches(path, *, patch_number=100, tumor_rate=0.5):
     """
     Reads all CT-Scans from a folder with several patients in it.
@@ -53,16 +77,45 @@ def get_patches(path, *, patch_number=100, tumor_rate=0.5):
     data_health_all = get_rand_samples(os.path.join(path, 'health'), patch_number - int(patch_number*tumor_rate))
 
     logger.info('Read ct scan data from %s patients in %d seconds.', count, time.time() - start_time)
-    data = data_nod_all + data_health_all
-    labels_nod = [1] * len(data_nod_all)
-    labels_health = [0] * len(data_health_all)
+    logger.info('Successfully read in %s lung patches.', len(data_nod_all) + len(data_health_all))
+
+    return create_labels(data_nod_all, data_health_all)
+
+
+def create_labels(data_nod, data_health):
+    """
+    Labels created for the healthy patches and nodule patches.
+    
+    :param data_nod: data containing nodules
+    :param data_health:  data containing only healthy patches
+    :return: data and label list shuffled
+    """
+    data = data_nod + data_health
+    labels_nod = [1] * len(data_nod)
+    labels_health = [0] * len(data_health)
     labels = labels_nod + labels_health
 
     combined = list(zip(data, labels))
     random.shuffle(combined)
-    logger.info('Successfully read in %s lung patches.', len(data))
 
     return zip(*combined)
+
+
+def get_patient_samples(path, number, patient_number='0666'):
+    """
+    Get specific data samples for one patient.
+    
+    :param path: the folder with the files
+    :param number: the number of samples to pick
+    :param patient_number: the patient number as a string
+    :return: patient_samples as a list
+    """
+    data = []
+    files = [f for f in os.listdir(path) if re.match('.*' + patient_number + '.*', f)]
+    files = random.sample(files, number)
+    for file in files:
+        data.append(np.load(os.path.join(path, file)))
+    return data
 
 
 def get_rand_samples(path, number):
@@ -99,7 +152,6 @@ if __name__ == "__main__":
             self.i = self.i + 1 if self.i < self.scans.shape[2] - 1 else 0
             img = self.scans[:, :, self.i]
             return True, img
-
 
     # plot a tumor patch
     cvloop(Data(train_data[labels.index(1)], labels[labels.index(1)]))

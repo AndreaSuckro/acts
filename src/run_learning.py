@@ -3,7 +3,6 @@ from visualization.network_visualiser import plot_loss, plot_sample
 from visualization.log import log_results
 from learning.network import train_network
 from optparse import OptionParser
-import logging
 import logging.config
 import numpy as np
 import os

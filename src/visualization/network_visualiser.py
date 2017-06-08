@@ -1,7 +1,4 @@
 import matplotlib.pyplot as plt
-import random
-import numpy as np
-
 
 def plot_loss(epochs, losses):
     """
@@ -18,29 +15,6 @@ def plot_loss(epochs, losses):
     plt.ylabel('loss')
     plt.title('Loss over the training')
 
-    plt.show()
-
-
-def plot_sample(train_data, train_label, number=1):
-    """
-    Plots a subplot with a random positive and negative case sample.
-    
-    :param train_data: training lung ct patch
-    :param train_label: the label per patch
-    :param number: the number of samples that should be plotted
-    :return: a plot with a sample from both classes
-    """
-
-    no_tumor_idx = random.choice([i for i, x in enumerate(train_label) if x == 0])
-    tumor_idx = random.choice([i for i, x in enumerate(train_label) if x == 1])
-
-    plt.figure(1)
-    plt.title('Tumor an non-Tumor Patch')
-    plt.subplot(211)
-    plt.imshow(np.array(train_data[tumor_idx]))
-
-    plt.subplot(212)
-    plt.imshow(np.array(train_data[no_tumor_idx]))
     plt.show()
 
 

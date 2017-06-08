@@ -8,11 +8,11 @@ Seven academic centers and eight medical imaging companies collaborated to creat
 \section{Content and Structure}
 \section{Properties of the Data}
 \section{Preprocessing}
-The network is working on cubical sections of the total ct scan.
-\subsection{Selection of Scans}
+Ignore the folders that have only <10 scans.
+The network is working on cubical sections of the total ct scan. The cubes are picked at random
+\subsection{Splitting the dataset}
+The whole dataset was split into a training, testing and validation dataset. The training dataset is used during the learning process of the neural network.
 
-
-\subsection{Segmentation of Background, Thorax and Lung}
-Make background and thorax/heart black and only leave the image structure of the lung tissue ?
+The testing dataset is used to measure the performance of the network 
 
 \end{document}
