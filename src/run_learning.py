@@ -1,5 +1,6 @@
 from preprocessing.data import get_train_data
-from visualization.network_visualiser import plot_loss, plot_sample
+from visualization.network_visualiser import plot_loss
+from visualization.data_visualizer import plot_data
 from visualization.log import log_results
 from learning.network import train_network
 from optparse import OptionParser
@@ -51,7 +52,7 @@ if __name__ == "__main__":
     train_labels_raw = np.asarray(train_labels_raw)
 
     if option.plot_samp:
-      plot_sample(train_data_raw, train_labels_raw)
+      plot_data(train_data_raw, train_labels_raw)
 
     logger.info('Start training of the network')
     epochs_val, losses = train_network(train_data_raw, train_labels_raw, batch_size=option.batchsize,
