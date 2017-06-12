@@ -1,10 +1,26 @@
 \documentclass[main.tex]{subfiles}
 \begin{document}
 \chapter{Introduction}
-General information about the use case and for which illnesses this becomes important, how many scans are made
+Why this data set?
+Why deep learning?
+What is the context?
+
+\section{Medical Context}
+In Germany 34.490 men and 18.030 women were diagnosed with an illness corresponding to the ICD-10 code C33-34 in 2012 \cite{koch2015krebs}. This code describes malignant tumors in the breathable tract more generally summarized as lung cancer. 43499 people died from this illness, which makes it one of the most dangerous types of cancer in Germany. The international comparison shows that other countries too suffer under it's impact.
+
+\begin{figure}[h]
+\includegraphics[width=\textwidth]{cancerInternational.png}
+\caption{International comparison of age-standardized and mortality rates for lung cancer in the year 2012}
+\end{figure}
+
+The main risk factor has been shown to be the exposure to tobacco smoke, whether it's active consumption via cigarettes, or passive exposure especially in closed rooms. CT scanners are used to detect irregular tissue in a patients lung region. I
+
 \section{Overview}
+
+
  A pulmonary nodule is a small, round (parenchymal nodule) or worm (juxtapleural nodule) shaped lesion in the lungs
  ground glass opacity nodules.
+ 
  GGO nodules are more likely to be malignant than solid nodules
 There exist many algorithmic approaches to finding nodules in CT-Scans \cite{papers_classical} and some that
 make use of deep convolutional neural networks to solve this task \cite{papers_dnn}
