@@ -6,13 +6,77 @@ The Lung Image Database Consortium image collection (LIDC-IDRI) consists of diag
 Seven academic centers and eight medical imaging companies collaborated to create this data set which contains 1018 cases.  Each subject includes images from a clinical thoracic CT scan and an associated XML file that records the results of a two-phase image annotation process performed by four experienced thoracic radiologists. In the initial blinded-read phase, each radiologist independently reviewed each CT scan and marked lesions belonging to one of three categories ("nodule > or =3 mm," "nodule <3 mm," and "non-nodule > or =3 mm"). In the subsequent unblinded-read phase, each radiologist independently reviewed their own marks along with the anonymized marks of the three other radiologists to render a final opinion. The goal of this process was to identify as completely as possible all lung nodules in each CT scan without requiring forced consensus. \cite{armato2011lung}
 
 \section{Content and Structure}
+The dataset contains a folder for each patient. These folders contain a full Chest CT scan and the annotations done by the radiologists. The CT Scan is encoded in a list of .dicom files and the annotations as a .xml file.
+
+i.	Reconstruction interval and collimation both < 3 mm
+i.	Scans may include high levels of noise or streak, motion, or metal artifacts (this will be characterized in the assessment of image quality)
+i.	Other pathology may be present, unless it is spatially contiguous with nodules and substantially interferes with their visual interpretation
+
+Nominated cases could have 0 to 6 nodules, where
+
+i.	Nodules may represent primary lung cancers, metastatic disease, or non-cancerous processes
+
+
+\subsection{Annotation Structure}
+Two different types of nodules are encoded in the data: nodules with a diameter of $>=$ 3mm and nodules smaller than that. The big nodules have extensive information stored with them: a rich edge map which outlines a complete contour for them in all sections \ref{fig:bigNod}. They also have a measure for their characteristics (like a measure for their subtlety and malignancy on a scale from 1 to 5). Those extra information have not been used in the learning process for this thesis.
+
+\lstset{
+  language=XML,
+  morekeywords={characteristics,noduleID,edgeMap,imageZposition}
+}
+\begin{figure}
+\begin{lstlisting}
+      <noduleID>IL057_127581</noduleID>
+      <characteristics>
+        <subtlety>4</subtlety>
+        <malignancy>3</malignancy>
+        [...]
+      </characteristics>
+      
+      <edgeMap>
+        <xCoord>103</xCoord>
+        <yCoord>391</yCoord>
+      </edgeMap>
+ 
+      <imageZposition>-232.535004</imageZposition>
+       
+      <edgeMap>
+         <xCoord>104</xCoord>
+         <yCoord>393</yCoord>
+      </edgeMap>
+\end{lstlisting}
+\caption{A shortened example xml annotation for a nodule with diameter $>=$ 3mm.}
+\label{fig:bigNod}
+\end{figure}
+
+Nodules with a smaller diameter have less information stored with them. They only contain the approximate center of mass for the nodule \ref{fig:smallNod}.
+
+\begin{figure}
+\begin{lstlisting}
+	<noduleID>7</noduleID>
+	<roi>
+	<imageZposition>-227.535004</imageZposition>
+        <imageSOP_UID>1.3.6.1.4...</imageSOP_UID>
+	<inclusion>TRUE</inclusion>
+	<edgeMap>
+	   <xCoord>127</xCoord>
+	   <yCoord>370</yCoord>
+	</edgeMap>
+	</roi>
+\end{lstlisting}
+\caption{Nodules with a diameter of $<$ 3mm have only the center of mass stored.}
+\label{fig:smallNod}
+\end{figure}
+
 \section{Properties of the Data}
+
 \section{Preprocessing}
-Ignore the folders that have only <10 scans.
+Some of the extra folders for a patient contain only a few scans and not a complete CT. Those folders were ignored. The other scanned files are read in and sliced up for the network.
+
 The network is working on cubical sections of the total ct scan. The cubes are picked at random
 \subsection{Splitting the dataset}
 The whole dataset was split into a training, testing and validation dataset. The training dataset is used during the learning process of the neural network.
 
-The testing dataset is used to measure the performance of the network 
+The testing dataset is used to measure the performance of the network while it is trained on the train dataset.
 
 \end{document}
