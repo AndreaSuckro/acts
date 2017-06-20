@@ -1,7 +1,8 @@
 import tensorflow as tf
 import numpy as np
 import logging
-
+from datetime import datetime
+import os
 
 def network_model(data, labels, *, patch_size=[20, 20, 3]):
     """
@@ -99,13 +100,15 @@ def simple_network_model(data, labels, *, patch_size=[50, 50, 3]):
     return total_loss, optimizer, onehot_labels, nodule_class
 
 
-def train_network(train_data, train_labels, *, batch_size=5, epochs=1000,
+def train_network(train_data, train_labels, test_data, test_labels, *, batch_size=5, epochs=1000,
                   patch_size=[50, 50, 3], save_level=100, net_save_path='acts_network.tf'):
     """
     Trains the network with the given batchsize and for a certain amount of epochs.
 
     :param train_data: the data to be trained on
     :param train_labels: the labels for the data
+    :param test_data: the data for checking the performance of the network
+    :param test_labels: the labels for checking the performance
     :param batch_size: the batch_size (default is 20)
     :param epochs: the number of epochs (default is 100)
     :param patch_size: the patch_size of th lung scan
@@ -116,7 +119,7 @@ def train_network(train_data, train_labels, *, batch_size=5, epochs=1000,
     logger = logging.getLogger()
 
     train_data_ph = tf.placeholder(tf.float32, [batch_size, patch_size[0], patch_size[1], patch_size[2]])
-    train_labels_ph = tf.placeholder(tf.bool, [batch_size])
+    train_labels_ph = tf.placeholder(tf.bool, [None])
 
     loss, optimizer, target, network_output = simple_network_model(train_data_ph, train_labels_ph)
 
@@ -134,18 +137,25 @@ def train_network(train_data, train_labels, *, batch_size=5, epochs=1000,
                 # build a batch
                 batch = np.random.permutation(len(train_data))[0:batch_size]
                 batch_scans, batch_labels = train_data[batch], train_labels[batch]
-                _, realLabel, netThought = sess.run([optimizer, target, network_output], {train_data_ph: batch_scans, train_labels_ph: batch_labels})
+                _, realLabel, netThought = sess.run([optimizer, target, network_output],
+                                                    {train_data_ph: batch_scans, train_labels_ph: batch_labels})
 
                 if i % save_level == 0:
-                    loss_val = sess.run(loss, {train_data_ph: batch_scans, train_labels_ph: batch_labels})
+                    loss_val_train = sess.run(loss, {train_data_ph: batch_scans, train_labels_ph: batch_labels})
+                    # test data
+                    batch_test = np.random.permutation(len(test_data))[0:batch_size]
+                    print(batch_test)
+                    batch_scans_test, batch_labels_test = test_data[batch_test], test_labels[batch_test]
+                    loss_val_test = sess.run(loss,
+                                             {train_data_ph: batch_scans_test, train_labels_ph: batch_labels_test})
                     epochs_val.append(i)
-                    losses.append(loss_val)
-                    logger.info('Epoch: %s, Loss: %s', i, loss_val)
+                    losses.append(loss_val_train)
+                    logger.info('Epoch: %s, Loss Train: %s, Loss Test: %s', i, loss_val_train, loss_val_test)
                     saver.save(sess, 'acts_network.tf')
         else:
-            saver.restore(sess, 'acts_network.tf')
+            saver.restore(sess, os.path.append(net_save_path, datetime.now() + '_acts_network.tf'))
             logger.info('Evaluate network performance on all data')
-            sess.run(nodule_class, {train_data_ph: train_data, train_labels_ph: train_labels})
+            sess.run(network_output, {train_data_ph: train_data, train_labels_ph: train_labels})
 
         sess.close()
 

@@ -70,13 +70,12 @@ def get_patches(path, *, patch_number=100, tumor_rate=0.5):
     """
     logger = logging.getLogger()
 
-    count = 0
     start_time = time.time()
 
     data_nod_all = get_rand_samples(os.path.join(path, 'nodules'), int(patch_number*tumor_rate))
     data_health_all = get_rand_samples(os.path.join(path, 'health'), patch_number - int(patch_number*tumor_rate))
 
-    logger.info('Read ct scan data from %s patients in %d seconds.', count, time.time() - start_time)
+    logger.info('Read ct scan data in %d seconds.', time.time() - start_time)
     logger.info('Successfully read in %s lung patches.', len(data_nod_all) + len(data_health_all))
 
     return create_labels(data_nod_all, data_health_all)
