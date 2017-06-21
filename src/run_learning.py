@@ -52,8 +52,11 @@ if __name__ == "__main__":
     train_data_raw = np.asarray(train_data_raw)
     train_labels_raw = np.asarray(train_labels_raw)
 
+    test_data_raw = np.asarray(test_data_raw)
+    test_labels_raw = np.asarray(test_labels_raw)
+
     if option.plot_samp:
-      plot_data(train_data_raw, train_labels_raw)
+        plot_data(train_data_raw, train_labels_raw)
 
     logger.info('Start training of the network')
     epochs_val, losses = train_network(train_data_raw, train_labels_raw,
@@ -66,4 +69,4 @@ if __name__ == "__main__":
     log_results(epochs_val, losses, log_path=option.log)
 
     if option.plot_samp:
-      plot_loss(epochs_val, losses)
+        plot_loss(epochs_val, losses)

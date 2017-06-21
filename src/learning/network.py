@@ -144,7 +144,6 @@ def train_network(train_data, train_labels, test_data, test_labels, *, batch_siz
                     loss_val_train = sess.run(loss, {train_data_ph: batch_scans, train_labels_ph: batch_labels})
                     # test data
                     batch_test = np.random.permutation(len(test_data))[0:batch_size]
-                    print(batch_test)
                     batch_scans_test, batch_labels_test = test_data[batch_test], test_labels[batch_test]
                     loss_val_test = sess.run(loss,
                                              {train_data_ph: batch_scans_test, train_labels_ph: batch_labels_test})
