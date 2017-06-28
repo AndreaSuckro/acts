@@ -72,16 +72,16 @@ def plot_data(train_data, train_label):
         plt.axis('off')
 
     g.show()
+    plt.show()
 
 if __name__ == "__main__":
 
     data_dir = '../../data/'
 
     patch_num = 10  # better divisible by 2
-    train_data, labels = d.get_train_data_patient(data_dir, patient_num='LIDC-IDRI-0666',
+    train_data, labels = d.get_train_data_patient(data_dir, patient_num='LIDC-IDRI-0023',
                                                   patch_number=patch_num, tumor_rate=0.5)
     plot_data(train_data, labels)
 
-    test_patient = os.path.join(data_dir, 'raw', 'train', 'LIDC-IDRI-0666')
-    plot_patient(test_patient)
-
+    #test_patient = os.path.join(data_dir, 'raw', 'train', 'LIDC-IDRI-0666')
+    #plot_patient(test_patient)

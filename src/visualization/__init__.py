@@ -1,1 +1,1 @@
-__all__ = ["network_visualiser"]
+__all__ = ["network_visualiser", "data_visualizer"]

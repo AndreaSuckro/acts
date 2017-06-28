@@ -22,3 +22,8 @@ preprocess: src/preprocessing/
 .PHONY: learn
 learn: src/run_learning.py data/processed/train data/processed/test
 	python3 src/run_learning.py $(ARGS)
+
+# plot sample data
+.PHONY: plot
+plot: src/show.py src/visualization/data_visualizer.py data/processed/train
+	python3 src/show.py $(ARGS)

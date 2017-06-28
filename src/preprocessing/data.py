@@ -38,7 +38,7 @@ def get_test_data(data_dir, *, patch_number=100, tumor_rate=0.5):
 def get_train_data_patient(data_dir, *, patient_num='LIDC-IDRI-0666', patch_number=100, tumor_rate=0.5):
     """
     Searches only in train data for a specific patient number
-    
+
     :param data_dir: data directory
     :param patient_num: the number of the patient to be read
     :param patch_number: how many patches to get
@@ -84,7 +84,7 @@ def get_patches(path, *, patch_number=100, tumor_rate=0.5):
 def create_labels(data_nod, data_health):
     """
     Labels created for the healthy patches and nodule patches.
-    
+
     :param data_nod: data containing nodules
     :param data_health:  data containing only healthy patches
     :return: data and label list shuffled
@@ -100,10 +100,10 @@ def create_labels(data_nod, data_health):
     return zip(*combined)
 
 
-def get_patient_samples(path, number, patient_number='0666'):
+def get_patient_samples(path, number, *, patient_number='0666'):
     """
     Get specific data samples for one patient.
-    
+
     :param path: the folder with the files
     :param number: the number of samples to pick
     :param patient_number: the patient number as a string
@@ -120,7 +120,7 @@ def get_patient_samples(path, number, patient_number='0666'):
 def get_rand_samples(path, number):
     """
     Reads n different sample numpy arrays from the specified folder.
-    
+
     :param path: the path thi the patches
     :param number: the number of patches that should be read
     :return: a list of patches
