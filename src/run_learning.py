@@ -22,11 +22,13 @@ def get_commandline_args():
                       help="number of samples per batch", type="int")
     parser.add_option("-p", "--plotSample", dest="plot_samp",
                       default=False, help="True if a sample of the data should be plotted")
-    parser.add_option("-l", "--logPath", dest="log",
+    parser.add_option("-l", "--log_path", dest="log",
                       default=".", help="The directory to which the logged results shall be printed")
     parser.add_option("-s", "--save_level", dest="save_level",
                       default=100, help="At how many epochs the performance of the network is saved",
                       type="int")
+    parser.add_option("-n", "--net_save_path", dest="net_save_path",
+                      default='acts_net.tf', help="Path to the network storage location")
 
     return parser.parse_args()
 
@@ -63,7 +65,8 @@ if __name__ == "__main__":
                                        test_data_raw, test_labels_raw,
                                        batch_size=option.batchsize,
                                        epochs=option.epochs,
-                                       save_level=option.save_level)
+                                       save_level=option.save_level,
+                                       net_save_path=option.net_save_path)
     logger.info('Finished training! Saving results...')
 
     log_results(epochs_val, losses, log_path=option.log)
