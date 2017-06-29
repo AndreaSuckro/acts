@@ -42,18 +42,20 @@ def network_model(data, labels, *, patch_size=[50, 50, 3]):
     nodule_class = tf.layers.dense(inputs=dropout1, units=2)
     onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=2)
 
-    # Accuracy
-    accuracy = tf.metrics.accuracy(onehot_labels, nodule_class)
-
     # Training labels and loss
     total_loss = tf.losses.softmax_cross_entropy(onehot_labels=onehot_labels, logits=nodule_class)
     optimizer = tf.train.AdamOptimizer().minimize(total_loss)
+
+    # Accuracy
+    correct_prediction = tf.equal(tf.argmax(onehot_labels, 1), tf.argmax(nodule_class, 1))
+    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    #accuracy, accuracy_op = tf.metrics.accuracy(onehot_labels, nodule_class)
 
     return total_loss, optimizer, onehot_labels, nodule_class, accuracy
 
 
 def train_network(train_data, train_labels, test_data, test_labels, *, batch_size=5, epochs=1000,
-                  patch_size=[50, 50, 3], save_level=100, net_save_path='acts_network.tf'):
+                  patch_size=[50, 50, 3], save_level=100, net_save_path='../logs/acts_network.tf'):
     """
     Trains the network with the given batchsize and for a certain amount of epochs.
 
@@ -80,37 +82,39 @@ def train_network(train_data, train_labels, test_data, test_labels, *, batch_siz
     epochs_val = []
 
     with tf.Session() as sess:
+
         saver = tf.train.Saver()
 
         if True:
             # initialize the variables
             sess.run(tf.global_variables_initializer())
             for i in range(1, epochs + 1):
+
                 for j in range(1, len(train_data)//batch_size):
                     # build a batch
                     batch = np.random.permutation(len(train_data))[0:batch_size]
                     batch_scans, batch_labels = train_data[batch], train_labels[batch]
-                    _, realLabel, netThought = sess.run([optimizer, target, network_output],
-                                                        {train_data_ph: batch_scans, train_labels_ph: batch_labels})
+                    sess.run([optimizer, target, network_output],
+                                               {train_data_ph: batch_scans, train_labels_ph: batch_labels})
 
                 if i % save_level == 0:
-                    acc_val_train = sess.run(accuracy, {train_data_ph: batch_scans, train_labels_ph: batch_labels})
+                    # train data (take the last batch)
+                    train_acc = sess.run(accuracy, {train_data_ph: batch_scans, train_labels_ph: batch_labels})
 
                     # test data
                     batch_test = np.random.permutation(len(test_data))[0:batch_size]
                     batch_scans_test, batch_labels_test = test_data[batch_test], test_labels[batch_test]
-                    acc_val_test = sess.run(accuracy,
-                                             {train_data_ph: batch_scans_test, train_labels_ph: batch_labels_test})
+
+                    test_acc = sess.run(accuracy, {train_data_ph: batch_scans_test, train_labels_ph: batch_labels_test})
+
                     epochs_val.append(i)
-                    losses.append(acc_val_train)
-                    logger.info('Epoch: %s, Acc Train: %s, Acc Test: %s', i, acc_val_train, acc_val_test)
-                    saver.save(sess, 'acts_network.tf')
+                    losses.append(train_acc)
+                    logger.info('Epoch: %s, Acc Train: %s, Acc Test: %s', i, train_acc, test_acc)
+                    saver.save(sess, net_save_path)
         else:
             saver.restore(sess, os.path.append(net_save_path, datetime.now() + '_acts_network.tf'))
             logger.info('Evaluate network performance on all data')
             sess.run(network_output, {train_data_ph: train_data, train_labels_ph: train_labels})
-
-        sess.close()
 
     return epochs_val, losses
 
