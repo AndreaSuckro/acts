@@ -7,6 +7,21 @@ from cvloop import cvloop
 import re
 
 
+def get_data(data_dir, folder, *, patch_number=100, tumor_rate=0.5):
+    """
+    Returns lung patches and labels for the specified folder.
+
+    :param data_dir: the directory that contains all data_dir
+    :param folder: can be either 'train' or 'test'
+    :param patch_number: the number of patches to be returned
+    :param tumor_rate: the fraction of tumors in the returned data
+    """
+    if folder is 'train':
+        return get_train_data(data_dir, patch_number=patch_number, tumor_rate=tumor_rate)
+    else if folder is 'test':
+        return get_test_data(data_dir, patch_number=patch_number, tumor_rate=tumor_rate)
+
+
 def get_train_data(data_dir, *, patch_number=100, tumor_rate=0.5):
     """
     Reads all training data as specified in the training data.
@@ -35,7 +50,7 @@ def get_test_data(data_dir, *, patch_number=100, tumor_rate=0.5):
                        tumor_rate=tumor_rate)
 
 
-def get_train_data_patient(data_dir, *, patient_num='LIDC-IDRI-0666', patch_number=100, tumor_rate=0.5):
+def get_data_patient(data_dir, *, patient_num='LIDC-IDRI-0666', dir='train', patch_number=100, tumor_rate=0.5):
     """
     Searches only in train data for a specific patient number
 

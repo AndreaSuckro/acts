@@ -7,6 +7,88 @@ import os
 import time
 
 
+class DataBrowser:
+
+    def __init__(self, data, labels, *,
+                 rows=2,
+                 cmaps={'jet'},
+                 name='Healthy vs. Nodule Patches'):
+
+        self.dataset = dataset
+        self.nodule_idxs = [i for i, x in enumerate(labels) if x == 1]
+        self.health_idxs = [i for i, x in enumerate(labels) if x == 0]
+        self.rows = rows
+
+        self.current = 0
+
+
+        self.figure, self.axes = plt.subplots(rows, 2)
+        if name:
+            self.figure.canvas.set_window_title(name)
+
+        self.axes = self.axes.flatten()
+        self.images = []
+        for i, axes in enumerate(self.axes):
+            img = image.AxesImage(axes, cmap=cmaps[0])
+            axes.set_aspect('equal')
+            self.images.append(axes.add_image(img))
+
+        self.show_next()
+
+        self.keycb = self.figure.canvas.mpl_connect(
+                'key_press_event',
+                lambda event: self.__key_press_event(event))
+
+    def show_next(self):
+        self.update_axes()
+
+    def show_previous(self):
+        self.current = (self.current - 2 * self.rows) % len(self.dataset)
+        self.update_axes()
+
+    def update_axes(self):
+        first = self.current
+
+            for i, nodule in enumerate(nodule_idxs):
+                plt.subplot(len(train_label)//2, 2, 2*(i+1) - 1)
+                plt.imshow(), cmap='gray')
+                plt.axis('off')
+
+            for i, health in enumerate(health_idxs):
+                plt.subplot(len(train_label) // 2, 2, 2*(i+1))
+                plt.imshow(np.array(train_data[health][:, :, 1]), cmap='gray')
+                plt.axis('off')
+
+
+        for axes, img, key in zip(self.axes, self.images,
+                                  itertools.cycle(self.keys)):
+            sample = self.dataset[self.current]
+            img.set_data(np.array(sample[:, :, 1])
+            axes.set_xlim([0, data.shape[1]])
+            axes.set_ylim([data.shape[0], 0])
+
+            if key == self.keys[-1]:
+                self.current = (self.current + 1) % len(self.dataset)
+
+        self.figure.suptitle(f'Showing samples {first} to {self.current - 1}')
+        self.figure.canvas.draw()
+
+    def __key_press_event(self, event):
+        events = {
+            'q': lambda event: plt.close(self.figure),
+            'escape': lambda event: plt.close(self.figure),
+            'cmd+w': lambda event: plt.close(self.figure),
+            'right': lambda event: self.show_next(),
+            'down': lambda event: self.show_next(),
+            'left': lambda event: self.show_previous(),
+            'up': lambda event: self.show_previous()
+        }
+        try:
+            events[event.key](event)
+        except KeyError:
+            print(f'Key pressed but no action available: {event.key}')
+
+
 def plot_patient(path):
     # show case the methods of the data module
     scan_pat = data.read_patient(path)
