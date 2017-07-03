@@ -9,7 +9,10 @@ import time
 
 
 class DataVisualizer:
-
+    """
+    Is used to visualize the data, the network is trained with.
+    Shows healthy patches on the left and patches with nodules on the right side.
+    """
     def __init__(self, data, labels, *,
                  rows=1,
                  cmaps=['gray'],
@@ -92,6 +95,11 @@ class DataVisualizer:
 
 
 def plot_patient(path):
+    """
+    Plots all scan data for one patient in a loop.
+
+    :param path: Path to the data directory.
+    """
     # show case the methods of the data module
     scan_pat = data.read_patient(path)
     annos = data.read_annotation(path, scan_pat)
@@ -122,47 +130,15 @@ def plot_patient(path):
 
         def read(self):
             time.sleep(0.3)  # delays for 0.3 seconds
-            self.i = self.i + 1 if self.i < self.scans.shape[2] - 1 else 0
+            self.i = (self.i + 1) if self.i < self.scans.shape[2] - 1 else 0
             img = self.scans[:, :, self.i]
             return True, img
 
     cvloop(Data(array_patient), annotations=annos, print_info=True)
 
 
-def plot_data(train_data, train_label):
-    """
-    Plots a subplot with a random positive and negative case sample.
-
-    :param train_data: training lung ct patch
-    :param train_label: the label per patch
-    :param number: the number of samples that should be plotted
-    :return: a plot with a sample from both classes
-    """
-
-    nodule_idxs = [i for i, x in enumerate(train_label) if x == 1]
-    health_idxs = [i for i, x in enumerate(train_label) if x == 0]
-
-    g = plt.figure(1)
-    plt.suptitle(f'Tumor and non-Tumor Patch of size: {train_data[0].shape}')
-
-    for i, nodule in enumerate(nodule_idxs):
-        plt.subplot(len(train_label)//2, 2, 2*(i+1) - 1)
-        plt.imshow(np.array(train_data[nodule][:, :, 1]), cmap='gray')
-        plt.axis('off')
-
-    for i, health in enumerate(health_idxs):
-        plt.subplot(len(train_label) // 2, 2, 2*(i+1))
-        plt.imshow(np.array(train_data[health][:, :, 1]), cmap='gray')
-        plt.axis('off')
-
-    g.show()
-    plt.show()
-
 if __name__ == "__main__":
 
     data_dir = '../../data/'
 
-    patch_num = 10  # better divisible by 2
-    train_data, labels = d.get_train_data_patient(data_dir, patient_num='LIDC-IDRI-0023',
-                                                  patch_number=patch_num, tumor_rate=0.5)
-    plot_data(train_data, labels)
+    plot_patient(data_dir, patient_num='LIDC-IDRI-0023')

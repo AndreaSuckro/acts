@@ -1,5 +1,5 @@
 from preprocessing.data import get_data_patient, get_data
-from visualization.data_visualizer import plot_data, DataVisualizer
+from visualization.data_visualizer import plot_patient, DataVisualizer
 from visualization.log import log_results
 from optparse import OptionParser
 from matplotlib import pyplot as plt
@@ -7,8 +7,17 @@ import numpy as np
 import os
 import inspect
 
-def plot_raw(*, data_dir='data'):
-    print('Has to be implemented')
+
+def plot_raw(*, data_dir='data/raw/train/', patient_num='0023'):
+    """
+    Plots all ct-scans for a patient.
+
+    :param data_dir: the path to hte folder that contains the patient
+                     file (like raw/train or raw/test)
+    :param patient_num: the patient number that should be plotted
+    """
+    print(os.path.join(data_dir,'LIDC-IDRI-'+patient_num))
+    plot_patient(os.path.join(data_dir,'LIDC-IDRI-'+patient_num))
 
 
 def plot_samples(*, data_dir='data', patch_num=10, patient_num='0023',
@@ -31,6 +40,7 @@ def plot_samples(*, data_dir='data', patch_num=10, patient_num='0023',
     DataVisualizer(train_data, labels)
     plt.show()
 
+
 def plot_network(*, data_dir='data'):
     print('Has to be implemented')
 
@@ -40,6 +50,7 @@ def plot_network(*, data_dir='data'):
 methods = { 'r':plot_raw,
             'p':plot_samples,
             'n':plot_network}
+
 
 def get_commandline_args():
     """
@@ -67,6 +78,7 @@ def get_vals(dictionary, *keys):
     """
     dict_keys = dictionary.keys()
     return {key: dictionary[key] for key in keys if key in dict_keys}
+
 
 if __name__ == "__main__":
     (option, args) = get_commandline_args()

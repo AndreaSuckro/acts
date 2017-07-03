@@ -20,8 +20,8 @@ preprocess: src/preprocessing/
 
 # learn network data
 .PHONY: learn
-learn: src/run_learning.py data/processed/train data/processed/test
-	python3 src/run_learning.py $(ARGS)
+learn: src/learn.py data/processed/train data/processed/test
+	python3 src/learn.py $(ARGS)
 
 # plot sample data
 .PHONY: plot
