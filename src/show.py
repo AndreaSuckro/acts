@@ -1,7 +1,8 @@
-from preprocessing.data import get_train_data_patient, get_data
-from visualization.data_visualizer import plot_data, DataBrowser
+from preprocessing.data import get_data_patient, get_data
+from visualization.data_visualizer import plot_data, DataVisualizer
 from visualization.log import log_results
 from optparse import OptionParser
+from matplotlib import pyplot as plt
 import numpy as np
 import os
 
@@ -16,16 +17,16 @@ def plot_samples(*, data_dir='data', patch_num=10, patient_num='0023',
     :param data_set: specify the dataset to be used here (either 'train' or 'test')
     """
     if patient_num is not None:
-        train_data, labels = get_train_data_patient(data_dir,
-                                                patient_num='LIDC-IDRI-' + str(patient_num),
-                                                patch_number=patch_num, tumor_rate=tumor_rate)
+        train_data, labels = get_data_patient(data_dir,
+                                              patient_num='LIDC-IDRI-' + str(patient_num), dir='train',
+                                              patch_number=patch_num, tumor_rate=tumor_rate)
     else:
-        train_data, labels = get_data(data_dir, data_set, patient_num=None,
+        train_data, labels = get_data(data_dir, data_set,
                                       patch_number=patch_num, tumor_rate=tumor_rate)
 
-
     #plot_data(train_data, labels)
-    DataBrowser(train_data, labels)
+    DataVisualizer(train_data, labels)
+    plt.show()
 
 
 def get_commandline_args():

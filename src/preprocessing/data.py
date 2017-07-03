@@ -18,7 +18,7 @@ def get_data(data_dir, folder, *, patch_number=100, tumor_rate=0.5):
     """
     if folder is 'train':
         return get_train_data(data_dir, patch_number=patch_number, tumor_rate=tumor_rate)
-    else if folder is 'test':
+    elif folder is 'test':
         return get_test_data(data_dir, patch_number=patch_number, tumor_rate=tumor_rate)
 
 
@@ -61,6 +61,9 @@ def get_data_patient(data_dir, *, patient_num='LIDC-IDRI-0666', dir='train', pat
     :return: get training data for one patient
     """
     logger = logging.getLogger()
+    if data_dir is None:
+        logger.error('Data directory was not specified.')
+        return
 
     logger.info('Read train data for patient %s', patient_num)
     full_path = os.path.join(data_dir, 'processed', 'train')
