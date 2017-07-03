@@ -55,12 +55,12 @@ def process_data(data_dir, *, target='all', patch_number=100, patch_size=PATCH_S
 def save_data(nodules, health, dir_path, patient_info_health, patient_info_nodule):
     """
     Puts the generated patches on disk separated for nodules and healthy patches
-    
+
     :param nodules: the list of nodule patches
     :param health: the list of healthy patches
-    :param dir_path: the target directory for the saved numpy arrays 
+    :param dir_path: the target directory for the saved numpy arrays
     :param patient_info: number of the patient for each sample
-    :return: 
+    :return:
     """
 
     nod_path = os.path.join(dir_path, 'nodules')
@@ -166,9 +166,9 @@ def read_annotation(path, scan_files):
             if '.xml' in filename.lower():
                 xml_anno = xml.etree.ElementTree.parse(os.path.join(dirName, filename)).getroot()
                 break  # there is only one xml file per patient
-
-    for session in xml_anno.findall('{http://www.nih.gov}readingSession'):
-        for nodule in session.findall('{http://www.nih.gov}unblindedReadNodule'):
+    domain = '{http://www.nih.gov}'
+    for session in xml_anno.findall(domain + 'readingSession'):
+        for nodule in session.findall(domain + 'unblindedReadNodule'):
 
             mapCount = 0
             roiCount = 0
@@ -176,16 +176,16 @@ def read_annotation(path, scan_files):
             yPosAll = 0
             zPosAll = 0
 
-            for roi in nodule.findall('{http://www.nih.gov}roi'):
+            for roi in nodule.findall(domain + 'roi'):
                 roiCount = roiCount + 1
-                zPos_tmp = float(roi.find('{http://www.nih.gov}imageZposition').text)
+                zPos_tmp = float(roi.find(domain + 'imageZposition').text)
                 ztransformed = np.abs(float(zPos_tmp) - slice_begin) // slice_distance
                 zPosAll = zPosAll + ztransformed
 
-                for edgeMap in roi.findall('{http://www.nih.gov}edgeMap'):
+                for edgeMap in roi.findall(domain + 'edgeMap'):
                     mapCount = mapCount + 1
-                    xPosAll = xPosAll + float(edgeMap.find('{http://www.nih.gov}xCoord').text)
-                    yPosAll = yPosAll + float(edgeMap.find('{http://www.nih.gov}yCoord').text)
+                    xPosAll = xPosAll + float(edgeMap.find(domain + 'xCoord').text)
+                    yPosAll = yPosAll + float(edgeMap.find(domain + 'yCoord').text)
 
             xPos = xPosAll/mapCount
             yPos = yPosAll/mapCount

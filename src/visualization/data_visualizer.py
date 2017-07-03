@@ -17,7 +17,7 @@ class DataVisualizer:
 
         self.data = data
         self.rows = rows
-        self.current = 0
+        self.current = -1
 
         self.nodule_idxs = [i for i, x in enumerate(labels) if x == 1]
         self.health_idxs = [i for i, x in enumerate(labels) if x == 0]
@@ -46,31 +46,31 @@ class DataVisualizer:
                 lambda event: self.__key_press_event(event))
 
     def show_next(self):
+        self.current = self.current + 1
         self.update_axes()
 
     def show_up_nodule(self):
-        self.pos_nodule = (self.pos_nodule + 1)%len(self.data[0]) # shape is the same for health and nodule
+        self.pos_nodule = (self.pos_nodule + 1)%self.data[0].shape[2] # shape is the same for health and nodule
         self.update_axes()
 
     def show_up_health(self):
-        self.pos_health = (self.pos_health + 1)%len(self.data[0]) # shape is the same for health and nodule
+        self.pos_health = (self.pos_health + 1)%self.data[0].shape[2] # shape is the same for health and nodule
         self.update_axes()
 
     def show_previous(self):
-        self.current = (self.current - self.rows) % len(self.nodule_idxs)
+        self.current = (self.current - 1) % len(self.nodule_idxs)
         self.update_axes()
 
     def update_axes(self):
-        first = self.current
+        first = self.current % len(self.nodule_idxs)
 
-        nodule_idx = self.current % len(self.nodule_idxs)
-        health_idx = self.current % len(self.health_idxs)
+        nodule_idx = self.nodule_idxs[self.current % len(self.nodule_idxs)]
+        health_idx = self.health_idxs[self.current % len(self.health_idxs)]
 
-        #for axes, img in zip(self.axes, self.images):
-        self.images[0].set_data(self.data[nodule_idx][self.pos_health])
-        self.images[1].set_data(self.data[nodule_idx][self.pos_nodule])
+        self.images[0].set_data(self.data[health_idx][...,self.pos_health])
+        self.images[1].set_data(self.data[nodule_idx][...,self.pos_nodule])
 
-        self.figure.suptitle(f'Showing health vs. nodule samples {first} to {first + 1}')
+        self.figure.suptitle(f'Showing health vs. nodule samples {first} to {first + 1} from {len(self.data)}')
         self.figure.canvas.draw()
 
     def __key_press_event(self, event):
@@ -166,6 +166,3 @@ if __name__ == "__main__":
     train_data, labels = d.get_train_data_patient(data_dir, patient_num='LIDC-IDRI-0023',
                                                   patch_number=patch_num, tumor_rate=0.5)
     plot_data(train_data, labels)
-
-    #test_patient = os.path.join(data_dir, 'raw', 'train', 'LIDC-IDRI-0666')
-    #plot_patient(test_patient)

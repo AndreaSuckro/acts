@@ -50,13 +50,12 @@ def get_test_data(data_dir, *, patch_number=100, tumor_rate=0.5):
                        tumor_rate=tumor_rate)
 
 
-def get_data_patient(data_dir, *, patient_num='LIDC-IDRI-0666', dir='train', patch_number=100, tumor_rate=0.5):
+def get_data_patient(data_dir, *, patient_num='LIDC-IDRI-0666', dir='train'):
     """
     Searches only in train data for a specific patient number
 
     :param data_dir: data directory
     :param patient_num: the number of the patient to be read
-    :param patch_number: how many patches to get
     :param tumor_rate: the rate of tumors in the combined data
     :return: get training data for one patient
     """
@@ -69,9 +68,9 @@ def get_data_patient(data_dir, *, patient_num='LIDC-IDRI-0666', dir='train', pat
     full_path = os.path.join(data_dir, 'processed', 'train')
 
     data_nod_all = get_patient_samples(os.path.join(full_path, 'nodules'),
-                                       int(patch_number*tumor_rate), patient_number=patient_num)
+                                       patient_number=patient_num)
     data_health_all = get_patient_samples(os.path.join(full_path, 'health'),
-                                          patch_number - int(patch_number*tumor_rate), patient_number=patient_num)
+                                          patient_number=patient_num)
 
     return create_labels(data_nod_all, data_health_all)
 
@@ -118,7 +117,7 @@ def create_labels(data_nod, data_health):
     return zip(*combined)
 
 
-def get_patient_samples(path, number, *, patient_number='0666'):
+def get_patient_samples(path, *, patient_number='0666'):
     """
     Get specific data samples for one patient.
 
@@ -129,7 +128,6 @@ def get_patient_samples(path, number, *, patient_number='0666'):
     """
     data = []
     files = [f for f in os.listdir(path) if re.match('.*' + patient_number + '.*', f)]
-    files = random.sample(files, number)
     for file in files:
         data.append(np.load(os.path.join(path, file)))
     return data
