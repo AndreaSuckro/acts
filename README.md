@@ -21,3 +21,14 @@ First the data needs to be preprocessed. For this use the following command (the
 After this is done, use the learn command to train the network on the data:
 
 `make learn ARGS="-d data/ -l logs/ -e 2000"`
+
+## Visualization
+The data can be visualized using the following commands.
+
+`make plot ARGS="-t r -d data/raw/train/ -p 0005"`
+
+Visualizes the patient with number `0005` by playing it's slices after one another.
+
+`make plot ARGS="-t p -d data/ -p 0005"`
+
+Visualizes the data from the preprocessed folder and shows the cubes that are used for learning the network.
