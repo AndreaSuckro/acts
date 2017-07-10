@@ -2,7 +2,10 @@
 Analyzing CT scans with Machine Learning - a Cognitive Science Master Thesis at the University of Osnabrück.
 
 ## Setup
-To visualize the data OpenCV has to be installed on your machine.
+To visualize the data OpenCV has to be installed on your machine and a few environment variables have to be in place. Set the `JOB_ID` to any value you like, it is only used for tracking on the grid.
+```
+set -x JOB_ID local
+```
 
 ### Using pip
 All dependencies for this project can be installed via pip with `make install` in the projects root directory.

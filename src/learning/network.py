@@ -20,9 +20,10 @@ def network_model(data, labels, *, patch_size=[50, 50, 3]):
         inputs=input_layer,
         filters=filter_num1,
         kernel_size=[3, 3, 3],
-        padding="same")
-
-    pool1 = tf.layers.max_pooling3d(inputs=conv1, pool_size=[2, 2, 1], strides=1)
+        padding="same",
+        name="conv1")
+    pool1 = tf.layers.max_pooling3d(inputs=conv1, pool_size=[2, 2, 1],
+                                    strides=1, name='pool1')
 
     filter_num2 = 50
 
@@ -30,25 +31,32 @@ def network_model(data, labels, *, patch_size=[50, 50, 3]):
         inputs=pool1,
         filters=filter_num2,
         kernel_size=[3, 3, 3],
-        padding="same")
-    pool2 = tf.layers.max_pooling3d(inputs=conv2, pool_size=[2, 2, 1], strides=1)
+        padding="same",
+        name="conv2")
+    pool2 = tf.layers.max_pooling3d(inputs=conv2, pool_size=[2, 2, 1],
+                                    strides=1, name="pool2")
 
-    pool2_flat = tf.reshape(pool2, [-1, (patch_size[0]-2)*(patch_size[1]-2)*patch_size[2]*filter_num2])
+    pool2_flat = tf.reshape(pool2, [-1, (patch_size[0]-2) * (patch_size[1]-2)
+                                        * patch_size[2] * filter_num2])
 
     # Fully conected Layer with dropout
-    dense1 = tf.layers.dense(inputs=pool2_flat, units=30, activation=tf.nn.relu)
-    dropout1 = tf.layers.dropout(inputs=dense1, rate=0.4)
+    dense1 = tf.layers.dense(inputs=pool2_flat, units=30,
+                             activation=tf.nn.relu, name="dense1")
+    dropout1 = tf.layers.dropout(inputs=dense1, rate=0.4, name="dropout")
 
-    nodule_class = tf.layers.dense(inputs=dropout1, units=2)
+    nodule_class = tf.layers.dense(inputs=dropout1, units=2, name="class")
     onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=2)
 
     # Training labels and loss
-    total_loss = tf.losses.softmax_cross_entropy(onehot_labels=onehot_labels, logits=nodule_class)
+    total_loss = tf.losses.softmax_cross_entropy(onehot_labels=onehot_labels,
+                                                 logits=nodule_class)
+    tf.summary.scalar("loss_entropy", total_loss)
     optimizer = tf.train.AdamOptimizer().minimize(total_loss)
 
     # Accuracy
     correct_prediction = tf.equal(tf.argmax(onehot_labels, 1), tf.argmax(nodule_class, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    tf.summary.scalar("accuracy", accuracy)
     #accuracy, accuracy_op = tf.metrics.accuracy(onehot_labels, nodule_class)
 
     return total_loss, optimizer, onehot_labels, nodule_class, accuracy

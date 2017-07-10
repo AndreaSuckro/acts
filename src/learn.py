@@ -1,6 +1,5 @@
 from preprocessing.data import get_train_data, get_test_data
 from visualization.network_visualiser import plot_loss
-from visualization.data_visualizer import plot_data
 from visualization.log import log_results
 from learning.network import train_network
 from optparse import OptionParser
