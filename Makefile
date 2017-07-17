@@ -1,3 +1,6 @@
+# Training Parameters
+JOB_ID ?= local
+
 # install dependencies for the project with pip
 .PHONY: install
 install: src/requirements.txt
@@ -21,9 +24,13 @@ preprocess: src/preprocessing/
 # learn network data
 .PHONY: learn
 learn: src/learn.py data/processed/train data/processed/test
-	python3 src/learn.py $(ARGS)
+	JOB_ID=$JOB_ID python3 src/learn.py $(ARGS)
 
 # plot sample data
 .PHONY: plot
 plot: src/show.py src/visualization/data_visualizer.py data/processed/train
 	python3 src/show.py $(ARGS)
+
+# open tensorboard
+.PHONY: tb
+tb: tensorboard --logdir=. --port 6006
