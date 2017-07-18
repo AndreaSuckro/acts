@@ -50,15 +50,18 @@ def network_model(data, labels, *, patch_size=[50, 50, 3]):
     # Training labels and loss
     total_loss = tf.losses.softmax_cross_entropy(onehot_labels=onehot_labels,
                                                  logits=nodule_class)
-    tf.summary.scalar("loss_entropy", total_loss)
+    sum_train_loss = tf.summary.scalar("train/loss", total_loss)
+    sum_test_loss = tf.summary.scalar("test/loss", total_loss)
+
     optimizer = tf.train.AdamOptimizer().minimize(total_loss)
 
     # Accuracy
     correct_prediction = tf.equal(tf.argmax(onehot_labels, 1), tf.argmax(nodule_class, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-    tf.summary.scalar("accuracy", accuracy)
+    sum_train_acc = tf.summary.scalar("train/acc", accuracy)
+    sum_test_acc = tf.summary.scalar("test/acc", accuracy)
 
-    return total_loss, optimizer, onehot_labels, nodule_class, accuracy
+    return total_loss, optimizer, onehot_labels, nodule_class, accuracy, sum_train_loss, sum_test_loss, sum_train_acc, sum_test_acc
 
 
 def train_network(train_data, train_labels, test_data, test_labels, *, batch_size=5, epochs=1000,
@@ -82,7 +85,9 @@ def train_network(train_data, train_labels, test_data, test_labels, *, batch_siz
     train_data_ph = tf.placeholder(tf.float32, [batch_size, patch_size[0], patch_size[1], patch_size[2]])
     train_labels_ph = tf.placeholder(tf.bool, [None])
 
-    loss, optimizer, target, network_output, accuracy = network_model(train_data_ph, train_labels_ph)
+    loss, optimizer, target, network_output, accuracy, sum_train_loss, sum_test_loss, sum_train_acc, sum_test_acc = network_model(train_data_ph, train_labels_ph)
+
+    writer = tf.summary.FileWriter(os.path.join(net_save_path, 'acts_' + datetime.now().isoformat()), graph=tf.get_default_graph())
 
     # variables for plotting
     losses = []
@@ -106,17 +111,22 @@ def train_network(train_data, train_labels, test_data, test_labels, *, batch_siz
 
                 if i % save_level == 0:
                     # train data (take the last batch)
-                    train_acc = sess.run(accuracy, {train_data_ph: batch_scans, train_labels_ph: batch_labels})
+                    train_acc, train_loss = sess.run([sum_train_acc, sum_train_loss], {train_data_ph: batch_scans, train_labels_ph: batch_labels})
 
                     # test data
                     batch_test = np.random.permutation(len(test_data))[0:batch_size]
                     batch_scans_test, batch_labels_test = test_data[batch_test], test_labels[batch_test]
 
-                    test_acc = sess.run(accuracy, {train_data_ph: batch_scans_test, train_labels_ph: batch_labels_test})
+                    test_acc, test_loss = sess.run([sum_test_acc, sum_test_loss], {train_data_ph: batch_scans_test, train_labels_ph: batch_labels_test})
 
                     epochs_val.append(i)
                     losses.append(train_acc)
                     logger.info('Epoch: %s, Acc Train: %s, Acc Test: %s', i, train_acc, test_acc)
+                    global_step=i*len(train_data)//batch_size+j
+                    writer.add_summary(train_acc, global_step)
+                    writer.add_summary(test_acc, global_step)
+                    writer.add_summary(train_loss, global_step)
+                    writer.add_summary(test_loss, global_step)
                     saver.save(sess, net_save_path)
         else:
             saver.restore(sess, os.path.append(net_save_path, datetime.now() + '_acts_network.tf'))
