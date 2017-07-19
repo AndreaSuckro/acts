@@ -153,7 +153,6 @@ def store_values(sess, train_data, train_labels, test_data, test_labels,
     epochs_val.append(global_step)
     losses.append(train_acc)
 
-    # TODO: use real values here
     logger.info('Step: %s, Acc Train: %s, Acc Test: %s', global_step, train_acc_val, test_acc_val)
     writer.add_summary(train_acc, global_step)
     writer.add_summary(train_loss, global_step)
