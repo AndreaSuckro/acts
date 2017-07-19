@@ -19,7 +19,7 @@ def network_model(data, labels, *, patch_size=[50, 50, 3]):
     conv1 = tf.layers.conv3d(
         inputs=input_layer,
         filters=filter_num1,
-        kernel_size=[3, 3, 3],
+        kernel_size=[5, 5, 3],
         padding="same",
         name="conv1")
     pool1 = tf.layers.max_pooling3d(inputs=conv1, pool_size=[2, 2, 2],
@@ -82,16 +82,19 @@ def train_network(train_data, train_labels, test_data, test_labels, *, batch_siz
     """
     logger = logging.getLogger()
 
-    train_data_ph = tf.placeholder(tf.float32, [batch_size, patch_size[0], patch_size[1], patch_size[2]])
+    train_data_ph = tf.placeholder(tf.float32, [None, patch_size[0], patch_size[1], patch_size[2]])
     train_labels_ph = tf.placeholder(tf.bool, [None])
 
     loss, optimizer, target, network_output, accuracy, sum_train_loss, sum_test_loss, sum_train_acc, sum_test_acc = network_model(train_data_ph, train_labels_ph)
 
-    writer = tf.summary.FileWriter(os.path.join(net_save_path, 'acts_' + datetime.now().isoformat()), graph=tf.get_default_graph())
+    log_path = os.path.join(net_save_path, 'acts_' + datetime.now().isoformat())
+    writer = tf.summary.FileWriter(log_path, graph=tf.get_default_graph())
 
     # variables for plotting
     losses = []
     epochs_val = []
+
+    global_step = 0
 
     with tf.Session() as sess:
 
@@ -108,32 +111,55 @@ def train_network(train_data, train_labels, test_data, test_labels, *, batch_siz
                     batch_scans, batch_labels = train_data[batch], train_labels[batch]
                     sess.run([optimizer, target, network_output],
                                                {train_data_ph: batch_scans, train_labels_ph: batch_labels})
+                    global_step = global_step + 1
 
+                # logging important information out for tensorboard
                 if i % save_level == 0:
-                    # train data (take the last batch)
-                    train_acc, train_loss = sess.run([sum_train_acc, sum_train_loss], {train_data_ph: batch_scans, train_labels_ph: batch_labels})
+                    store_values(sess, train_data, train_labels, test_data, test_labels,
+                                 batch_size, writer, saver, log_path, global_step,
+                                 sum_train_loss, sum_test_loss, sum_train_acc, sum_test_acc,
+                                 train_data_ph, train_labels_ph, epochs_val, losses, accuracy)
 
-                    # test data
-                    batch_test = np.random.permutation(len(test_data))[0:batch_size]
-                    batch_scans_test, batch_labels_test = test_data[batch_test], test_labels[batch_test]
-
-                    test_acc, test_loss = sess.run([sum_test_acc, sum_test_loss], {train_data_ph: batch_scans_test, train_labels_ph: batch_labels_test})
-
-                    epochs_val.append(i)
-                    losses.append(train_acc)
-                    logger.info('Epoch: %s, Acc Train: %s, Acc Test: %s', i, train_acc, test_acc)
-                    global_step=i*len(train_data)//batch_size+j
-                    writer.add_summary(train_acc, global_step)
-                    writer.add_summary(test_acc, global_step)
-                    writer.add_summary(train_loss, global_step)
-                    writer.add_summary(test_loss, global_step)
-                    saver.save(sess, net_save_path)
         else:
             saver.restore(sess, os.path.append(net_save_path, datetime.now() + '_acts_network.tf'))
             logger.info('Evaluate network performance on all data')
             sess.run(network_output, {train_data_ph: train_data, train_labels_ph: train_labels})
 
     return epochs_val, losses
+
+
+def store_values(sess, train_data, train_labels, test_data, test_labels,
+                 batch_size, writer, saver, log_path, global_step,
+                 sum_train_loss, sum_test_loss, sum_train_acc, sum_test_acc,
+                 train_data_ph, train_labels_ph, epochs_val, losses, accuracy):
+    """
+    Saves metrics for this specific network and the session.
+    """
+    # calculate accuracy on one batch
+    logger = logging.getLogger()
+
+    batch_train = np.random.permutation(len(train_data))[0:batch_size]
+    batch_scans_train, batch_labels_train = train_data[batch_train], train_labels[batch_train]
+
+    train_acc, train_loss, train_acc_val = sess.run([sum_train_acc, sum_train_loss, accuracy],
+                                                    {train_data_ph: batch_scans_train, train_labels_ph: batch_labels_train})
+
+    batch_test = np.random.permutation(len(test_data))[0:batch_size]
+    batch_scans_test, batch_labels_test = test_data[batch_test], test_labels[batch_test]
+
+    test_acc, test_loss, test_acc_val = sess.run([sum_test_acc, sum_test_loss, accuracy],
+                                                 {train_data_ph: batch_scans_test, train_labels_ph: batch_labels_test})
+
+    epochs_val.append(global_step)
+    losses.append(train_acc)
+
+    # TODO: use real values here
+    logger.info('Step: %s, Acc Train: %s, Acc Test: %s', global_step, train_acc_val, test_acc_val)
+    writer.add_summary(train_acc, global_step)
+    writer.add_summary(train_loss, global_step)
+    writer.add_summary(test_acc, global_step)
+    writer.add_summary(test_loss, global_step)
+    saver.save(sess, log_path)
 
 if __name__ == "__main__":
     # Todo: think about some tests or func checks
