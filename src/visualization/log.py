@@ -10,3 +10,18 @@ def log_results(epochs, losses, *, log_path='.'):
     for ep, loss in zip(epochs, losses):
         file.write(f'Epoch: {ep} has loss {loss} \n')
     file.close()
+
+def log_args(func):
+    """
+    This decorator dumps out the arguments passed to a function before calling it
+    :param func: the function to log
+    :return: 
+    """
+    logger = logging.getLogger()
+    fname = func.__name__
+
+    def echo_func(*args, **kwargs):
+        logger.info(f'Calling `{fname}` with args: {kwargs}')
+        return func(*args, **kwargs)
+
+    return echo_func

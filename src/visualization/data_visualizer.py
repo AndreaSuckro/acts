@@ -1,10 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib import image
-import numpy as np
 import preprocessing.create_samples as data
-import preprocessing.data as d
 from cvloop import cvloop
-import os
 import time
 
 

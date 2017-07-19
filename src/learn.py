@@ -1,6 +1,5 @@
 from preprocessing.data import get_train_data, get_test_data
-from visualization.network_visualiser import plot_loss
-from visualization.log import log_results
+from visualization.data_visualizer import DataVisualizer
 from learning.network import train_network
 from optparse import OptionParser
 import logging.config
@@ -57,7 +56,7 @@ if __name__ == "__main__":
     test_labels_raw = np.asarray(test_labels_raw)
 
     if option.plot_samp:
-        plot_data(train_data_raw, train_labels_raw)
+        DataVisualizer(train_data_raw, train_labels_raw)
 
     logger.info('Start training of the network')
     epochs_val, losses = train_network(train_data_raw, train_labels_raw,
@@ -66,9 +65,5 @@ if __name__ == "__main__":
                                        epochs=option.epochs,
                                        save_level=option.save_level,
                                        net_save_path=option.net_save_path)
-    logger.info('Finished training! Saving results...')
 
-    log_results(epochs_val, losses, log_path=option.log)
-
-    if option.plot_samp:
-        plot_loss(epochs_val, losses)
+    logger.info('Finished training! Check out the log directory for results')
