@@ -1,5 +1,5 @@
 import datetime
-
+import logging
 
 def log_results(epochs, losses, *, log_path='.'):
     """
@@ -11,9 +11,10 @@ def log_results(epochs, losses, *, log_path='.'):
         file.write(f'Epoch: {ep} has loss {loss} \n')
     file.close()
 
+
 def log_args(func):
     """
-    This decorator dumps out the arguments passed to a function before calling it
+    This decorator dumps out the keyword-arguments passed to a function before calling it
     :param func: the function to log
     :return: 
     """
