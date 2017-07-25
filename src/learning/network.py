@@ -42,6 +42,7 @@ def train_network(train_data, train_labels, test_data, test_labels, *, batch_siz
 
     with tf.Session() as sess:
 
+        writer = tf.summary.FileWriter(log_path, graph=sess.graph)
         saver = tf.train.Saver()
 
         # initialize the variables
@@ -62,6 +63,8 @@ def train_network(train_data, train_labels, test_data, test_labels, *, batch_siz
                              batch_size, writer, saver, log_path, global_step,
                              sum_train_loss, sum_test_loss, sum_train_acc, sum_test_acc,
                              train_data_ph, train_labels_ph, epochs_val, losses, accuracy)
+
+        writer.close()
 
     return epochs_val, losses
 
