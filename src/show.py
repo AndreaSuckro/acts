@@ -1,9 +1,7 @@
 from preprocessing.data import get_data_patient, get_data
-from visualization.data_visualizer import plot_patient, DataVisualizer
-from visualization.log import log_results
+from visualization.data_visualizer import plot_patient, DataVisualizer, plot_histogram
 from optparse import OptionParser
 from matplotlib import pyplot as plt
-import numpy as np
 import os
 import inspect
 
@@ -36,7 +34,6 @@ def plot_samples(*, data_dir='data', patch_num=10, patient_num='0023',
         train_data, labels = get_data(data_dir, data_set,
                                       patch_number=patch_num, tumor_rate=tumor_rate)
 
-    #plot_data(train_data, labels)
     DataVisualizer(train_data, labels)
     plt.show()
 
@@ -44,12 +41,23 @@ def plot_samples(*, data_dir='data', patch_num=10, patient_num='0023',
 def plot_network(*, data_dir='data'):
     print('Has to be implemented')
 
+
+def plot_distribution(*, data_dir='data'):
+    """
+    Plotts the value distribution of the training and test data.
+    :param data_dir: where to find the data 
+    :return: 
+    """
+    plot_histogram(data_dir)
+    plt.show()
+
 ############################################################################
 ### Call and commandline helper functions
 
-methods = { 'r':plot_raw,
-            'p':plot_samples,
-            'n':plot_network}
+methods = {'r':plot_raw,
+           'p':plot_samples,
+           'n':plot_network,
+           'd':plot_distribution}
 
 
 def get_commandline_args():
