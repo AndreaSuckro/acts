@@ -15,8 +15,7 @@ def log_results(epochs, losses, *, log_path='.'):
 def log_args(func):
     """
     This decorator dumps out the keyword-arguments passed to a function before calling it
-    :param func: the function to log
-    :return: 
+    :param func: the function to log 
     """
     logger = logging.getLogger()
     fname = func.__name__

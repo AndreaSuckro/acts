@@ -40,7 +40,7 @@ def network_model(data, labels, *, patch_size=[50, 50, 3]):
 
     #########################################################
     # Fully connected Layer with dropout
-    dense1 = tf.layers.dense(inputs=pool2_flat, units=30,
+    dense1 = tf.layers.dense(inputs=pool2_flat, units=50,
                              activation=tf.nn.relu, name="dense1")
     dropout1 = tf.layers.dropout(inputs=dense1, rate=0.4, name="dropout")
 
