@@ -39,4 +39,4 @@ plot: src/show.py src/visualization/data_visualizer.py data/processed/train
 # open tensorboard
 .PHONY: tb
 tb:
-	tensorboard --logdir=../logs/ --port 6066
+	tensorboard --logdir=../logs/ --port 6006
