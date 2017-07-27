@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 
-def network_model(data, labels, *, patch_size=[50, 50, 3]):
+def network_model(data, labels, *, patch_size=[50, 50, 10]):
     """
     The graph for the tensorflow model that is currently used.
 
