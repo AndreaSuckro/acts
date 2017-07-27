@@ -19,7 +19,7 @@ doc-pres: doc/presentation/overview.md
 # preprocess data
 .PHONY: preprocess
 preprocess: src/preprocessing/
-	python3 src/preprocessing/create_samples.py $(ARGS)
+	JOB_ID=$JOB_ID python3 src/preprocessing/create_samples.py $(ARGS)
 
 # learn network data
 .PHONY: learn

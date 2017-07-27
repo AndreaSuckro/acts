@@ -106,7 +106,9 @@ def create_labels(data_nod, data_health):
     :param data_health:  data containing only healthy patches
     :return: data and label list shuffled
     """
+
     data = np.array(data_nod + data_health)
+
     labels_nod = [1] * len(data_nod)
     labels_health = [0] * len(data_health)
     labels = np.array(labels_nod + labels_health)

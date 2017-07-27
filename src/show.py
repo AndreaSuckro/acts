@@ -29,7 +29,7 @@ def plot_samples(*, data_dir='data', patch_num=10, patient_num='0023',
     """
     if patient_num is not None:
         train_data, labels = get_data_patient(data_dir,
-                                              patient_num='LIDC-IDRI-' + str(patient_num), dir='train')
+                                              patient_num='LIDC-IDRI-' + str(patient_num), dir=data_set)
     else:
         train_data, labels = get_data(data_dir, data_set,
                                       patch_number=patch_num, tumor_rate=tumor_rate)
