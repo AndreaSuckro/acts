@@ -38,20 +38,19 @@ def network_model(data, labels, *, patch_size=[50, 50, 10]):
     filter_num3 = 20
 
     conv3 = tf.layers.conv3d(
-        inputs=pool1,
+        inputs=pool2,
         filters=filter_num3,
-        kernel_size=[7, 7, 2],
+        kernel_size=[15, 15, 3],
         padding="same",
         name="conv3")
-    pool3 = tf.layers.max_pooling3d(inputs=conv3, pool_size=[3, 3, 2],
+    pool3 = tf.layers.max_pooling3d(inputs=conv3, pool_size=[10, 10, 8],
                                     strides=2, name="pool3")
 
-    pool3_flat = tf.reshape(pool3, [-1, (patch_size[0] - 3) * (patch_size[1] - 3)
-                                    * (patch_size[2] - 2) * filter_num3])
+    pool3_flat = tf.contrib.layers.flatten(pool3)
 
     #########################################################
     # Fully connected Layer with dropout
-    dense1 = tf.layers.dense(inputs=pool3_flat, units=100,
+    dense1 = tf.layers.dense(inputs=pool3_flat, units=50,
                              activation=tf.nn.relu, name="dense1")
     dropout1 = tf.layers.dropout(inputs=dense1, rate=0.4, name="dropout")
 
