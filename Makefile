@@ -29,7 +29,7 @@ learn: src/learn.py data/processed/train data/processed/test
 # test learning for code checking
 .PHONY: test
 test: src/learn.py data/processed/train data/processed/test
-	JOB_ID=$JOB_ID python3 src/learn.py -d data/ -l ../tests/ -e 2 -s 1 -b 200 -n .
+	JOB_ID=$JOB_ID python3 src/learn.py -d data/ -l ../tests/ -e 2 -s 1 -b 1 -n ../tests/
 
 # plot sample data
 .PHONY: plot
