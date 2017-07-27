@@ -9,7 +9,7 @@ import shutil
 import argparse
 import sys
 
-PATCH_SIZE_DEFAULT = [50, 50, 3]
+PATCH_SIZE_DEFAULT = [50, 50, 10]
 
 
 def normalize(a):
@@ -215,7 +215,7 @@ def conv2array(scan_files):
     return normalize(array_imgs)
 
 
-def slice_patient(all_scans, annotation, patch_size=[50, 50, 3], number_of_patches=100, tumor_rate=0.3):
+def slice_patient(all_scans, annotation, patch_size=PATCH_SIZE_DEFAULT, number_of_patches=100, tumor_rate=0.3):
     """
     Generates cubes from a complete CT-Scan with a fixed size and a given distribution of
     tumor containing patches.
