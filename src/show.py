@@ -19,12 +19,15 @@ def plot_raw(*, data_dir='data/raw/train/', patient_num='0023'):
 
 
 def plot_samples(*, data_dir='data', patch_num=10, patient_num='0023',
-                 tumor_rate=0.5, data_set='train', **rest):
+                 tumor_rate=0.5, data_set='train'):
     """
     Plots samples from the dataset. Can be used to get the data for a specific
     patient or to plot samples from a whole dataset.
-
-    :param patient_num: Can contain a specific patient number
+    
+    :param data_dir: the location of the data directory
+    :param patch_num: the number of patches to be retrieved
+    :param patient_num: can contain a specific patient number
+    :param tumor_rate: the rate of tumor patches in the returned data
     :param data_set: specify the dataset to be used here (either 'train' or 'test')
     """
     if patient_num is not None:
