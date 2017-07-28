@@ -29,7 +29,10 @@ def train_network(train_data, train_labels, test_data, test_labels, *, batch_siz
     train_data_ph = tf.placeholder(tf.float32, [None, patch_size[0], patch_size[1], patch_size[2]])
     train_labels_ph = tf.placeholder(tf.bool, [None])
 
-    loss, optimizer, target, network_output, accuracy, sum_train_loss, sum_test_loss, sum_train_acc, sum_test_acc = network_model(train_data_ph, train_labels_ph)
+    # so many variables!
+    loss, optimizer, target, network_output, \
+    accuracy, sum_train_loss, sum_test_loss, \
+    sum_train_acc, sum_test_acc, phase = network_model(train_data_ph, train_labels_ph)
 
     log_path = os.path.join(net_save_path, 'acts_' + datetime.now().isoformat())
 
@@ -54,7 +57,7 @@ def train_network(train_data, train_labels, test_data, test_labels, *, batch_siz
                 batch = np.random.permutation(len(train_data))[0:batch_size]
                 batch_scans, batch_labels = train_data[batch], train_labels[batch]
                 sess.run([optimizer, target, network_output],
-                         {train_data_ph: batch_scans, train_labels_ph: batch_labels})
+                         {train_data_ph: batch_scans, train_labels_ph: batch_labels, phase: 1})
                 global_step = global_step + 1
 
             # logging important information out for tensorboard
@@ -62,7 +65,7 @@ def train_network(train_data, train_labels, test_data, test_labels, *, batch_siz
                 store_values(sess, train_data, train_labels, test_data, test_labels,
                              batch_size, writer, saver, log_path, global_step,
                              sum_train_loss, sum_test_loss, sum_train_acc, sum_test_acc,
-                             train_data_ph, train_labels_ph, epochs_val, losses, accuracy)
+                             train_data_ph, train_labels_ph, epochs_val, losses, accuracy, phase)
 
         writer.close()
 
@@ -72,7 +75,7 @@ def train_network(train_data, train_labels, test_data, test_labels, *, batch_siz
 def store_values(sess, train_data, train_labels, test_data, test_labels,
                  batch_size, writer, saver, log_path, global_step,
                  sum_train_loss, sum_test_loss, sum_train_acc, sum_test_acc,
-                 train_data_ph, train_labels_ph, epochs_val, losses, accuracy):
+                 train_data_ph, train_labels_ph, epochs_val, losses, accuracy, phase):
     """
     Saves metrics for this specific network and the session.
     """
@@ -83,13 +86,15 @@ def store_values(sess, train_data, train_labels, test_data, test_labels,
     batch_scans_train, batch_labels_train = train_data[batch_train], train_labels[batch_train]
 
     train_acc, train_loss, train_acc_val = sess.run([sum_train_acc, sum_train_loss, accuracy],
-                                                    {train_data_ph: batch_scans_train, train_labels_ph: batch_labels_train})
+                                                    {train_data_ph: batch_scans_train,
+                                                     train_labels_ph: batch_labels_train, phase: 1})
 
     batch_test = np.random.permutation(len(test_data))[0:batch_size]
     batch_scans_test, batch_labels_test = test_data[batch_test], test_labels[batch_test]
 
     test_acc, test_loss, test_acc_val = sess.run([sum_test_acc, sum_test_loss, accuracy],
-                                                 {train_data_ph: batch_scans_test, train_labels_ph: batch_labels_test})
+                                                 {train_data_ph: batch_scans_test,
+                                                  train_labels_ph: batch_labels_test, phase: 0})
 
     epochs_val.append(global_step)
     losses.append(train_acc)

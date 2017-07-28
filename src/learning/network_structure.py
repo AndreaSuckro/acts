@@ -10,6 +10,7 @@ def network_model(data, labels, *, patch_size=[50, 50, 10]):
     :param patch_size: the patch_size of th lung scan
     :return: the loss of the network
     """
+    phase = tf.placeholder(tf.bool, name='phase')
     input_layer = tf.reshape(data, [-1, patch_size[0], patch_size[1], patch_size[2], 1])
 
     #########################################################
@@ -21,7 +22,9 @@ def network_model(data, labels, *, patch_size=[50, 50, 10]):
         kernel_size=[5, 5, 3],
         padding="same",
         name="conv1")
-    pool1 = tf.layers.max_pooling3d(inputs=conv1, pool_size=[2, 2, 2],
+    bn1 = tf.layers.batch_normalization(conv1, center=True, scale=True,
+                                        training=phase)
+    pool1 = tf.layers.max_pooling3d(inputs=bn1, pool_size=[2, 2, 2],
                                     strides=1, name='pool1')
 
     filter_num2 = 50
@@ -32,7 +35,9 @@ def network_model(data, labels, *, patch_size=[50, 50, 10]):
         kernel_size=[5, 5, 3],
         padding="same",
         name="conv2")
-    pool2 = tf.layers.max_pooling3d(inputs=conv2, pool_size=[3, 3, 2],
+    bn2 = tf.layers.batch_normalization(conv2, center=True, scale=True,
+                                        training=phase)
+    pool2 = tf.layers.max_pooling3d(inputs=bn2, pool_size=[3, 3, 2],
                                     strides=1, name="pool2")
 
     filter_num3 = 20
@@ -43,7 +48,9 @@ def network_model(data, labels, *, patch_size=[50, 50, 10]):
         kernel_size=[15, 15, 3],
         padding="same",
         name="conv3")
-    pool3 = tf.layers.max_pooling3d(inputs=conv3, pool_size=[10, 10, 8],
+    bn3 = tf.layers.batch_normalization(conv3, center=True, scale=True,
+                                        training=phase)
+    pool3 = tf.layers.max_pooling3d(inputs=bn3, pool_size=[10, 10, 8],
                                     strides=2, name="pool3")
 
     pool3_flat = tf.contrib.layers.flatten(pool3)
@@ -52,7 +59,9 @@ def network_model(data, labels, *, patch_size=[50, 50, 10]):
     # Fully connected Layer with dropout
     dense1 = tf.layers.dense(inputs=pool3_flat, units=50,
                              activation=tf.nn.relu, name="dense1")
-    dropout1 = tf.layers.dropout(inputs=dense1, rate=0.4, name="dropout")
+    bnd1 = tf.layers.batch_normalization(dense1, center=True, scale=True,
+                                         training=phase)
+    dropout1 = tf.layers.dropout(inputs=bnd1, rate=0.4, name="dropout")
 
     nodule_class = tf.layers.dense(inputs=dropout1, units=2, name="class")
     onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=2)
@@ -72,4 +81,4 @@ def network_model(data, labels, *, patch_size=[50, 50, 10]):
     sum_test_acc = tf.summary.scalar("test/acc", accuracy)
 
     return total_loss, optimizer, onehot_labels, nodule_class, accuracy, sum_train_loss, sum_test_loss, \
-           sum_train_acc, sum_test_acc
+           sum_train_acc, sum_test_acc, phase
