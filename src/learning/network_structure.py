@@ -72,7 +72,10 @@ def network_model(data, labels, *, patch_size=[50, 50, 10]):
     sum_train_loss = tf.summary.scalar("train/loss", total_loss)
     sum_test_loss = tf.summary.scalar("test/loss", total_loss)
 
-    optimizer = tf.train.AdamOptimizer().minimize(total_loss)
+    # for the moving mean if the batch norm
+    update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+    with tf.control_dependencies(update_ops):
+        optimizer = tf.train.AdamOptimizer().minimize(total_loss)
 
     # Accuracy
     correct_prediction = tf.equal(tf.argmax(onehot_labels, 1), tf.argmax(nodule_class, 1))
