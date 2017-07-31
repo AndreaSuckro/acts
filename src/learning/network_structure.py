@@ -24,7 +24,8 @@ def network_model(data, labels, *, patch_size=[50, 50, 10]):
         name="conv1")
     bn1 = tf.layers.batch_normalization(conv1, center=True, scale=True,
                                         training=phase)
-    pool1 = tf.layers.max_pooling3d(inputs=bn1, pool_size=[2, 2, 2],
+    dpo1 = tf.layers.dropout(inputs=bn1, rate=0.01, name="dropout1")
+    pool1 = tf.layers.max_pooling3d(inputs=dpo1, pool_size=[2, 2, 2],
                                     strides=1, name='pool1')
 
     filter_num2 = 50
@@ -37,7 +38,8 @@ def network_model(data, labels, *, patch_size=[50, 50, 10]):
         name="conv2")
     bn2 = tf.layers.batch_normalization(conv2, center=True, scale=True,
                                         training=phase)
-    pool2 = tf.layers.max_pooling3d(inputs=bn2, pool_size=[3, 3, 2],
+    dpo2 = tf.layers.dropout(inputs=bn2, rate=0.01, name="dropout2")
+    pool2 = tf.layers.max_pooling3d(inputs=dpo2, pool_size=[3, 3, 2],
                                     strides=1, name="pool2")
 
     filter_num3 = 20
@@ -50,7 +52,8 @@ def network_model(data, labels, *, patch_size=[50, 50, 10]):
         name="conv3")
     bn3 = tf.layers.batch_normalization(conv3, center=True, scale=True,
                                         training=phase)
-    pool3 = tf.layers.max_pooling3d(inputs=bn3, pool_size=[10, 10, 8],
+    dpo3 = tf.layers.dropout(inputs=bn3, rate=0.01, name="dropout3")
+    pool3 = tf.layers.max_pooling3d(inputs=dpo3, pool_size=[10, 10, 8],
                                     strides=2, name="pool3")
 
     pool3_flat = tf.contrib.layers.flatten(pool3)
@@ -66,13 +69,14 @@ def network_model(data, labels, *, patch_size=[50, 50, 10]):
     nodule_class = tf.layers.dense(inputs=dropout1, units=2, name="class")
     onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=2)
 
-    # Training labels and loss
+    #########################################################
+    # Optimizer and Accuracy
     total_loss = tf.losses.softmax_cross_entropy(onehot_labels=onehot_labels,
                                                  logits=nodule_class)
     sum_train_loss = tf.summary.scalar("train/loss", total_loss)
     sum_test_loss = tf.summary.scalar("test/loss", total_loss)
 
-    # for the moving mean if the batch norm
+    # for the moving mean of the batch norm
     update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
     with tf.control_dependencies(update_ops):
         optimizer = tf.train.AdamOptimizer().minimize(total_loss)
