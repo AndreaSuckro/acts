@@ -1,5 +1,5 @@
 from preprocessing.data import get_data_patient, get_data
-from visualization.data_visualizer import plot_patient, DataVisualizer, plot_histogram
+from tools.data_visualizer import plot_patient, DataVisualizer, plot_histogram
 from optparse import OptionParser
 from matplotlib import pyplot as plt
 import os

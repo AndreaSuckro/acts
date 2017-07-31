@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 import logging
 from datetime import datetime
-from visualization.log import log_args
+from tools.log import log_args
 import os
 
 from learning.network_structure import network_model

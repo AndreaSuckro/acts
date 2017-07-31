@@ -40,3 +40,8 @@ plot: src/show.py src/visualization/data_visualizer.py data/processed/train
 .PHONY: tb
 tb:
 	tensorboard --logdir=../logs/ --port 6006
+
+# check patient number
+.PHONY: check
+check: data/raw
+	python3 src/tools/patient_numcheck.py

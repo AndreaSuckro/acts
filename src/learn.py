@@ -1,5 +1,5 @@
 from preprocessing.data import get_train_data, get_validation_data
-from visualization.data_visualizer import DataVisualizer
+from tools.data_visualizer import DataVisualizer
 from learning.network import train_network
 from optparse import OptionParser
 import logging.config
