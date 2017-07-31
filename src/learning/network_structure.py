@@ -74,7 +74,7 @@ def network_model(data, labels, *, patch_size=[50, 50, 10]):
     total_loss = tf.losses.softmax_cross_entropy(onehot_labels=onehot_labels,
                                                  logits=nodule_class)
     sum_train_loss = tf.summary.scalar("train/loss", total_loss)
-    sum_test_loss = tf.summary.scalar("test/loss", total_loss)
+    sum_test_loss = tf.summary.scalar("validation/loss", total_loss)
 
     # for the moving mean of the batch norm
     update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
@@ -85,7 +85,7 @@ def network_model(data, labels, *, patch_size=[50, 50, 10]):
     correct_prediction = tf.equal(tf.argmax(onehot_labels, 1), tf.argmax(nodule_class, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     sum_train_acc = tf.summary.scalar("train/acc", accuracy)
-    sum_test_acc = tf.summary.scalar("test/acc", accuracy)
+    sum_test_acc = tf.summary.scalar("validation/acc", accuracy)
 
     return total_loss, optimizer, onehot_labels, nodule_class, accuracy, sum_train_loss, sum_test_loss, \
            sum_train_acc, sum_test_acc, phase

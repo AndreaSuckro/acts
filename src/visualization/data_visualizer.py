@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib import image
 import preprocessing.create_samples as data
-from preprocessing.data import get_train_data, get_test_data
+from preprocessing.data import get_train_data, get_validation_data
 from cvloop import cvloop
 import time
 import numpy as np
@@ -138,26 +138,26 @@ def plot_patient(path):
 
 def plot_histogram(data_dir):
     """
-    Plots the data distribution of test and training.
+    Plots the data distribution of validation and training.
     
     :param data_dir: the data directory
     :return: a plot for the data distribution
     """
     train_data_raw, train_labels_raw = get_train_data(data_dir, patch_number=1000)
     train_data_raw = np.array(train_data_raw)
-    test_data_raw, test_labels_raw = get_test_data(data_dir, patch_number=1000)
-    test_data_raw = np.array(test_data_raw)
+    validation_data_raw, validation_labels_raw = get_validation_data(data_dir, patch_number=1000)
+    validation_data_raw = np.array(validation_data_raw)
 
     train_nodule_idxs = [i for i, x in enumerate(train_labels_raw) if x == 1]
     train_health_idxs = [i for i, x in enumerate(train_labels_raw) if x == 0]
 
-    test_nodule_idxs = [i for i, x in enumerate(test_labels_raw) if x == 1]
-    test_health_idxs = [i for i, x in enumerate(test_labels_raw) if x == 0]
+    validation_nodule_idxs = [i for i, x in enumerate(validation_labels_raw) if x == 1]
+    validation_health_idxs = [i for i, x in enumerate(validation_labels_raw) if x == 0]
 
     train_nodules = np.array(train_data_raw[train_nodule_idxs].flatten())
     train_health = np.array(train_data_raw[train_health_idxs].flatten())
-    test_nodules = np.array(test_data_raw[test_nodule_idxs].flatten())
-    test_health = np.array(test_data_raw[test_health_idxs].flatten())
+    validation_nodules = np.array(validation_data_raw[validation_nodule_idxs].flatten())
+    validation_health = np.array(validation_data_raw[validation_health_idxs].flatten())
 
     f, axarr = plt.subplots(2, 2)
     axarr = axarr.ravel()
@@ -170,11 +170,11 @@ def plot_histogram(data_dir):
     axarr[2].set_ylabel("Nodule")
     axarr[2].get_yaxis().set_ticks([])
 
-    axarr[1].hist(test_health, bins=30)
-    axarr[1].set_title("Test")
+    axarr[1].hist(validation_health, bins=30)
+    axarr[1].set_title("Validation")
     axarr[1].get_yaxis().set_ticks([])
 
-    axarr[3].hist(test_nodules, bins=30)
+    axarr[3].hist(validation_nodules, bins=30)
     axarr[3].get_yaxis().set_ticks([])
 
 

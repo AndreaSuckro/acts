@@ -18,8 +18,8 @@ def get_data(data_dir, folder, *, patch_number=100, tumor_rate=0.5):
     """
     if folder is 'train':
         return get_train_data(data_dir, patch_number=patch_number, tumor_rate=tumor_rate)
-    elif folder is 'test':
-        return get_test_data(data_dir, patch_number=patch_number, tumor_rate=tumor_rate)
+    elif folder is 'validation':
+        return get_validation_data(data_dir, patch_number=patch_number, tumor_rate=tumor_rate)
 
 
 def get_train_data(data_dir, *, patch_number=100, tumor_rate=0.5):
@@ -36,7 +36,7 @@ def get_train_data(data_dir, *, patch_number=100, tumor_rate=0.5):
                        tumor_rate=tumor_rate)
 
 
-def get_test_data(data_dir, *, patch_number=100, tumor_rate=0.5):
+def get_validation_data(data_dir, *, patch_number=100, tumor_rate=0.5):
     """
     Returns all data under the test directory.
 
@@ -45,7 +45,7 @@ def get_test_data(data_dir, *, patch_number=100, tumor_rate=0.5):
     :param tumor_rate: the fraction of tumors that should be contained in the patches
     :return: data with nodules and without
     """
-    return get_patches(os.path.join(data_dir, 'processed', 'test'),
+    return get_patches(os.path.join(data_dir, 'processed', 'validation'),
                        patch_number=patch_number,
                        tumor_rate=tumor_rate)
 

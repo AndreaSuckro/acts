@@ -1,4 +1,4 @@
-from preprocessing.data import get_train_data, get_test_data
+from preprocessing.data import get_train_data, get_validation_data
 from visualization.data_visualizer import DataVisualizer
 from learning.network import train_network
 from optparse import OptionParser
@@ -46,21 +46,21 @@ if __name__ == "__main__":
 
     logger.info('Reading in the Lung CT data')
     train_data_raw, train_labels_raw = get_train_data(option.data_dir, patch_number=3000)
-    test_data_raw, test_labels_raw = get_test_data(option.data_dir, patch_number=1000)
+    validation_data_raw, validation_labels_raw = get_validation_data(option.data_dir, patch_number=1000)
     logger.info('Finished reading data')
 
     train_data_raw = np.asarray(train_data_raw)
     train_labels_raw = np.asarray(train_labels_raw)
 
-    test_data_raw = np.asarray(test_data_raw)
-    test_labels_raw = np.asarray(test_labels_raw)
+    validation_data_raw = np.asarray(validation_data_raw)
+    validation_labels_raw = np.asarray(validation_labels_raw)
 
     if option.plot_samp:
         DataVisualizer(train_data_raw, train_labels_raw)
 
     logger.info('Start training of the network')
     epochs_val, losses = train_network(train_data_raw, train_labels_raw,
-                                       test_data_raw, test_labels_raw,
+                                       validation_data_raw, validation_labels_raw,
                                        batch_size=option.batchsize,
                                        epochs=option.epochs,
                                        save_level=option.save_level,
