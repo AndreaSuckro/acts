@@ -1,6 +1,33 @@
 import tensorflow as tf
 
 
+def conv3d_layer(scope, input, phase, *, num_filters=20, kernel_size=[5, 5, 3], pool_size=[2, 2, 2], pool_stride=1):
+    """
+    Creates a 3d convolutional layer with batchnorm and dropout followed by pooling.
+    
+    :param scope: the scope for this layer
+    :param input: the input tensor to this layer
+    :param phase: either test or train
+    :param num_filters: number of filter kernels to be used
+    :param kernel_size: the size of the filter kernels
+    :param pool_size: the pooling size
+    :param pool_stride: the stride of the pooling kernel
+    :return: the activation of the layer
+    """
+    with tf.variable_scope(scope):
+        conv = tf.layers.conv3d(inputs=input,
+                                filters=num_filters,
+                                kernel_size=kernel_size,
+                                padding="same",
+                                name="conv")
+        bn = tf.layers.batch_normalization(conv, center=True, scale=True,
+                                           training=phase)
+        dropout = tf.layers.dropout(inputs=bn, rate=0.01, name="dropout1")
+        pool = tf.layers.max_pooling3d(inputs=dropout, pool_size=pool_size,
+                                       strides=pool_stride, name='pool1')
+    return pool
+
+
 def network_model(data, labels, *, patch_size=[50, 50, 10]):
     """
     The graph for the tensorflow model that is currently used.
@@ -14,49 +41,18 @@ def network_model(data, labels, *, patch_size=[50, 50, 10]):
     input_layer = tf.reshape(data, [-1, patch_size[0], patch_size[1], patch_size[2], 1])
 
     #########################################################
-    # Convolutional layers with pooling
-    filter_num1 = 25
-    conv1 = tf.layers.conv3d(
-        inputs=input_layer,
-        filters=filter_num1,
-        kernel_size=[5, 5, 3],
-        padding="same",
-        name="conv1")
-    bn1 = tf.layers.batch_normalization(conv1, center=True, scale=True,
-                                        training=phase)
-    dpo1 = tf.layers.dropout(inputs=bn1, rate=0.01, name="dropout1")
-    pool1 = tf.layers.max_pooling3d(inputs=dpo1, pool_size=[2, 2, 2],
-                                    strides=1, name='pool1')
+    # Convolutional layers
 
-    filter_num2 = 50
+    conv1 = conv3d_layer('conv1', input_layer, phase, num_filters=25,
+                         kernel_size=[5, 5, 3], pool_size=[2, 2, 2], pool_stride=1)
 
-    conv2 = tf.layers.conv3d(
-        inputs=pool1,
-        filters=filter_num2,
-        kernel_size=[5, 5, 3],
-        padding="same",
-        name="conv2")
-    bn2 = tf.layers.batch_normalization(conv2, center=True, scale=True,
-                                        training=phase)
-    dpo2 = tf.layers.dropout(inputs=bn2, rate=0.01, name="dropout2")
-    pool2 = tf.layers.max_pooling3d(inputs=dpo2, pool_size=[3, 3, 2],
-                                    strides=1, name="pool2")
+    conv2 = conv3d_layer('conv2', conv1, phase, num_filters=50,
+                         kernel_size=[5, 5, 3], pool_size=[3, 3, 2], pool_stride=1)
 
-    filter_num3 = 20
+    conv3 = conv3d_layer('conv3', conv2, phase, num_filters=20,
+                         kernel_size=[15, 15, 3], pool_size=[10, 10, 8], pool_stride=2)
 
-    conv3 = tf.layers.conv3d(
-        inputs=pool2,
-        filters=filter_num3,
-        kernel_size=[15, 15, 3],
-        padding="same",
-        name="conv3")
-    bn3 = tf.layers.batch_normalization(conv3, center=True, scale=True,
-                                        training=phase)
-    dpo3 = tf.layers.dropout(inputs=bn3, rate=0.01, name="dropout3")
-    pool3 = tf.layers.max_pooling3d(inputs=dpo3, pool_size=[10, 10, 8],
-                                    strides=2, name="pool3")
-
-    pool3_flat = tf.contrib.layers.flatten(pool3)
+    pool3_flat = tf.contrib.layers.flatten(conv3)
 
     #########################################################
     # Fully connected Layer with dropout
