@@ -45,3 +45,8 @@ tb:
 .PHONY: check
 check: data/raw
 	python3 src/tools/patient_numcheck.py
+
+# split patient data
+.PHONY: split
+split: data/raw
+	python3 src/tools/split_data.py

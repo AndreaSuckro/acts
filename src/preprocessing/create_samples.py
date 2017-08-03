@@ -38,7 +38,7 @@ def process_data(data_dir, *, target='all', patch_number=100, patch_size=PATCH_S
     if target == 'all':  # if all data should be preprocessed just call the method again
         process_data(data_dir, target='train', patch_number=patch_number, patch_size=patch_size, tumor_rate=tumor_rate)
         process_data(data_dir, target='test', patch_number=patch_number, patch_size=patch_size, tumor_rate=tumor_rate)
-        process_data(data_dir, target='validate', patch_number=patch_number, patch_size=patch_size, tumor_rate=tumor_rate)
+        process_data(data_dir, target='validation', patch_number=patch_number, patch_size=patch_size, tumor_rate=tumor_rate)
 
     else:
         if os.path.isdir(os.path.join(data_dir, 'processed', target)):
