@@ -4,7 +4,7 @@ import tensorflow as tf
 def conv3d_layer(scope, input, phase, *, num_filters=20, kernel_size=[5, 5, 3], pool_size=[2, 2, 2], pool_stride=1):
     """
     Creates a 3d convolutional layer with batchnorm and dropout followed by pooling.
-    
+
     :param scope: the scope for this layer
     :param input: the input tensor to this layer
     :param phase: either test or train
@@ -14,7 +14,7 @@ def conv3d_layer(scope, input, phase, *, num_filters=20, kernel_size=[5, 5, 3], 
     :param pool_stride: the stride of the pooling kernel
     :return: the activation of the layer
     """
-    with tf.variable_scope(scope):
+    with tf.variable_scope(scope) as scope:
         conv = tf.layers.conv3d(inputs=input,
                                 filters=num_filters,
                                 kernel_size=kernel_size,
@@ -82,6 +82,9 @@ def network_model(data, labels, *, patch_size=[50, 50, 10]):
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     sum_train_acc = tf.summary.scalar("train/acc", accuracy)
     sum_test_acc = tf.summary.scalar("validation/acc", accuracy)
+
+    all_vars = tf.trainable_variables()
+    tf.contrib.layers.summarize_tensors(all_vars)
 
     return total_loss, optimizer, onehot_labels, nodule_class, accuracy, sum_train_loss, sum_test_loss, \
            sum_train_acc, sum_test_acc, phase
