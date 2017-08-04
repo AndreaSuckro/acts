@@ -1,6 +1,10 @@
 # Training Parameters
 JOB_ID ?= local
 
+# configure project
+#.PHONY: configure
+#configure:
+
 # install dependencies for the project with pip
 .PHONY: install
 install: src/requirements.txt
@@ -48,5 +52,5 @@ check: data/raw
 
 # split patient data
 .PHONY: split
-split: data/raw
+split:
 	python3 src/tools/split_data.py
