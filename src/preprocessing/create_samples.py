@@ -8,6 +8,7 @@ import logging.config
 import shutil
 import argparse
 import sys
+from tools.helper import convert_to_float, convert_to_floats
 
 PATCH_SIZE_DEFAULT = [20, 20, 5]
 
@@ -99,14 +100,12 @@ def get_data(path, *, patch_number=100, patch_size=PATCH_SIZE_DEFAULT, tumor_rat
     for dirName in os.listdir(path):
         folder = os.path.join(path, dirName)
         if os.path.isdir(folder):
-            scans = read_patient(folder)
             try:
-                annots = read_annotation(folder, scans)
+                scans = read_patient(folder)
+                annots = convert_to_floats(read_annotation(folder, scans))
                 array_patient = conv2array(scans)
 
-                if annots is None or len(annots) == 0:
-                    raise AttributeError('Annotations contain no Nodules')
-
+                logger.info('Start slicing patient %s', dirName)
                 data_nod, data_health = slice_patient(array_patient,
                                                       annots,
                                                       patch_size=patch_size,
@@ -134,12 +133,18 @@ def read_patient(path):
     :param path: the path to the patient directory
     :return: all scans of this patient in the anatomic order
     """
+    logger = logging.getLogger()
     all_scans = []
     for dirName, subdirList, fileList in os.walk(path):
         if len(fileList) > 20:  # there are smaller folders that can not be used since they lack the annotations
             for filename in fileList:
                 if ".dcm" in filename.lower():
                     all_scans.append(dicom.read_file(os.path.join(dirName, filename)))
+
+    if len(all_scans) == 0:
+        logger.error('No scan files were read in folder %s', path)
+        raise AttributeError('No scanfiles could be read')
+
     all_scans.sort(key=lambda x: int(x.InstanceNumber))
     return all_scans
 
@@ -152,14 +157,18 @@ def read_annotation(path, scan_files):
     :param scan_files: the already read in slice data
     :return: a list of all nodule locations in x y z locations
     """
+    logger = logging.getLogger()
 
     nodule_locations = []
-
     ref_scan_1 = scan_files[0]
     ref_scan_2 = scan_files[1]
 
-    slice_begin = float(ref_scan_1.ImagePositionPatient[2])
-    slice_distance = np.abs(float(ref_scan_2.ImagePositionPatient[2]) - float(ref_scan_1.ImagePositionPatient[2]))
+    slice_begin = convert_to_float(ref_scan_1.ImagePositionPatient[2])
+    ref2 = ref_scan_2.ImagePositionPatient[2]
+    ref1 = ref_scan_1.ImagePositionPatient[2]
+    slice_distance = np.abs(convert_to_float(ref2) - convert_to_float(ref1))
+
+    logger.info('Slice distance is: %0.2f', slice_distance)
 
     for dirName, subdirList, fileList in os.walk(path):
         for filename in fileList:
@@ -178,14 +187,14 @@ def read_annotation(path, scan_files):
 
             for roi in nodule.findall(domain + 'roi'):
                 roiCount = roiCount + 1
-                zPos_tmp = float(roi.find(domain + 'imageZposition').text)
-                ztransformed = np.abs(float(zPos_tmp) - slice_begin) // slice_distance
+                zPos_tmp = convert_to_float(roi.find(domain + 'imageZposition').text)
+                ztransformed = np.abs(convert_to_float(zPos_tmp) - slice_begin) // slice_distance
                 zPosAll = zPosAll + ztransformed
 
                 for edgeMap in roi.findall(domain + 'edgeMap'):
                     mapCount = mapCount + 1
-                    xPosAll = xPosAll + float(edgeMap.find(domain + 'xCoord').text)
-                    yPosAll = yPosAll + float(edgeMap.find(domain + 'yCoord').text)
+                    xPosAll = xPosAll + convert_to_float(edgeMap.find(domain + 'xCoord').text)
+                    yPosAll = yPosAll + convert_to_float(edgeMap.find(domain + 'yCoord').text)
 
             xPos = xPosAll/mapCount
             yPos = yPosAll/mapCount
@@ -221,7 +230,7 @@ def slice_patient(all_scans, annotation, patch_size=PATCH_SIZE_DEFAULT, number_o
     tumor containing patches.
 
     :param all_scans: a complete CT-Scan of a patient
-    :param annotation: the annotation data for this patient
+    :param annotation: the annotation data for this patient as a list of floats
     :param patch_size: the size of the cubes in [x,y,z] format
     :param number_of_patches: the number of cubes to be cut
     :param tumor_rate: the amount of tumorous patches
@@ -234,22 +243,28 @@ def slice_patient(all_scans, annotation, patch_size=PATCH_SIZE_DEFAULT, number_o
 
     for i in range(int(number_of_patches*tumor_rate)):
         # pick a random tumor
-        tumor = random.choice(annotation)
-
-        while(int(tumor[0] - patch_size[0]) < 0
+        tumor = [int(x) for x in random.choice(annotation)]
+        i = 0
+        while((int(tumor[0] - patch_size[0]) < 0
               or int(tumor[0] + patch_size[0]) > all_scans.shape[0]
               or int(tumor[1] - patch_size[1]) < 0
               or int(tumor[1] + patch_size[1]) > all_scans.shape[1]
               or int(tumor[2] - patch_size[2]) < 0
-              or int(tumor[2] + patch_size[2]) > all_scans.shape[2]
+              or int(tumor[2] + patch_size[2]) > all_scans.shape[2])
+              and i < 100
               ):
-            tumor = random.choice(annotation)  # take another annotation and hope for the best
+            i = i + 1
+            tumor = [int(x) for x in random.choice(annotation)]  # take another annotation and hope for the best
 
-        
+        if i > 100:
+            logger.error(f'Could not find a matching patch in {i} tries, aborting ...')
+            raise AttributeError('Nodules do not fit!')
+
         # use random start point around nodule
-        start_point = [random.randint(tumor[0] - patch_size[0], tumor[0]),
-                       random.randint(tumor[1] - patch_size[1], tumor[1]),
-                       random.randint(tumor[2] - patch_size[2], tumor[2])]
+        x = random.randint(tumor[0] - patch_size[0], tumor[0])
+        y = random.randint(tumor[1] - patch_size[1], tumor[1])
+        z = random.randint(tumor[2] - patch_size[2], tumor[2])
+        start_point = [x,y,z]
 
         # center nodule
         #start_point = [int(tumor[0] - patch_size[0]//2),
@@ -280,47 +295,3 @@ def slice_patient(all_scans, annotation, patch_size=PATCH_SIZE_DEFAULT, number_o
         healthy_patches.append(patch)
 
     return [nodule_patches, healthy_patches]
-
-
-def main(data_dir=None, target='all', patch_number=100, patch_size=PATCH_SIZE_DEFAULT, tumor_rate=0.5, show_case=False):
-    """
-    Processes the data and shows a sample if needed. See the documentation of process_data() for more information
-    on the parameters.
-    """
-    process_data(data_dir, target=target, patch_number=patch_number, patch_size=patch_size, tumor_rate=tumor_rate)
-
-
-def parse_args():
-    """
-    Parses the arguments for the main call of this function.
-    :return: a dictionary of arguments
-    """
-    parser = argparse.ArgumentParser(description='Data processing for the lung CTs of patients.')
-    parser.add_argument('-d', '--data', dest='data_dir', help='Path to the data directory, this is required')
-    parser.add_argument('-p', '--patch_num', dest='patch_number',
-                        default=100, type=int, help='Number of patches to be loaded per patient')
-    parser.add_argument('-t', '--target', dest='target',
-                        default='all', help='Choose whether all, train, test or validation should be used')
-    parser.add_argument('-s', '--patch_size', dest='patch_size',
-                        default=PATCH_SIZE_DEFAULT, type=list, help='Size of the patches to be generated in [x,y,z]')
-    parser.add_argument('-r', '--tumor_rate', dest='tumor_rate',
-                        default=0.5, type=float, help='The fraction of the tumorous patches to be generated')
-    parser.add_argument('-f', '--plot_figure', dest='show_case',
-                        default=False, type=bool, help='True when a sample should be plotted')
-    args = parser.parse_args()
-
-    if not args.data_dir:
-        sys.exit(parser.print_help())
-
-    return vars(args)
-
-
-if __name__ == '__main__':
-    """
-    Just calls the main method with the parameters defined over the commandline interface.
-    """
-    # initialize logging
-    logging.config.fileConfig(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'logging.ini'))
-
-    logger = logging.getLogger()
-    main(**parse_args())

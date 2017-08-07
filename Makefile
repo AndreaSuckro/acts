@@ -23,7 +23,7 @@ doc-pres: doc/presentation/overview.md
 # preprocess data
 .PHONY: preprocess
 preprocess: src/preprocessing/
-	JOB_ID=$JOB_ID python3 src/preprocessing/create_samples.py $(ARGS)
+	JOB_ID=$JOB_ID python3 src/preproc.py $(ARGS)
 
 # learn network data
 .PHONY: learn
@@ -37,7 +37,7 @@ test: src/learn.py data/processed/train data/processed/test
 
 # plot sample data
 .PHONY: plot
-plot: src/show.py src/visualization/data_visualizer.py data/processed/train
+plot:
 	python3 src/show.py $(ARGS)
 
 # open tensorboard
