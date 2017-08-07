@@ -10,7 +10,7 @@ from learning.network_structure import network_model
 
 @log_args
 def train_network(train_data, train_labels, validation_data, validation_labels, *, batch_size=5, epochs=1000,
-                  patch_size=[50, 50, 10], save_level=100, net_save_path='../logs/acts_network.tf'):
+                  patch_size=[20, 20, 5], save_level=100, net_save_path='../logs/acts_network.tf'):
     """
     Trains the network with the given batchsize and for a certain amount of epochs.
 

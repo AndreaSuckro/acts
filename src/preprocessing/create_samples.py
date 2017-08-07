@@ -9,7 +9,7 @@ import shutil
 import argparse
 import sys
 
-PATCH_SIZE_DEFAULT = [50, 50, 10]
+PATCH_SIZE_DEFAULT = [20, 20, 5]
 
 
 def normalize(a):
@@ -236,25 +236,25 @@ def slice_patient(all_scans, annotation, patch_size=PATCH_SIZE_DEFAULT, number_o
         # pick a random tumor
         tumor = random.choice(annotation)
 
-        while(int(tumor[0] - patch_size[0] // 2) < 0
-              or int(tumor[0] + patch_size[0] // 2) > all_scans.shape[0]
-              or int(tumor[1] - patch_size[1] // 2) < 0
-              or int(tumor[1] + patch_size[1] // 2) > all_scans.shape[1]
-              or int(tumor[2] - patch_size[2] // 2) < 0
-              or int(tumor[2] + patch_size[2] // 2) > all_scans.shape[2]
+        while(int(tumor[0] - patch_size[0]) < 0
+              or int(tumor[0] + patch_size[0]) > all_scans.shape[0]
+              or int(tumor[1] - patch_size[1]) < 0
+              or int(tumor[1] + patch_size[1]) > all_scans.shape[1]
+              or int(tumor[2] - patch_size[2]) < 0
+              or int(tumor[2] + patch_size[2]) > all_scans.shape[2]
               ):
             tumor = random.choice(annotation)  # take another annotation and hope for the best
 
-
+        
         # use random start point around nodule
-        #start_point = [random.randint(tumor[0] - patch_size[0], tumor[0]),
-        #               random.randint(tumor[1] - patch_size[1], tumor[1]),
-        #               random.randint(tumor[2] - patch_size[2], tumor[2])]
+        start_point = [random.randint(tumor[0] - patch_size[0], tumor[0]),
+                       random.randint(tumor[1] - patch_size[1], tumor[1]),
+                       random.randint(tumor[2] - patch_size[2], tumor[2])]
 
         # center nodule
-        start_point = [int(tumor[0] - patch_size[0]//2),
-                       int(tumor[1] - patch_size[1]//2),
-                       int(tumor[2] - patch_size[2]//2)]
+        #start_point = [int(tumor[0] - patch_size[0]//2),
+        #               int(tumor[1] - patch_size[1]//2),
+        #               int(tumor[2] - patch_size[2]//2)]
 
         nodule_patches.append(all_scans[start_point[0]:start_point[0] + patch_size[0],
                                         start_point[1]:start_point[1] + patch_size[1],
