@@ -45,10 +45,7 @@ def process_data(data_dir, *, target='all', patch_number=100, patch_size=PATCH_S
         if os.path.isdir(os.path.join(data_dir, 'processed', target)):
             shutil.rmtree(os.path.join(data_dir, 'processed', target))
 
-        nodules, health, patient_info_health, patient_info_nodule = proc_data(data_dir, target,
-                                                                              patch_number=patch_number,
-                                                                              patch_size=patch_size,
-                                                                              tumor_rate=tumor_rate)
+        proc_data(data_dir, target, patch_number=patch_number, patch_size=patch_size, tumor_rate=tumor_rate)
 
 
 def save_data(nodules, health, dir_path, patient_info_health, patient_info_nodule):
@@ -165,8 +162,6 @@ def read_annotation(path, scan_files):
     ref2 = ref_scan_2.ImagePositionPatient[2]
     ref1 = ref_scan_1.ImagePositionPatient[2]
     slice_distance = np.abs(convert_to_float(ref2) - convert_to_float(ref1))
-
-    logger.info('Slice distance is: %0.2f', slice_distance)
 
     for dirName, subdirList, fileList in os.walk(path):
         for filename in fileList:
