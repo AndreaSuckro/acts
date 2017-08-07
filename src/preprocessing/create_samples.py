@@ -45,12 +45,10 @@ def process_data(data_dir, *, target='all', patch_number=100, patch_size=PATCH_S
         if os.path.isdir(os.path.join(data_dir, 'processed', target)):
             shutil.rmtree(os.path.join(data_dir, 'processed', target))
 
-        nodules, health, patient_info_health, patient_info_nodule = get_data(os.path.join(data_dir, 'raw', target),
-                                                                             patch_number=patch_number,
-                                                                             patch_size=patch_size,
-                                                                             tumor_rate=tumor_rate)
-
-        save_data(nodules, health, os.path.join(data_dir, 'processed', target), patient_info_health, patient_info_nodule)
+        nodules, health, patient_info_health, patient_info_nodule = proc_data(data_dir, target,
+                                                                              patch_number=patch_number,
+                                                                              patch_size=patch_size,
+                                                                              tumor_rate=tumor_rate)
 
 
 def save_data(nodules, health, dir_path, patient_info_health, patient_info_nodule):
@@ -60,9 +58,12 @@ def save_data(nodules, health, dir_path, patient_info_health, patient_info_nodul
     :param nodules: the list of nodule patches
     :param health: the list of healthy patches
     :param dir_path: the target directory for the saved numpy arrays
-    :param patient_info: number of the patient for each sample
+    :param patient_info_health: a list with the patient number n times for each data point
+    :param patient_info_nodule: a list with the patient number n times for each data point
     :return:
     """
+    logger = logging.getLogger()
+    logger.info('Saving patches for patient %s', patient_info_health[0])
 
     nod_path = os.path.join(dir_path, 'nodules')
     health_path = os.path.join(dir_path, 'health')
@@ -77,7 +78,7 @@ def save_data(nodules, health, dir_path, patient_info_health, patient_info_nodul
         np.save(os.path.join(health_path, patient_info_health[i]+'_'+str(i)), health_patch)
 
 
-def get_data(path, *, patch_number=100, patch_size=PATCH_SIZE_DEFAULT, tumor_rate=0.5):
+def proc_data(data_dir, target, *, patch_number=100, patch_size=PATCH_SIZE_DEFAULT, tumor_rate=0.5):
     """
     Reads all CT-Scans from a folder with several patients in it.
 
@@ -89,12 +90,11 @@ def get_data(path, *, patch_number=100, patch_size=PATCH_SIZE_DEFAULT, tumor_rat
     """
     logger = logging.getLogger()
 
+    path = os.path.join(data_dir, 'raw', target)
+    path_result = os.path.join(data_dir, 'processed', target)
+
     logger.info('Start reading the data from %s', path)
 
-    data_nod_all = []
-    data_health_all = []
-    pat_info_health = []
-    pat_info_nodule = []
     count = 0
     start_time = time.time()
     for dirName in os.listdir(path):
@@ -111,19 +111,17 @@ def get_data(path, *, patch_number=100, patch_size=PATCH_SIZE_DEFAULT, tumor_rat
                                                       patch_size=patch_size,
                                                       number_of_patches=patch_number,
                                                       tumor_rate=tumor_rate)
-                data_nod_all += data_nod
-                data_health_all += data_health
-                pat_info_health += [dirName] * len(data_nod)
-                pat_info_nodule += [dirName] * len(data_health)
+
+                pat_info_health = [dirName] * len(data_nod)
+                pat_info_nodule = [dirName] * len(data_health)
                 count += 1
+                save_data(data_nod, data_health, path_result, pat_info_health, pat_info_nodule)
             except AttributeError as e:
                 # ignore secondary folders for one patient
                 logger.error('Something went wrong with reading files from folder %s: %s', folder, e)
                 continue
 
     logger.info('Read ct scan data from %s patients in %d seconds.', count, time.time() - start_time)
-
-    return data_nod_all, data_health_all, pat_info_health, pat_info_nodule
 
 
 def read_patient(path):
