@@ -4,6 +4,7 @@ from optparse import OptionParser
 from matplotlib import pyplot as plt
 import os
 import inspect
+import logging.config
 
 
 def plot_raw(*, data_dir='data/raw/train/', patient_num='0023'):
@@ -23,7 +24,7 @@ def plot_samples(*, data_dir='data', patch_num=10, patient_num='0023',
     """
     Plots samples from the dataset. Can be used to get the data for a specific
     patient or to plot samples from a whole dataset.
-    
+
     :param data_dir: the location of the data directory
     :param patch_num: the number of patches to be retrieved
     :param patient_num: can contain a specific patient number
@@ -48,8 +49,8 @@ def plot_network(*, data_dir='data'):
 def plot_distribution(*, data_dir='data'):
     """
     Plotts the value distribution of the training and test data.
-    :param data_dir: where to find the data 
-    :return: 
+    :param data_dir: where to find the data
+    :return:
     """
     plot_histogram(data_dir)
     plt.show()
@@ -92,6 +93,9 @@ def get_vals(dictionary, *keys):
 
 
 if __name__ == "__main__":
+
+    logging.config.fileConfig(os.path.dirname(os.path.realpath(__file__)) + os.path.sep + 'logging.ini')
+
     (option, args) = get_commandline_args()
 
     target = option.target
