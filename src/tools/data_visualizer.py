@@ -139,7 +139,7 @@ def plot_patient(path):
 def plot_histogram(data_dir):
     """
     Plots the data distribution of validation and training.
-    
+
     :param data_dir: the data directory
     :return: a plot for the data distribution
     """

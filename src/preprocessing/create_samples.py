@@ -249,7 +249,7 @@ def slice_patient(all_scans, annotation, patch_size=PATCH_SIZE_DEFAULT, number_o
             i = i + 1
             tumor = [int(x) for x in random.choice(annotation)]  # take another annotation and hope for the best
 
-        if i > 100:
+        if i > 99:
             logger.error(f'Could not find a matching patch in {i} tries, aborting ...')
             raise AttributeError('Nodules do not fit!')
 
@@ -280,6 +280,10 @@ def slice_patient(all_scans, annotation, patch_size=PATCH_SIZE_DEFAULT, number_o
         patch = all_scans[start_point[0]:start_point[0] + patch_size[0],
                           start_point[1]:start_point[1] + patch_size[1],
                           start_point[2]:start_point[2] + patch_size[2]]
+
+        #check patch size
+        if np.array(patch).shape != tuple(patch_size):
+            continue # sometimes it is just not right and python doesn't complain
 
         for anno in annotation:
             if anno in patch:
