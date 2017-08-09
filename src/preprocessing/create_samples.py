@@ -20,7 +20,7 @@ def normalize(a):
     :param a: the matrix to be normalized
     :return: the normalized matrix
     """
-    a += np.abs(np.amin(a))
+    a -= np.amin(a)
     a = a / np.amax(a)
     return a
 
