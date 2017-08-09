@@ -23,7 +23,7 @@ The included cases have between 0 and 6 nodules with a longest diameter between 
 \begin{minipage}[b]{0.7\textwidth}
 	\includegraphics[width=\textwidth]{slice2.png}
 \end{minipage}
-\caption{Two slices from different patients in the dataset. Images have been generated with OsiriX Lite \cite{rosset2004osirix}}
+\caption{Two slices from different patients in the dataset. Images have been generated with OsiriX Lite \cite{rosset2004osirix}. The information in the corner of the picture is extracted from the meta information stored in the DICOM format.}
 \label{fig:slices}
 \end{figure}
 
@@ -80,18 +80,31 @@ Nodules with a smaller diameter have less information stored with them. They onl
 
 \section{Properties of the Data}
 
-The two classes the network should differentiate were healthy patches and patches that contain a tumor. 1000 samples from the two classes 
+The two classes the network should differentiate between healthy patches and patches that contain a tumor. 1000 samples from the two classes 
+
+There are not only patients in the dataset that have `real` tumorous tissue. 
+
+
 
 \section{Preprocessing}
 The data is available in the form of sub-folders for each patient that contain the CT scan results in .dicom file format and the annotation data as xml files. The following sections describe the read in and preprocessing of the data.
 
+1 patients CT scans could not be processed by the script because the information of the slice thickness could not be interpolated from the different slices (they were the same)
+
+147 patients contained no relevant nodules or had corrupted .xml definitions and were excluded for the data generation.
+
 \subsection{Reading in the data}
-Initially the whole dataset was manually randomly distributed to 3 folders in a $50:25:25$ split ratio: train, validation and test. The training dataset is used during the learning process of the neural network. The testing dataset is used to measure the performance of the network while it is trained on the train dataset. See \ref{fig:ttdist} for a distribution of values for the two classes. 
+The whole dataset was randomly distributed to 3 folders in a $60:20:20$ split ratio: train, validation and test. The training dataset is used during the learning process of the neural network. The validation dataset is used to measure the performance of the network while it is trained on the train dataset. See \ref{fig:ttdist} for a distribution of values for the two classes. 
 \begin{figure}
 \includegraphics[width=\textwidth]{distribution_class.png}
-\caption{Distribution of the normalized pixel values for both classes in the training and test set (1000 instances per set)}
+\caption{Distribution of the normalized pixel values for both classes in the training and validation set (1000 instances per set)}
 \label{fig:ttdist}
 \end{figure}
-Each of the folders contains a list of patients containing one ore more sub-folders with CT scans. Some of the extra folders for a patient contain only a few scans and not a complete CT. Those folders were ignored. With the use of the Python package dicom \cite{mason2011t} the ct scans are converted to a 3 dimensional numpy array. The annotations are evaluated to find the location the nodules. In the case of nodules with a diameter of $<3mm$ the center of mass value is used, for the bigger nodules that have information of the whole edgemap, the mean over all dimensions is used as an crude approximation for the center of mass of those nodules. This information is used to generate the patches from the complete scan. A fixed number of patches is generated from the data per patient. The patches for the healthy data are cut randomly from the tissue that contain no nodules while the patches with the nodule information are centered around the nodule's center of mass.
+Each of the folders contains a list of patients containing one ore more sub-folders with CT scans. Some of the extra folders for a patient contain only a few scans and not a complete CT. Those folders were ignored. With the use of the Python package dicom \cite{mason2011t} the ct scans are converted to a 3 dimensional numpy array. The annotation xml files are evaluated to find the location the nodules. In the case of nodules with a diameter of $<3mm$ the center of mass value is used, for the bigger nodules that have information of the whole edgemap, the mean over all dimensions is used as an crude approximation for the center of mass of those nodules. 
+
+There exist patient files that contain no real nodules and others that have corrupted data (the xml file had a corrupted structure or wrong formatting that prevented the algorithm to extract the nodule coordinates).
+
+\subsection{Slicing the patches}
+This information is used to generate the patches from the complete scan. A fixed number of patches is generated from the data per patient. The patches for the healthy data are cut randomly from the tissue that contain no nodules while the patches with the nodule information are randomly picked around the nodule's center of mass.
 
 \end{document}
