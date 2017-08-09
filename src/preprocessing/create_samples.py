@@ -20,8 +20,11 @@ def normalize(a):
     :param a: the matrix to be normalized
     :return: the normalized matrix
     """
+    logger = logging.getLogger()
+    a = a.astype(np.int32) # have to convert to int32 to avoid overflow
     a -= np.amin(a)
     a = a / np.amax(a)
+
     return a
 
 
@@ -102,12 +105,15 @@ def proc_data(data_dir, target, *, patch_number=100, patch_size=PATCH_SIZE_DEFAU
                 annots = convert_to_floats(read_annotation(folder, scans))
                 array_patient = conv2array(scans)
 
-                logger.info('Start slicing patient %s', dirName)
                 data_nod, data_health = slice_patient(array_patient,
                                                       annots,
                                                       patch_size=patch_size,
                                                       number_of_patches=patch_number,
                                                       tumor_rate=tumor_rate)
+
+                if np.amin(data_nod) < 0 or np.amin(data_health) < 0:
+                    logger.error('Found negative data in patient %s, nodules: %f, health: %f', folder, np.amin(data_nod), np.amin(data_health))
+
 
                 pat_info_health = [dirName] * len(data_nod)
                 pat_info_nodule = [dirName] * len(data_health)
@@ -291,4 +297,4 @@ def slice_patient(all_scans, annotation, patch_size=PATCH_SIZE_DEFAULT, number_o
 
         healthy_patches.append(patch)
 
-    return [nodule_patches, healthy_patches]
+    return np.array(nodule_patches), np.array(healthy_patches)
