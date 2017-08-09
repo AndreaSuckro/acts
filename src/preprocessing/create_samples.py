@@ -58,7 +58,7 @@ def save_data(nodules, health, dir_path, patient_info_health, patient_info_nodul
     :param patient_info_health: a list with the patient number n times for each data point
     :param patient_info_nodule: a list with the patient number n times for each data point
     :return:
-    """
+    """amin
     logger = logging.getLogger()
     logger.info('Saving patches for patient %s', patient_info_health[0])
 
@@ -151,7 +151,7 @@ def read_annotation(path, scan_files):
     :param path: the path to the patient directory
     :param scan_files: the already read in slice data
     :return: a list of all nodule locations in x y z locations
-    """
+    """amin
     logger = logging.getLogger()
 
     nodule_locations = []
