@@ -10,7 +10,7 @@ from learning.network_structure import network_model
 
 @log_args
 def train_network(train_data, train_labels, validation_data, validation_labels, *, batch_size=5, epochs=1000,
-                  patch_size=[20, 20, 5], save_level=100, net_save_path='../logs/acts_network.tf'):
+                  patch_size=[40, 40, 5], save_level=100, net_save_path='../logs/acts_network.tf', test_name='default'):
     """
     Trains the network with the given batchsize and for a certain amount of epochs.
 
@@ -23,6 +23,7 @@ def train_network(train_data, train_labels, validation_data, validation_labels, 
     :param patch_size: the patch_size of th lung scan
     :param save_level: defines at how many epochs the performance is saved
     :param net_save_path: the path the trained network is saved to, is also used for replaying
+    :param test_name: the experiment name that describes the layout or data
     :return: epochs and losses depending on the save_level
     """
 
@@ -34,7 +35,7 @@ def train_network(train_data, train_labels, validation_data, validation_labels, 
     accuracy, sum_train_loss, sum_validation_loss, \
     sum_train_acc, sum_validation_acc, phase = network_model(train_data_ph, train_labels_ph)
 
-    log_path = os.path.join(net_save_path, 'acts_' + datetime.now().isoformat())
+    log_path = os.path.join(net_save_path, 'acts_' + test_name +'_' + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
     # variables for plotting
     losses = []
@@ -89,7 +90,9 @@ def store_values(sess, train_data, train_labels, validation_data, validation_lab
                                                     {train_data_ph: batch_scans_train,
                                                      train_labels_ph: batch_labels_train, phase: 1})
 
-    batch_validation = np.random.permutation(len(validation_data))[0:batch_size]
+    # be bold and take whole validation set
+    # batch_validation = np.random.permutation(len(validation_data))[0:batch_size]
+    batch_validation = np.random.permutation(len(validation_data))[0:len(validation_data)]
     batch_scans_validation, batch_labels_validation = validation_data[batch_validation], \
                                                       validation_labels[batch_validation]
 

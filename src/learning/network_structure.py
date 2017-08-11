@@ -28,7 +28,7 @@ def conv3d_layer(scope, input, phase, *, num_filters=20, kernel_size=[5, 5, 3], 
     return pool
 
 
-def network_model(data, labels, *, patch_size=[20, 20, 5]):
+def network_model(data, labels, *, patch_size=[40, 40, 5]):
     """
     The graph for the tensorflow model that is currently used.
 
@@ -43,14 +43,14 @@ def network_model(data, labels, *, patch_size=[20, 20, 5]):
     #########################################################
     # Convolutional layers
 
-    conv1 = conv3d_layer('conv1', input_layer, phase, num_filters=25,
-                         kernel_size=[5, 5, 3], pool_size=[2, 2, 2], pool_stride=1)
+    conv1 = conv3d_layer('conv1', input_layer, phase, num_filters=50,
+                         kernel_size=[7, 7, 3], pool_size=[5, 5, 2], pool_stride=1)
 
-    conv2 = conv3d_layer('conv2', conv1, phase, num_filters=50,
-                         kernel_size=[5, 5, 3], pool_size=[3, 3, 2], pool_stride=1)
+    conv2 = conv3d_layer('conv2', conv1, phase, num_filters=20,
+                         kernel_size=[5, 5, 3], pool_size=[5, 5, 2], pool_stride=2)
 
     conv3 = conv3d_layer('conv3', conv2, phase, num_filters=20,
-                         kernel_size=[15, 15, 3], pool_size=[10, 10, 2], pool_stride=2)
+                         kernel_size=[3, 3, 3], pool_size=[5, 5, 2], pool_stride=2)
 
     pool3_flat = tf.contrib.layers.flatten(conv3)
 

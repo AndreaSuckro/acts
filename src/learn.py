@@ -27,14 +27,14 @@ def get_commandline_args():
                       type="int")
     parser.add_option("-n", "--net_save_path", dest="net_save_path",
                       default='acts_net.tf', help="Path to the network storage location")
+    parser.add_option("-t", "--test_name", dest="test_name",
+                      default='exp', help="Description for this run")
 
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     # initialize logging
-    print(os.path.dirname(os.path.realpath(__file__)))
-
     logging.config.fileConfig(os.path.dirname(os.path.realpath(__file__)) + os.path.sep + 'logging.ini')
 
     logger = logging.getLogger()
@@ -64,6 +64,7 @@ if __name__ == "__main__":
                                        batch_size=option.batchsize,
                                        epochs=option.epochs,
                                        save_level=option.save_level,
-                                       net_save_path=option.net_save_path)
+                                       net_save_path=option.net_save_path,
+                                       test_name=option.test_name)
 
     logger.info('Finished training! Check out the log directory for results')
