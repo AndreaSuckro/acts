@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 
-def conv3d_layer(scope, input, phase, *, num_filters=20, kernel_size=[5, 5, 3], pool_size=[2, 2, 2], pool_stride=1):
+def conv3d_layer(scope, input, phase, *, num_filters=20, kernel_size=[5, 5, 3], kernel_stride=[1,1,1], pool_size=[2, 2, 2], pool_stride=1):
     """
     Creates a 3d convolutional layer with batchnorm and dropout followed by pooling.
 
@@ -18,12 +18,13 @@ def conv3d_layer(scope, input, phase, *, num_filters=20, kernel_size=[5, 5, 3], 
         conv = tf.layers.conv3d(inputs=input,
                                 filters=num_filters,
                                 kernel_size=kernel_size,
+                                strides=kernel_stride,
                                 padding="same",
                                 name="conv")
         bn = tf.layers.batch_normalization(conv, center=True, scale=True,
                                            training=phase)
-        #dropout = tf.layers.dropout(inputs=bn, rate=0.01, name="dropout1")
-        pool = tf.layers.max_pooling3d(inputs=bn, pool_size=pool_size,
+        dropout = tf.layers.dropout(inputs=bn, rate=0.01, name="dropout1")
+        pool = tf.layers.max_pooling3d(inputs=dropout, pool_size=pool_size,
                                        strides=pool_stride, name='pool1')
     return pool
 
@@ -43,25 +44,25 @@ def network_model(data, labels, *, patch_size=[40, 40, 5]):
     #########################################################
     # Convolutional layers
 
-    conv1 = conv3d_layer('conv1', input_layer, phase, num_filters=50,
-                         kernel_size=[7, 7, 3], pool_size=[5, 5, 2], pool_stride=1)
+    conv1 = conv3d_layer('conv1', input_layer, phase, num_filters=20,
+                         kernel_size=[5, 5, 3], kernel_stride=[3, 3, 2], pool_size=[3, 3, 1], pool_stride=1)
 
-    conv2 = conv3d_layer('conv2', conv1, phase, num_filters=20,
-                         kernel_size=[5, 5, 3], pool_size=[5, 5, 2], pool_stride=2)
+    conv2 = conv3d_layer('conv2', conv1, phase, num_filters=10,
+                         kernel_size=[5, 5, 3], pool_size=[2, 2, 1], pool_stride=2)
 
-    conv3 = conv3d_layer('conv3', conv2, phase, num_filters=20,
-                         kernel_size=[3, 3, 3], pool_size=[5, 5, 2], pool_stride=2)
+    conv3 = conv3d_layer('conv3', conv2, phase, num_filters=5,
+                         kernel_size=[3, 3, 3], pool_size=[5, 5, 1], pool_stride=5)
 
     pool3_flat = tf.contrib.layers.flatten(conv3)
 
     #########################################################
     # Fully connected Layer with dropout
     with tf.variable_scope('dense'):
-        dense1 = tf.layers.dense(inputs=pool3_flat, units=50,
+        dense1 = tf.layers.dense(inputs=pool3_flat, units=40,
                                  activation=tf.nn.relu, name="dense1")
         bnd1 = tf.layers.batch_normalization(dense1, center=True, scale=True,
                                              training=phase)
-        dropout1 = tf.layers.dropout(inputs=bnd1, rate=0.4, name="dropout")
+        dropout1 = tf.layers.dropout(inputs=bnd1, rate=0.1, name="dropout")
 
     nodule_class = tf.layers.dense(inputs=dropout1, units=2, name="class")
     onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=2)

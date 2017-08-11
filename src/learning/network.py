@@ -83,12 +83,12 @@ def store_values(sess, train_data, train_labels, validation_data, validation_lab
     # calculate accuracy on one batch
     logger = logging.getLogger()
 
-    batch_train = np.random.permutation(len(train_data))[0:batch_size]
+    batch_train = np.random.permutation(len(train_data))[0:len(train_data)]
     batch_scans_train, batch_labels_train = train_data[batch_train], train_labels[batch_train]
 
     train_acc, train_loss, train_acc_val = sess.run([sum_train_acc, sum_train_loss, accuracy],
                                                     {train_data_ph: batch_scans_train,
-                                                     train_labels_ph: batch_labels_train, phase: 1})
+                                                     train_labels_ph: batch_labels_train, phase: 0})
 
     # be bold and take whole validation set
     # batch_validation = np.random.permutation(len(validation_data))[0:batch_size]
