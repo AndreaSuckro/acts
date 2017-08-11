@@ -45,8 +45,8 @@ if __name__ == "__main__":
         raise ValueError('data_dir must be set to the correct folder path, use -d to specify the data location!')
 
     logger.info('Reading in the Lung CT data')
-    train_data_raw, train_labels_raw = get_train_data(option.data_dir, patch_number=3000)
-    validation_data_raw, validation_labels_raw = get_validation_data(option.data_dir, patch_number=1000)
+    train_data_raw, train_labels_raw = get_train_data(option.data_dir, patch_number=4000)
+    validation_data_raw, validation_labels_raw = get_validation_data(option.data_dir, patch_number=1600)
     logger.info('Finished reading data')
 
     train_data_raw = np.asarray(train_data_raw)

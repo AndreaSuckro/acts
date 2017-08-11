@@ -22,13 +22,13 @@ def conv3d_layer(scope, input, phase, *, num_filters=20, kernel_size=[5, 5, 3], 
                                 name="conv")
         bn = tf.layers.batch_normalization(conv, center=True, scale=True,
                                            training=phase)
-        dropout = tf.layers.dropout(inputs=bn, rate=0.01, name="dropout1")
-        pool = tf.layers.max_pooling3d(inputs=dropout, pool_size=pool_size,
+        #dropout = tf.layers.dropout(inputs=bn, rate=0.01, name="dropout1")
+        pool = tf.layers.max_pooling3d(inputs=bn, pool_size=pool_size,
                                        strides=pool_stride, name='pool1')
     return pool
 
 
-def network_model(data, labels, *, patch_size=[50, 50, 10]):
+def network_model(data, labels, *, patch_size=[20, 20, 5]):
     """
     The graph for the tensorflow model that is currently used.
 
@@ -50,17 +50,18 @@ def network_model(data, labels, *, patch_size=[50, 50, 10]):
                          kernel_size=[5, 5, 3], pool_size=[3, 3, 2], pool_stride=1)
 
     conv3 = conv3d_layer('conv3', conv2, phase, num_filters=20,
-                         kernel_size=[15, 15, 3], pool_size=[10, 10, 8], pool_stride=2)
+                         kernel_size=[15, 15, 3], pool_size=[10, 10, 2], pool_stride=2)
 
     pool3_flat = tf.contrib.layers.flatten(conv3)
 
     #########################################################
     # Fully connected Layer with dropout
-    dense1 = tf.layers.dense(inputs=pool3_flat, units=50,
-                             activation=tf.nn.relu, name="dense1")
-    bnd1 = tf.layers.batch_normalization(dense1, center=True, scale=True,
-                                         training=phase)
-    dropout1 = tf.layers.dropout(inputs=bnd1, rate=0.4, name="dropout")
+    with tf.variable_scope('dense'):
+        dense1 = tf.layers.dense(inputs=pool3_flat, units=50,
+                                 activation=tf.nn.relu, name="dense1")
+        bnd1 = tf.layers.batch_normalization(dense1, center=True, scale=True,
+                                             training=phase)
+        dropout1 = tf.layers.dropout(inputs=bnd1, rate=0.4, name="dropout")
 
     nodule_class = tf.layers.dense(inputs=dropout1, units=2, name="class")
     onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=2)
@@ -75,7 +76,7 @@ def network_model(data, labels, *, patch_size=[50, 50, 10]):
     # for the moving mean of the batch norm
     update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
     with tf.control_dependencies(update_ops):
-        optimizer = tf.train.AdamOptimizer().minimize(total_loss)
+        optimizer = tf.train.AdamOptimizer(learning_rate=0.1).minimize(total_loss)
 
     # Accuracy
     correct_prediction = tf.equal(tf.argmax(onehot_labels, 1), tf.argmax(nodule_class, 1))

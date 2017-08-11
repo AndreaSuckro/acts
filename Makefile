@@ -33,7 +33,7 @@ learn: src/learn.py
 # test learning for code checking
 .PHONY: test
 test: src/learn.py
-	JOB_ID=$JOB_ID python3 src/learn.py -d data/ -l ../tests/ -e 2 -s 1 -b 1 -n ../tests/
+	JOB_ID=$JOB_ID python3 src/learn.py -d /net/store/cv/projects/datasets/image/pub/LIDC-IDRI -l ../tests/ -e 2 -s 1 -b 1 -n ../tests/
 
 # plot sample data
 .PHONY: plot
