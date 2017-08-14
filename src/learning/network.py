@@ -42,8 +42,10 @@ def train_network(train_data, train_labels, validation_data, validation_labels, 
     epochs_val = []
 
     global_step = 0
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
 
-    with tf.Session() as sess:
+    with tf.Session(config=config) as sess:
 
         writer = tf.summary.FileWriter(log_path, sess.graph)
         writer.add_graph(sess.graph)
