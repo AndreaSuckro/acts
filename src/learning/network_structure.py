@@ -59,14 +59,14 @@ def network_model(data, labels, *, patch_size=[40, 40, 5]):
     #########################################################
     # Convolutional layers
 
-    conv1 = conv3d_layer('conv1', input_layer, phase, num_filters=30,
+    conv1 = conv3d_layer('conv1', input_layer, phase, num_filters=20,
                          kernel_size=[5, 5, 2], kernel_stride=[2, 2, 1], pool_size=[2, 2, 1], pool_stride=1)
 
-    conv2 = conv3d_layer('conv2', conv1, phase, num_filters=40,
-                         kernel_size=[3, 3, 1], pool_size=[2, 2, 1], pool_stride=2)
+    conv2 = conv3d_layer('conv2', conv1, phase, num_filters=30,
+                         kernel_size=[3, 3, 2], pool_size=[2, 2, 1], pool_stride=2)
 
-    conv3 = conv3d_layer('conv3', conv2, phase, num_filters=50,
-                         kernel_size=[3, 3, 1], pool_size=[5, 5, 1], pool_stride=5)
+    conv3 = conv3d_layer('conv3', conv2, phase, num_filters=40,
+                         kernel_size=[3, 3, 2], pool_size=[2, 2, 1], pool_stride=2)
 
     pool3_flat = tf.contrib.layers.flatten(conv3)
 
@@ -88,7 +88,7 @@ def network_model(data, labels, *, patch_size=[40, 40, 5]):
     # for the moving mean of the batch norm
     update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
     with tf.control_dependencies(update_ops):
-        optimizer = tf.train.AdamOptimizer(learning_rate=0.1).minimize(total_loss)
+        optimizer = tf.train.AdamOptimizer(learning_rate=0.01).minimize(total_loss)
 
     # Accuracy
     correct_prediction = tf.equal(tf.argmax(onehot_labels, 1), tf.argmax(nodule_class, 1))
