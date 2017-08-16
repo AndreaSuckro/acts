@@ -39,7 +39,7 @@ def conv3d_layer(scope, input, phase, *, num_filters=20, kernel_size=[5, 5, 3],
     :param input: the input tensor to this layer
     :param phase: either test or train
     :param num_filters: number of filter kernels to be used
-    :param kernel_size: the size of the filter 
+    :param kernel_size: the size of the filter
     :param kernel_stride: how the kernel strides over the image
     :param pool_size: the pooling size
     :param pool_stride: the stride of the pooling kernel
@@ -54,8 +54,8 @@ def conv3d_layer(scope, input, phase, *, num_filters=20, kernel_size=[5, 5, 3],
                                 name="conv")
         bn = tf.layers.batch_normalization(conv, center=True, scale=True,
                                            training=phase)
-        dropout = tf.layers.dropout(inputs=bn, rate=0.01, name="dropout", training=phase)
-        pool = tf.layers.max_pooling3d(inputs=dropout, pool_size=pool_size,
+        #dropout = tf.layers.dropout(inputs=bn, rate=0.01, name="dropout", training=phase)
+        pool = tf.layers.max_pooling3d(inputs=bn, pool_size=pool_size,
                                        strides=pool_stride, name='pool')
     return pool
 
@@ -75,7 +75,16 @@ def dense_layer(scope, input, phase, *, num_neurons=50, activation_fun=tf.nn.rel
     return dropout
 
 
-def network_model(data, labels, *, patch_size=[40, 40, 1]):
+def augment_data(input_data):
+    """
+    Augments the data with random flip left right and up down.
+    """
+    data = tf.image.random_flip_left_right(input_data)
+    data = tf.image.random_flip_up_down(data)
+    return data
+
+
+def network_model(data, labels, *, patch_size=[20, 20, 10]):
     """
     The graph for the tensorflow model that is currently used.
 
@@ -85,33 +94,27 @@ def network_model(data, labels, *, patch_size=[40, 40, 1]):
     :return: the loss of the network
     """
     phase = tf.placeholder(tf.bool, name='phase')
-    input_layer = tf.reshape(data, [-1, patch_size[0], patch_size[1], patch_size[2]])
+    aug_data = tf.map_fn(augment_data, data)
+    input_layer = tf.reshape(aug_data, [-1, patch_size[0], patch_size[1], patch_size[2], 1])
 
     #########################################################
     # Convolutional layers
 
-    conv1 = conv2d_layer('conv1', input_layer, phase, num_filters=30,
-                         kernel_size=[4, 4], kernel_stride=[2, 2],
-                         pool_size =[2,2], pool_stride=1)
+    conv1 = conv3d_layer('conv1', input_layer, phase, num_filters=30,
+                         kernel_size=4, pool_size=2, pool_stride=1)
 
-    conv2 = conv2d_layer('conv2', conv1, phase, num_filters=40,
-                         kernel_size=[3, 3], pool_size=[2, 2], pool_stride=1)
+    conv2 = conv3d_layer('conv2', conv1, phase, num_filters=40,
+                         kernel_size=3, pool_size=2, pool_stride=1)
 
-    conv3 = conv2d_layer('conv3', conv2, phase, num_filters=50,
-                         kernel_size=[3, 3], pool_size=[2, 2], pool_stride=1)
+    conv3 = conv3d_layer('conv3', conv2, phase, num_filters=50,
+                          kernel_size=3, pool_size=2, pool_stride=1)
 
-    conv4 = conv2d_layer('conv4', conv3, phase, num_filters=50,
-                         kernel_size=[3, 3], pool_size=[2, 2], pool_stride=1)
-
-    conv5 = conv2d_layer('conv5', conv4, phase, num_filters=20,
-                         kernel_size=[3, 3], pool_size=[2, 2], pool_stride=1)
-
-    pool3_flat = tf.contrib.layers.flatten(conv5)
+    pool3_flat = tf.contrib.layers.flatten(conv1)
 
     #########################################################
     # Fully connected Layer with dropout
 
-    dens1 = dense_layer('dense', pool3_flat, phase, num_neurons=100, activation_fun = tf.nn.relu)
+    dens1 = dense_layer('dense', pool3_flat, phase, num_neurons=200, activation_fun = tf.nn.relu)
 
     nodule_class = tf.layers.dense(inputs=dens1, units=2, name="class")
     onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=2)

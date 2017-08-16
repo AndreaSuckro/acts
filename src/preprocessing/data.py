@@ -88,7 +88,8 @@ def get_patches(path, *, patch_number=100, tumor_rate=0.5):
     logger = logging.getLogger()
 
     start_time = time.time()
-
+    logger.info('Read ct scan data from %s', path)
+    logger.info('With patch_number of %d and tumor_rate of %.2f', patch_number, tumor_rate)
     data_nod_all = get_rand_samples(os.path.join(path, 'nodules'), int(patch_number*tumor_rate))
     data_health_all = get_rand_samples(os.path.join(path, 'health'), patch_number - int(patch_number*tumor_rate))
 
@@ -145,7 +146,7 @@ def get_rand_samples(path, number):
     """
     data = []
 
-    files = random.sample(os.listdir(path), number)
+    files = random.sample(os.listdir(path), int(number))
     for file in files:
         data.append(np.load(os.path.join(path, file)))
 

@@ -10,7 +10,7 @@ import argparse
 import sys
 from tools.helper import convert_to_float, convert_to_floats
 
-PATCH_SIZE_DEFAULT = [40, 40, 1]
+PATCH_SIZE_DEFAULT = [30, 30, 10]
 
 
 def normalize(a):
@@ -279,9 +279,9 @@ def slice_patient(all_scans, annotation, patch_size=PATCH_SIZE_DEFAULT, number_o
     healthy_patches = []
     while len(healthy_patches) < (number_of_patches - int(number_of_patches*tumor_rate)):
         # check that coordinates do not overlap tumor?
-        start_point = [random.randint(0, all_scans.shape[0] - patch_size[0]),
-                       random.randint(0, all_scans.shape[1] - patch_size[1]),
-                       random.randint(0, all_scans.shape[2] - patch_size[2])]
+        start_point = [random.randint(patch_size[0], all_scans.shape[0] - patch_size[0]),
+                       random.randint(patch_size[1], all_scans.shape[1] - patch_size[1]),
+                       random.randint(patch_size[2], all_scans.shape[2] - patch_size[2])]
 
         patch = all_scans[start_point[0]:start_point[0] + patch_size[0],
                           start_point[1]:start_point[1] + patch_size[1],

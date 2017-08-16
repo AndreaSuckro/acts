@@ -18,8 +18,8 @@ def get_commandline_args():
                       help="number of training epochs", type="int")
     parser.add_option("-b", "--batchsize", dest="batchsize", default=20,
                       help="number of samples per batch", type="int")
-    parser.add_option("-p", "--plotSample", dest="plot_samp",
-                      default=False, help="True if a sample of the data should be plotted")
+    parser.add_option("-p", "--patch_number", dest="patch_number", type="int",
+                      default=4000, help="Number of patches to be loaded from train")
     parser.add_option("-l", "--log_path", dest="log",
                       default=".", help="The directory to which the logged results shall be printed")
     parser.add_option("-s", "--save_level", dest="save_level",
@@ -44,9 +44,11 @@ if __name__ == "__main__":
     if option.data_dir is None:
         raise ValueError('data_dir must be set to the correct folder path, use -d to specify the data location!')
 
-    logger.info('Reading in the Lung CT data')
-    train_data_raw, train_labels_raw = get_train_data(option.data_dir, patch_number=4000)
-    validation_data_raw, validation_labels_raw = get_validation_data(option.data_dir, patch_number=1600)
+    trains = option.patch_number
+    vals = 0.1*option.patch_number
+    logger.info('Reading in the Lung CT data, %d training and %d validation', trains, vals)
+    train_data_raw, train_labels_raw = get_train_data(option.data_dir, patch_number=trains)
+    validation_data_raw, validation_labels_raw = get_validation_data(option.data_dir, patch_number=vals)
     logger.info('Finished reading data')
 
     train_data_raw = np.asarray(train_data_raw)
@@ -54,9 +56,6 @@ if __name__ == "__main__":
 
     validation_data_raw = np.asarray(validation_data_raw)
     validation_labels_raw = np.asarray(validation_labels_raw)
-
-    if option.plot_samp:
-        DataVisualizer(train_data_raw, train_labels_raw)
 
     logger.info('Start training of the network')
     epochs_val, losses = train_network(train_data_raw, train_labels_raw,

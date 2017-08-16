@@ -7,7 +7,7 @@ import os
 
 from learning.network_structure import network_model
 
-PATCH_SIZE = [40, 40, 1]
+PATCH_SIZE = [30, 30, 10]
 
 @log_args
 def train_network(train_data, train_labels, validation_data, validation_labels, *, batch_size=5, epochs=1000,
@@ -36,7 +36,7 @@ def train_network(train_data, train_labels, validation_data, validation_labels, 
     accuracy, sum_train_loss, sum_validation_loss, \
     sum_train_acc, sum_validation_acc, phase = network_model(train_data_ph, train_labels_ph, patch_size=patch_size)
 
-    log_path = os.path.join(net_save_path, 'acts_' + test_name +'_' + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    log_path = net_save_path
 
     # variables for plotting
     losses = []

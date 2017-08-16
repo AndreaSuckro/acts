@@ -33,8 +33,8 @@ learn: src/learn.py
 # test learning for code checking
 .PHONY: test
 test: src/learn.py
-	rm -rf ../tests/acts_exp*
-	JOB_ID=$JOB_ID python3 src/learn.py -d /net/store/cv/projects/datasets/image/pub/LIDC-IDRI -l ../tests/ -e 2 -s 1 -b 1 -n ../tests/ -t TEST
+	rm ../logs_testing/local_test/*
+	python3 src/learn.py -d /net/store/cv/projects/datasets/image/pub/LIDC-IDRI/testing -p 100 -l ../logs_testing/ -e 20 -s 1 -b 1 -n ../logs_testing/ -t local_test
 
 # plot sample data
 .PHONY: plot
