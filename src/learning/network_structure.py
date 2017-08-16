@@ -10,12 +10,13 @@ def conv3d_layer(scope, input, phase, *, num_filters=20, kernel_size=[5, 5, 3],
     :param input: the input tensor to this layer
     :param phase: either test or train
     :param num_filters: number of filter kernels to be used
-    :param kernel_size: the size of the filter kernels
+    :param kernel_size: the size of the filter 
+    :param kernel_stride: how the kernel strides over the image
     :param pool_size: the pooling size
     :param pool_stride: the stride of the pooling kernel
     :return: the activation of the layer
     """
-    with tf.variable_scope(scope) as scope:
+    with tf.variable_scope(scope):
         conv = tf.layers.conv3d(inputs=input,
                                 filters=num_filters,
                                 kernel_size=kernel_size,
@@ -36,9 +37,9 @@ def dense_layer(scope, input, phase, *, num_neurons=50, activation_fun=tf.nn.rel
     """
     with tf.variable_scope(scope):
         dense = tf.layers.dense(inputs=input, units=num_neurons,
-                                 activation=activation_fun, name="dense")
+                                activation=activation_fun, name="dense")
         bnd = tf.layers.batch_normalization(dense, center=True, scale=True,
-                                             training=phase)
+                                            training=phase)
         dropout = tf.layers.dropout(inputs=bnd, rate=0.1, name="dropout",
                                     training=phase)
 

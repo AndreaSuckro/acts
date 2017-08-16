@@ -17,7 +17,8 @@ def convert_to_floats(annots):
     """
     if annots is None or len(annots) == 0:
         raise AttributeError('Annotations are empty for this patient')
-    #try converting to float
+
+    # try converting to float
     annof = [[float(y) for y in x if is_convertable(y, float)] for x in annots]
     if annof is None or len(annof) == 0:
         raise AttributeError('Converted valued are empty for this patient')

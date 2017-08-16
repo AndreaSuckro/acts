@@ -56,7 +56,7 @@ def get_data_patient(data_dir, *, patient_num='LIDC-IDRI-0666', dir='train'):
 
     :param data_dir: data directory
     :param patient_num: the number of the patient to be read
-    :param tumor_rate: the rate of tumors in the combined data
+    :param dir: can be either test,train or validation
     :return: get training data for one patient
     """
     logger = logging.getLogger()
@@ -65,7 +65,7 @@ def get_data_patient(data_dir, *, patient_num='LIDC-IDRI-0666', dir='train'):
         return
 
     logger.info('Read train data for patient %s', patient_num)
-    full_path = os.path.join(data_dir, 'processed', 'train')
+    full_path = os.path.join(data_dir, 'processed', dir)
 
     data_nod_all = get_patient_samples(os.path.join(full_path, 'nodules'),
                                        patient_number=patient_num)

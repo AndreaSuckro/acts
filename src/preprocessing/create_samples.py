@@ -20,8 +20,7 @@ def normalize(a):
     :param a: the matrix to be normalized
     :return: the normalized matrix
     """
-    logger = logging.getLogger()
-    a = a.astype(np.int32) # have to convert to int32 to avoid overflow
+    a = a.astype(np.float32)  # have to convert to int32 to avoid overflow
     a -= np.amin(a)
     a = a / np.amax(a)
 
@@ -82,11 +81,12 @@ def proc_data(data_dir, target, *, patch_number=100, patch_size=PATCH_SIZE_DEFAU
     """
     Reads all CT-Scans from a folder with several patients in it.
 
-    :param path: the path to the folder with the patient files
+    :param data_dir: the path to the folder with the patient files
+    :param target: the respective sub folder, either train test or validation
     :param patch_number: the number of patches per patient that should be retrieved
     :param patch_size: the 3d extend of the scan patches
     :param tumor_rate: the fraction of tumors that should be contained in the patches
-    :return: datacubes and their labels
+    :return: data cubes and their labels
     """
     logger = logging.getLogger()
 
@@ -169,7 +169,7 @@ def read_annotation(path, scan_files):
     slice_distance = np.abs(convert_to_float(ref2) - convert_to_float(ref1))
 
     for dirName, subdirList, fileList in os.walk(path):
-        if len(fileList) > 20: #in the case of two folders take the larger one
+        if len(fileList) > 20: # in the case of two folders take the larger one
             for filename in fileList:
                 if '.xml' in filename.lower():
                     xml_anno = xml.etree.ElementTree.parse(os.path.join(dirName, filename)).getroot()
@@ -260,20 +260,19 @@ def slice_patient(all_scans, annotation, patch_size=PATCH_SIZE_DEFAULT, number_o
             raise AttributeError('Nodules do not fit!')
 
         # use random start point around nodule
-        #x = random.randint(tumor[0] - patch_size[0], tumor[0])
-        #y = random.randint(tumor[1] - patch_size[1], tumor[1])
-        #z = random.randint(tumor[2] - patch_size[2], tumor[2])
+        # x = random.randint(tumor[0] - patch_size[0], tumor[0])
+        # y = random.randint(tumor[1] - patch_size[1], tumor[1])
+        # z = random.randint(tumor[2] - patch_size[2], tumor[2])
 
-        #center nodule
+        # center nodule
         x = tumor[0] - patch_size[0]//2
         y = tumor[1] - patch_size[1]//2
         z = tumor[2] - patch_size[2]//2
-        start_point = [x,y,z]
+        start_point = [x, y, z]
 
         nodule_patches.append(all_scans[start_point[0]:start_point[0] + patch_size[0],
                                         start_point[1]:start_point[1] + patch_size[1],
                                         start_point[2]:start_point[2] + patch_size[2]])
-
 
     # get all the regular patches
     healthy_patches = []
@@ -287,9 +286,9 @@ def slice_patient(all_scans, annotation, patch_size=PATCH_SIZE_DEFAULT, number_o
                           start_point[1]:start_point[1] + patch_size[1],
                           start_point[2]:start_point[2] + patch_size[2]]
 
-        #check patch size
+        # check patch size
         if np.array(patch).shape != tuple(patch_size):
-            continue # sometimes it is just not right and python doesn't complain
+            continue  # sometimes it is just not right and python doesn't complain
 
         for anno in annotation:
             if anno in patch:
