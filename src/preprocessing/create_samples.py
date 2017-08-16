@@ -21,7 +21,7 @@ def normalize(a):
     :return: the normalized matrix
     """
     logger = logging.getLogger()
-    a = a.astype(np.int32) # have to convert to int32 to avoid overflow
+    a = a.astype(np.float32) # have to convert to int32 to avoid overflow
     a -= np.amin(a)
     a = a / np.amax(a)
 
