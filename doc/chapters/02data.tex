@@ -105,6 +105,6 @@ Each of the folders contains a list of patients containing one ore more sub-fold
 There exist patient files that contain no real nodules and others that have corrupted data (the xml file had a corrupted structure or wrong formatting that prevented the algorithm to extract the nodule coordinates).
 
 \subsection{Slicing the patches}
-This information is used to generate the patches from the complete scan. A fixed number of patches is generated from the data per patient. The patches for the healthy data are cut randomly from the tissue that contain no nodules while the patches with the nodule information are randomly picked around the nodule's center of mass.
+This information is used to generate the patches from the complete scan. A fixed number of patches is generated from the data per patient. The patches for the healthy data are cut randomly from the tissue that contain no nodules while the patches with the nodule information are randomly picked around the nodule's center. Determining the center of a nodule is easy in the cases of the nodules with $<3mm$ diameter. For the bigger nodules, where the whole edge map is stored, the mean across all dimensions is calculated as an approximation for the center of the nodule.
 
 \end{document}
