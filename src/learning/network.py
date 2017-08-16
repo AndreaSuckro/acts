@@ -7,10 +7,11 @@ import os
 
 from learning.network_structure import network_model
 
+PATCH_SIZE = [40, 40, 1]
 
 @log_args
 def train_network(train_data, train_labels, validation_data, validation_labels, *, batch_size=5, epochs=1000,
-                  patch_size=[40, 40, 5], save_level=100, net_save_path='../logs/acts_network.tf', test_name='default'):
+                  patch_size=PATCH_SIZE, save_level=100, net_save_path='../logs/acts_network.tf', test_name='default'):
     """
     Trains the network with the given batchsize and for a certain amount of epochs.
 
@@ -33,7 +34,7 @@ def train_network(train_data, train_labels, validation_data, validation_labels, 
     # so many variables!
     loss, optimizer, target, network_output, \
     accuracy, sum_train_loss, sum_validation_loss, \
-    sum_train_acc, sum_validation_acc, phase = network_model(train_data_ph, train_labels_ph)
+    sum_train_acc, sum_validation_acc, phase = network_model(train_data_ph, train_labels_ph, patch_size=patch_size)
 
     log_path = os.path.join(net_save_path, 'acts_' + test_name +'_' + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
@@ -59,8 +60,13 @@ def train_network(train_data, train_labels, validation_data, validation_labels, 
                 # build a batch
                 batch = np.random.permutation(len(train_data))[0:batch_size]
                 batch_scans, batch_labels = train_data[batch], train_labels[batch]
+                meta_data = tf.RunMetadata()
+                opts = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE) if global_step%100000 == 0 else None
                 sess.run([optimizer, target, network_output],
-                         {train_data_ph: batch_scans, train_labels_ph: batch_labels, phase: 1})
+                         {train_data_ph: batch_scans, train_labels_ph: batch_labels, phase: 1},
+                         run_metadata=meta_data, options=opts)
+                if i % save_level + j == 1:
+                    writer.add_run_metadata(meta_data, str(global_step))
                 global_step = global_step + 1
 
             # logging important information out for tensorboard

@@ -2,7 +2,7 @@ import tensorflow as tf
 
 
 def conv3d_layer(scope, input, phase, *, num_filters=20, kernel_size=[5, 5, 3],
-                 kernel_stride=[1,1,1], pool_size=[2, 2, 2], pool_stride=1):
+                 kernel_stride=[1, 1, 1], pool_size=[2, 2, 2], pool_stride=1):
     """
     Creates a 3d convolutional layer with batchnorm and dropout followed by pooling.
 
@@ -39,12 +39,13 @@ def dense_layer(scope, input, phase, *, num_neurons=50, activation_fun=tf.nn.rel
                                  activation=activation_fun, name="dense")
         bnd = tf.layers.batch_normalization(dense, center=True, scale=True,
                                              training=phase)
-        dropout = tf.layers.dropout(inputs=bnd, rate=0.1, name="dropout")
+        dropout = tf.layers.dropout(inputs=bnd, rate=0.1, name="dropout",
+                                    training=phase)
 
     return dropout
 
 
-def network_model(data, labels, *, patch_size=[40, 40, 5]):
+def network_model(data, labels, *, patch_size=[40, 40, 1]):
     """
     The graph for the tensorflow model that is currently used.
 
@@ -59,14 +60,14 @@ def network_model(data, labels, *, patch_size=[40, 40, 5]):
     #########################################################
     # Convolutional layers
 
-    conv1 = conv3d_layer('conv1', input_layer, phase, num_filters=20,
-                         kernel_size=[5, 5, 2], kernel_stride=[2, 2, 1], pool_size=[2, 2, 1], pool_stride=1)
+    conv1 = conv3d_layer('conv1', input_layer, phase, num_filters=30,
+                         kernel_size=[3, 3, 1], kernel_stride=[2, 2, 1], pool_stride=1)
 
-    conv2 = conv3d_layer('conv2', conv1, phase, num_filters=30,
-                         kernel_size=[3, 3, 2], pool_size=[2, 2, 1], pool_stride=2)
+    conv2 = conv3d_layer('conv2', conv1, phase, num_filters=40,
+                         kernel_size=[3, 3, 1], pool_size=[2, 2, 1], pool_stride=1)
 
-    conv3 = conv3d_layer('conv3', conv2, phase, num_filters=40,
-                         kernel_size=[3, 3, 2], pool_size=[2, 2, 1], pool_stride=2)
+    conv3 = conv3d_layer('conv3', conv2, phase, num_filters=50,
+                         kernel_size=[3, 3, 1], pool_size=[2, 2, 1], pool_stride=1)
 
     pool3_flat = tf.contrib.layers.flatten(conv3)
 
@@ -88,7 +89,7 @@ def network_model(data, labels, *, patch_size=[40, 40, 5]):
     # for the moving mean of the batch norm
     update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
     with tf.control_dependencies(update_ops):
-        optimizer = tf.train.AdamOptimizer(learning_rate=0.01).minimize(total_loss)
+        optimizer = tf.train.AdamOptimizer().minimize(total_loss)
 
     # Accuracy
     correct_prediction = tf.equal(tf.argmax(onehot_labels, 1), tf.argmax(nodule_class, 1))

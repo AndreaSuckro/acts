@@ -10,7 +10,7 @@ import argparse
 import sys
 from tools.helper import convert_to_float, convert_to_floats
 
-PATCH_SIZE_DEFAULT = [40, 40, 5]
+PATCH_SIZE_DEFAULT = [40, 40, 1]
 
 
 def normalize(a):
@@ -114,7 +114,6 @@ def proc_data(data_dir, target, *, patch_number=100, patch_size=PATCH_SIZE_DEFAU
                 if np.amin(data_nod) < 0 or np.amin(data_health) < 0:
                     logger.error('Found negative data in patient %s, nodules: %f, health: %f', folder, np.amin(data_nod), np.amin(data_health))
 
-
                 pat_info_health = [dirName] * len(data_nod)
                 pat_info_nodule = [dirName] * len(data_health)
                 count += 1
@@ -124,7 +123,7 @@ def proc_data(data_dir, target, *, patch_number=100, patch_size=PATCH_SIZE_DEFAU
                 logger.error('Something went wrong with reading files from folder %s: %s', folder, e)
                 continue
 
-    logger.info('Read ct scan data from %s patients in %d seconds.', count, time.time() - start_time)
+    logger.info('Read ct scan data from %s patients in %d minutes.', count, (time.time() - start_time)/60)
 
 
 def read_patient(path):
@@ -159,7 +158,7 @@ def read_annotation(path, scan_files):
     :return: a list of all nodule locations in x y z locations
     """
     logger = logging.getLogger()
-
+    logger.info('Read annotations from: %s', path)
     nodule_locations = []
     ref_scan_1 = scan_files[0]
     ref_scan_2 = scan_files[1]
@@ -170,10 +169,11 @@ def read_annotation(path, scan_files):
     slice_distance = np.abs(convert_to_float(ref2) - convert_to_float(ref1))
 
     for dirName, subdirList, fileList in os.walk(path):
-        for filename in fileList:
-            if '.xml' in filename.lower():
-                xml_anno = xml.etree.ElementTree.parse(os.path.join(dirName, filename)).getroot()
-                break  # there is only one xml file per patient
+        if len(fileList) > 20: #in the case of two folders take the larger one
+            for filename in fileList:
+                if '.xml' in filename.lower():
+                    xml_anno = xml.etree.ElementTree.parse(os.path.join(dirName, filename)).getroot()
+                    break  # there is only one xml file per patient
     domain = '{http://www.nih.gov}'
     for session in xml_anno.findall(domain + 'readingSession'):
         for nodule in session.findall(domain + 'unblindedReadNodule'):
@@ -260,9 +260,14 @@ def slice_patient(all_scans, annotation, patch_size=PATCH_SIZE_DEFAULT, number_o
             raise AttributeError('Nodules do not fit!')
 
         # use random start point around nodule
-        x = random.randint(tumor[0] - patch_size[0], tumor[0])
-        y = random.randint(tumor[1] - patch_size[1], tumor[1])
-        z = random.randint(tumor[2] - patch_size[2], tumor[2])
+        #x = random.randint(tumor[0] - patch_size[0], tumor[0])
+        #y = random.randint(tumor[1] - patch_size[1], tumor[1])
+        #z = random.randint(tumor[2] - patch_size[2], tumor[2])
+
+        #center nodule
+        x = tumor[0] - patch_size[0]//2
+        y = tumor[1] - patch_size[1]//2
+        z = tumor[2] - patch_size[2]//2
         start_point = [x,y,z]
 
         nodule_patches.append(all_scans[start_point[0]:start_point[0] + patch_size[0],
