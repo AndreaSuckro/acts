@@ -109,7 +109,7 @@ def network_model(data, labels, *, patch_size=[20, 20, 10]):
     conv3 = conv3d_layer('conv3', conv2, phase, num_filters=50,
                           kernel_size=3, pool_size=2, pool_stride=1)
 
-    pool3_flat = tf.contrib.layers.flatten(conv1)
+    pool3_flat = tf.contrib.layers.flatten(conv3)
 
     #########################################################
     # Fully connected Layer with dropout
