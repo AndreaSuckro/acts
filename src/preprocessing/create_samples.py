@@ -10,7 +10,7 @@ import argparse
 import sys
 from tools.helper import convert_to_float, convert_to_floats
 
-PATCH_SIZE_DEFAULT = [30, 30, 10]
+PATCH_SIZE_DEFAULT = [100, 100, 5]
 
 
 def normalize(a):
@@ -105,7 +105,6 @@ def proc_data(data_dir, target, *, patch_number=100, patch_size=PATCH_SIZE_DEFAU
                 scans = read_patient(folder)
                 annots = convert_to_floats(read_annotation(folder, scans))
                 array_patient = conv2array(scans)
-
                 data_nod, data_health = slice_patient(array_patient,
                                                       annots,
                                                       patch_size=patch_size,
@@ -196,11 +195,20 @@ def read_annotation(path, scan_files):
                     xPosAll = xPosAll + convert_to_float(edgeMap.find(domain + 'xCoord').text)
                     yPosAll = yPosAll + convert_to_float(edgeMap.find(domain + 'yCoord').text)
 
-            xPos = xPosAll/mapCount
-            yPos = yPosAll/mapCount
-            zPos = zPosAll/roiCount
+            xPos = xPosAll//mapCount
+            yPos = yPosAll//mapCount
+            zPos = zPosAll//roiCount
 
-            nodule_locations.append(np.array([xPos, yPos, zPos]))  # beware of switched x,y!
+            new_nod_pos = np.array([xPos, yPos, zPos])
+
+            nod_new = True
+            for nod in nodule_locations:
+                if np.array_equal(new_nod_pos, nod):
+                    nod_new = False
+                    break
+
+            if nod_new:
+                nodule_locations.append(new_nod_pos)
 
     return nodule_locations
 
@@ -245,18 +253,18 @@ def slice_patient(all_scans, annotation, patch_size=PATCH_SIZE_DEFAULT, number_o
         # pick a random tumor
         tumor = [int(x) for x in random.choice(annotation)]
         i = 0
-        while((int(tumor[0] - patch_size[0]) < 0
-              or int(tumor[0] + patch_size[0]) > all_scans.shape[0]
-              or int(tumor[1] - patch_size[1]) < 0
-              or int(tumor[1] + patch_size[1]) > all_scans.shape[1]
-              or int(tumor[2] - patch_size[2]) < 0
-              or int(tumor[2] + patch_size[2]) > all_scans.shape[2])
-              and i < 100
+        while((int(tumor[0] - patch_size[0]//2) < 0
+              or int(tumor[0] + patch_size[0]//2) > all_scans.shape[1]
+              or int(tumor[1] - patch_size[1]//2) < 0
+              or int(tumor[1] + patch_size[1]//2) > all_scans.shape[0]
+              or int(tumor[2] - patch_size[2]//2) < 0
+              or int(tumor[2] + patch_size[2]//2) > all_scans.shape[2])
+              and i < 10000
               ):
             i = i + 1
             tumor = [int(x) for x in random.choice(annotation)]  # take another annotation and hope for the best
 
-        if i > 99:
+        if i > 9999:
             logger.error(f'Could not find a matching patch in {i} tries, aborting ...')
             raise AttributeError('Nodules do not fit!')
 
@@ -271,20 +279,20 @@ def slice_patient(all_scans, annotation, patch_size=PATCH_SIZE_DEFAULT, number_o
         z = tumor[2] - patch_size[2]//2
         start_point = [x, y, z]
 
-        nodule_patches.append(all_scans[start_point[0]:start_point[0] + patch_size[0],
-                                        start_point[1]:start_point[1] + patch_size[1],
+        nodule_patches.append(all_scans[start_point[1]:start_point[1] + patch_size[1],
+                                        start_point[0]:start_point[0] + patch_size[0],
                                         start_point[2]:start_point[2] + patch_size[2]])
 
     # get all the regular patches
     healthy_patches = []
     while len(healthy_patches) < (number_of_patches - int(number_of_patches*tumor_rate)):
         # check that coordinates do not overlap tumor?
-        start_point = [random.randint(patch_size[0], all_scans.shape[0] - patch_size[0]),
-                       random.randint(patch_size[1], all_scans.shape[1] - patch_size[1]),
+        start_point = [random.randint(patch_size[0], all_scans.shape[0] - patch_size[1]),
+                       random.randint(patch_size[1], all_scans.shape[1] - patch_size[0]),
                        random.randint(patch_size[2], all_scans.shape[2] - patch_size[2])]
 
-        patch = all_scans[start_point[0]:start_point[0] + patch_size[0],
-                          start_point[1]:start_point[1] + patch_size[1],
+        patch = all_scans[start_point[1]:start_point[1] + patch_size[1],
+                          start_point[0]:start_point[0] + patch_size[0],
                           start_point[2]:start_point[2] + patch_size[2]]
 
         # check patch size

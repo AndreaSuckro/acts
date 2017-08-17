@@ -7,7 +7,7 @@ import os
 
 from learning.network_structure import network_model
 
-PATCH_SIZE = [30, 30, 10]
+PATCH_SIZE = [100, 100, 5]
 
 @log_args
 def train_network(train_data, train_labels, validation_data, validation_labels, *, batch_size=5, epochs=1000,

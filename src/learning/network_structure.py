@@ -100,21 +100,23 @@ def network_model(data, labels, *, patch_size=[20, 20, 10]):
     #########################################################
     # Convolutional layers
 
-    conv1 = conv3d_layer('conv1', input_layer, phase, num_filters=40,
-                         kernel_size=4, pool_size=2, pool_stride=1)
+    conv1 = conv3d_layer('conv1', input_layer, phase, num_filters=30,
+                         kernel_size=11, pool_size=2, pool_stride=1)
 
-    conv2 = conv3d_layer('conv2', conv1, phase, num_filters=50,
-                         kernel_size=3, pool_size=2, pool_stride=1)
+    conv2 = conv3d_layer('conv2', conv1, phase, num_filters=40,
+                         kernel_size=11, pool_size=2, pool_stride=1)
 
-    conv3 = conv3d_layer('conv3', conv2, phase, num_filters=60,
+    conv3 = conv3d_layer('conv3', conv2, phase, num_filters=40,
                           kernel_size=3, pool_size=2, pool_stride=1)
 
-    pool3_flat = tf.contrib.layers.flatten(conv3)
+    conv4 = conv3d_layer('conv4', conv3, phase, num_filters=10,
+                          kernel_size=3, pool_size=2, pool_stride=1)
+    pool3_flat = tf.contrib.layers.flatten(conv4)
 
     #########################################################
     # Fully connected Layer with dropout
 
-    dens1 = dense_layer('dense', pool3_flat, phase, num_neurons=200, activation_fun = tf.nn.relu)
+    dens1 = dense_layer('dense', pool3_flat, phase, num_neurons=50, activation_fun = tf.nn.relu)
 
     nodule_class = tf.layers.dense(inputs=dens1, units=2, name="class")
     onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=2)

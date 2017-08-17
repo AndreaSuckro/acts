@@ -108,7 +108,7 @@ def plot_patient(path):
     data_nod, data_health = data.slice_patient(array_patient, annos)
     print(f'Shape of nodules: {len(data_nod)}x{data_nod[0].shape}, '
           f'Shape of health: {len(data_health)}x{data_health[0].shape}')
-
+    print(f'Annotations for this patient: {annos}')
     # create annotations for frames
     formating = {'shape': 'RECT',
                  'color': '#008000',
@@ -128,7 +128,7 @@ def plot_patient(path):
             self.i = 0
 
         def read(self):
-            time.sleep(0.3)  # delays for 0.3 seconds
+            time.sleep(0.5)
             self.i = (self.i + 1) if self.i < self.scans.shape[2] - 1 else 0
             img = self.scans[:, :, self.i]
             return True, img
