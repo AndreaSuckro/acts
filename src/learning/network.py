@@ -34,7 +34,8 @@ def train_network(train_data, train_labels, validation_data, validation_labels, 
     # so many variables!
     loss, optimizer, target, network_output, \
     accuracy, sum_train_loss, sum_validation_loss, \
-    sum_train_acc, sum_validation_acc, phase = network_model(train_data_ph, train_labels_ph, patch_size=patch_size)
+    sum_train_acc, sum_validation_acc, phase, \
+    sum_health_img, sum_nodule_img = network_model(train_data_ph, train_labels_ph, patch_size=patch_size)
 
     log_path = net_save_path
 
@@ -43,6 +44,7 @@ def train_network(train_data, train_labels, validation_data, validation_labels, 
     epochs_val = []
 
     global_step = 0
+    #config = tf.ConfigProto(device_count = {'GPU': 0})
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
 
@@ -74,7 +76,8 @@ def train_network(train_data, train_labels, validation_data, validation_labels, 
                 store_values(sess, train_data, train_labels, validation_data, validation_labels,
                              batch_size, writer, saver, log_path, global_step,
                              sum_train_loss, sum_validation_loss, sum_train_acc, sum_validation_acc,
-                             train_data_ph, train_labels_ph, epochs_val, losses, accuracy, phase)
+                             train_data_ph, train_labels_ph, epochs_val, losses, accuracy, phase,
+                             sum_health_img, sum_nodule_img)
 
         writer.close()
 
@@ -84,7 +87,8 @@ def train_network(train_data, train_labels, validation_data, validation_labels, 
 def store_values(sess, train_data, train_labels, validation_data, validation_labels,
                  batch_size, writer, saver, log_path, global_step,
                  sum_train_loss, sum_validation_loss, sum_train_acc, sum_validation_acc,
-                 train_data_ph, train_labels_ph, epochs_val, losses, accuracy, phase):
+                 train_data_ph, train_labels_ph, epochs_val, losses, accuracy, phase,
+                 sum_health_img, sum_nodule_img):
     """
     Saves metrics for this specific network and the session.
     """
@@ -94,9 +98,10 @@ def store_values(sess, train_data, train_labels, validation_data, validation_lab
     batch_train = np.random.permutation(len(train_data))[0:len(train_data)]
     batch_scans_train, batch_labels_train = train_data[batch_train], train_labels[batch_train]
 
-    train_acc, train_loss, train_acc_val = sess.run([sum_train_acc, sum_train_loss, accuracy],
-                                                    {train_data_ph: batch_scans_train,
-                                                     train_labels_ph: batch_labels_train, phase: 0})
+    train_acc, train_loss, train_acc_val,\
+    sum_health_val, sum_nodule_val = sess.run([sum_train_acc, sum_train_loss, accuracy, sum_health_img, sum_nodule_img],
+                                              {train_data_ph: batch_scans_train,
+                                               train_labels_ph: batch_labels_train, phase: 0})
 
     # be bold and take whole validation set
     # batch_validation = np.random.permutation(len(validation_data))[0:batch_size]
@@ -116,6 +121,8 @@ def store_values(sess, train_data, train_labels, validation_data, validation_lab
     writer.add_summary(train_loss, global_step)
     writer.add_summary(validation_acc, global_step)
     writer.add_summary(validation_loss, global_step)
+    writer.add_summary(sum_health_val, global_step)
+    writer.add_summary(sum_nodule_val, global_step)
     saver.save(sess, log_path)
 
 if __name__ == "__main__":

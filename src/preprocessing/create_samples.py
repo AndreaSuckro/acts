@@ -279,9 +279,15 @@ def slice_patient(all_scans, annotation, patch_size=PATCH_SIZE_DEFAULT, number_o
         z = tumor[2] - patch_size[2]//2
         start_point = [x, y, z]
 
-        nodule_patches.append(all_scans[start_point[1]:start_point[1] + patch_size[1],
-                                        start_point[0]:start_point[0] + patch_size[0],
-                                        start_point[2]:start_point[2] + patch_size[2]])
+        patch = all_scans[start_point[1]:start_point[1] + patch_size[1],
+                          start_point[0]:start_point[0] + patch_size[0],
+                          start_point[2]:start_point[2] + patch_size[2]]
+
+        nodule_patches.append(patch)
+
+        if np.array(patch).shape != tuple(patch_size):
+            logger.error(f'Array dimension out of scope, was {np.array(patch).shape}, aborting ...')
+            raise AttributeError('Nodule did not fit!')
 
     # get all the regular patches
     healthy_patches = []

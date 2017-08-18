@@ -46,6 +46,11 @@ plot:
 tb:
 	tensorboard --logdir=/net/store/cv/projects/tmp/asuckro/logs/ --port 6006
 
+# open tensorboard
+.PHONY: tb-test
+tb-test:
+	tensorboard --logdir=/net/store/cv/projects/tmp/asuckro/logs_testing/ --port 6066
+
 # check patient number
 .PHONY: check
 check: data/raw

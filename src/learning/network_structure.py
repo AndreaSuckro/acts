@@ -84,6 +84,23 @@ def augment_data(input_data):
     return data
 
 
+def input_summary(aug_data, labels):
+    """
+    Generates a patch image for a healthy and an
+    unhealthy patch.
+    """
+    nodule_idx = tf.gather(tf.where(tf.equal(labels, True)), 0)
+    health_idx = tf.gather(tf.where(tf.equal(labels, False)), 0)
+
+    slice_nodule = tf.slice(tf.gather(aug_data, nodule_idx), [0,0,0,0], [-1,-1,-1,1])
+    slice_health = tf.slice(tf.gather(aug_data, health_idx), [0,0,0,0], [-1,-1,-1,1])
+
+    sum_health_img = tf.summary.image('health_patch', slice_health, max_outputs=1)
+    sum_nodule_img = tf.summary.image('nodule_patch', slice_nodule, max_outputs=1)
+
+    return sum_health_img, sum_nodule_img
+
+
 def network_model(data, labels, *, patch_size=[20, 20, 10]):
     """
     The graph for the tensorflow model that is currently used.
@@ -95,23 +112,25 @@ def network_model(data, labels, *, patch_size=[20, 20, 10]):
     """
     phase = tf.placeholder(tf.bool, name='phase')
     aug_data = tf.map_fn(augment_data, data)
+    sum_health_img, sum_nodule_img = input_summary(aug_data, labels)
+
+    ########################################################
+    # Layers
     input_layer = tf.reshape(aug_data, [-1, patch_size[0], patch_size[1], patch_size[2], 1])
 
     #########################################################
     # Convolutional layers
 
-    conv1 = conv3d_layer('conv1', input_layer, phase, num_filters=30,
+    conv1 = conv3d_layer('conv1', input_layer, phase, num_filters=10,
                          kernel_size=11, pool_size=2, pool_stride=1)
 
-    conv2 = conv3d_layer('conv2', conv1, phase, num_filters=40,
-                         kernel_size=11, pool_size=2, pool_stride=1)
+    conv2 = conv3d_layer('conv2', conv1, phase, num_filters=10,
+                         kernel_size=5, pool_size=2, pool_stride=1)
 
-    conv3 = conv3d_layer('conv3', conv2, phase, num_filters=40,
+    conv3 = conv3d_layer('conv3', conv2, phase, num_filters=5,
                           kernel_size=3, pool_size=2, pool_stride=1)
 
-    conv4 = conv3d_layer('conv4', conv3, phase, num_filters=10,
-                          kernel_size=3, pool_size=2, pool_stride=1)
-    pool3_flat = tf.contrib.layers.flatten(conv4)
+    pool3_flat = tf.contrib.layers.flatten(conv3)
 
     #########################################################
     # Fully connected Layer with dropout
@@ -143,4 +162,4 @@ def network_model(data, labels, *, patch_size=[20, 20, 10]):
     tf.contrib.layers.summarize_tensors(all_vars)
 
     return total_loss, optimizer, onehot_labels, nodule_class, accuracy, sum_train_loss, sum_test_loss, \
-           sum_train_acc, sum_test_acc, phase
+           sum_train_acc, sum_test_acc, phase, sum_health_img, sum_nodule_img
