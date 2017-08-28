@@ -86,14 +86,14 @@ def augment_data(input_data):
 
 def input_summary(aug_data, labels):
     """
-    Generates a patch image for a healthy and an
+    Generates a patch image for a healthy and annormal_net
     unhealthy patch.
     """
     nodule_idx = tf.gather(tf.where(tf.equal(labels, True)), 0)
     health_idx = tf.gather(tf.where(tf.equal(labels, False)), 0)
 
-    slice_nodule = tf.slice(tf.gather(aug_data, nodule_idx), [0,0,0,0], [-1,-1,-1,1])
-    slice_health = tf.slice(tf.gather(aug_data, health_idx), [0,0,0,0], [-1,-1,-1,1])
+    slice_nodule = tf.slice(tf.gather(aug_data, nodule_idx), [0,0,0,0], [-1,-1,-1,1], name = 'nodule_sum')
+    slice_health = tf.slice(tf.gather(aug_data, health_idx), [0,0,0,0], [-1,-1,-1,1], name = 'health_sum')
 
     sum_health_img = tf.summary.image('health_patch', slice_health, max_outputs=1)
     sum_nodule_img = tf.summary.image('nodule_patch', slice_nodule, max_outputs=1)
@@ -107,7 +107,7 @@ def network_model(data, labels, *, patch_size=[20, 20, 10]):
 
     :param data: the scan cubes as a list
     :param labels: the labels for the lung scan cubes (1 for nodule, 0 for healthy)
-    :param patch_size: the patch_size of th lung scan
+    :param patch_size: the patch_size of the lung scan
     :return: the loss of the network
     """
     phase = tf.placeholder(tf.bool, name='phase')
@@ -121,13 +121,13 @@ def network_model(data, labels, *, patch_size=[20, 20, 10]):
     #########################################################
     # Convolutional layers
 
-    conv1 = conv3d_layer('conv1', input_layer, phase, num_filters=10,
+    conv1 = conv3d_layer('conv1', input_layer, phase, num_filters=5,
                          kernel_size=11, pool_size=2, pool_stride=1)
 
-    conv2 = conv3d_layer('conv2', conv1, phase, num_filters=10,
+    conv2 = conv3d_layer('conv2', conv1, phase, num_filters=5,
                          kernel_size=5, pool_size=2, pool_stride=1)
 
-    conv3 = conv3d_layer('conv3', conv2, phase, num_filters=5,
+    conv3 = conv3d_layer('conv3', conv2, phase, num_filters=2,
                           kernel_size=3, pool_size=2, pool_stride=1)
 
     pool3_flat = tf.contrib.layers.flatten(conv3)
@@ -135,7 +135,7 @@ def network_model(data, labels, *, patch_size=[20, 20, 10]):
     #########################################################
     # Fully connected Layer with dropout
 
-    dens1 = dense_layer('dense', pool3_flat, phase, num_neurons=50, activation_fun = tf.nn.relu)
+    dens1 = dense_layer('dense', pool3_flat, phase, num_neurons=10, activation_fun = tf.nn.relu)
 
     nodule_class = tf.layers.dense(inputs=dens1, units=2, name="class")
     onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=2)

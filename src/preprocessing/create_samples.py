@@ -10,7 +10,7 @@ import argparse
 import sys
 from tools.helper import convert_to_float, convert_to_floats
 
-PATCH_SIZE_DEFAULT = [100, 100, 5]
+PATCH_SIZE_DEFAULT = [50, 50, 5]
 
 
 def normalize(a):
