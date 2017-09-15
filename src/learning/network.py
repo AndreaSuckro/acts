@@ -13,7 +13,7 @@ SCALE_SIZE = [15, 15]
 @log_args
 def train_network(train_data, train_labels, validation_data, validation_labels, *, batch_size=5, epochs=1000,
                   patch_size=PATCH_SIZE, save_level=100, net_save_path='../logs/acts_network.tf',
-                  test_name='default', scale_size=SCALE_SIZE):
+                  test_name='default'):
     """
     Trains the network with the given batchsize and for a certain amount of epochs.
 
@@ -38,8 +38,8 @@ def train_network(train_data, train_labels, validation_data, validation_labels, 
     loss, optimizer, target, network_output, \
     accuracy, sum_train_loss, sum_validation_loss, \
     sum_train_acc, sum_validation_acc, phase, \
-    sum_health_img, sum_nodule_img = network_model(train_data_ph, train_labels_ph,
-                                     patch_size=patch_size, scale_size=scale_size)
+    sum_health_img, sum_nodule_img = network_model(train_data_ph, train_labels_ph, SCALE_SIZE,
+                                     patch_size=patch_size)
 
     log_path = net_save_path
 
@@ -66,11 +66,14 @@ def train_network(train_data, train_labels, validation_data, validation_labels, 
                 # build a batch
                 batch = np.random.permutation(len(train_data))[0:batch_size]
                 batch_scans, batch_labels = train_data[batch], train_labels[batch]
+
                 meta_data = tf.RunMetadata()
                 opts = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE) if global_step%100000 == 0 else None
+
                 sess.run([optimizer, target, network_output],
                          {train_data_ph: batch_scans, train_labels_ph: batch_labels, phase: 1},
                          run_metadata=meta_data, options=opts)
+
                 if i % save_level + j == 1:
                     writer.add_run_metadata(meta_data, str(global_step))
                 global_step = global_step + 1
