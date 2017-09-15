@@ -8,10 +8,12 @@ import os
 from learning.network_structure import network_model
 
 PATCH_SIZE = [50, 50, 5]
+SCALE_SIZE = [15, 15]
 
 @log_args
 def train_network(train_data, train_labels, validation_data, validation_labels, *, batch_size=5, epochs=1000,
-                  patch_size=PATCH_SIZE, save_level=100, net_save_path='../logs/acts_network.tf', test_name='default'):
+                  patch_size=PATCH_SIZE, save_level=100, net_save_path='../logs/acts_network.tf',
+                  test_name='default', scale_size=SCALE_SIZE):
     """
     Trains the network with the given batchsize and for a certain amount of epochs.
 
@@ -25,6 +27,7 @@ def train_network(train_data, train_labels, validation_data, validation_labels, 
     :param save_level: defines at how many epochs the performance is saved
     :param net_save_path: the path the trained network is saved to, is also used for replaying
     :param test_name: the experiment name that describes the layout or data
+    :param scale_size: the x, y size to which the patches are downsampled
     :return: epochs and losses depending on the save_level
     """
 
@@ -35,7 +38,8 @@ def train_network(train_data, train_labels, validation_data, validation_labels, 
     loss, optimizer, target, network_output, \
     accuracy, sum_train_loss, sum_validation_loss, \
     sum_train_acc, sum_validation_acc, phase, \
-    sum_health_img, sum_nodule_img = network_model(train_data_ph, train_labels_ph, patch_size=patch_size)
+    sum_health_img, sum_nodule_img = network_model(train_data_ph, train_labels_ph,
+                                     patch_size=patch_size, scale_size=scale_size)
 
     log_path = net_save_path
 

@@ -84,6 +84,13 @@ def augment_data(input_data):
     return data
 
 
+def rescale_cubes(input_data, scale_size):
+    """
+    Rescales the input data in x and y plane but leaves the z
+    plane in tact (hopefully).
+    """
+    return tf.image.resize_images(images, scale_size)
+
 def input_summary(aug_data, labels):
     """
     Generates a patch image for a healthy and annormal_net
@@ -101,7 +108,7 @@ def input_summary(aug_data, labels):
     return sum_health_img, sum_nodule_img
 
 
-def network_model(data, labels, *, patch_size=[20, 20, 10]):
+def network_model(data, labels, *, patch_size=[20, 20, 10], scale_size=[10, 10]):
     """
     The graph for the tensorflow model that is currently used.
 
@@ -111,12 +118,13 @@ def network_model(data, labels, *, patch_size=[20, 20, 10]):
     :return: the loss of the network
     """
     phase = tf.placeholder(tf.bool, name='phase')
-    aug_data = tf.map_fn(augment_data, data)
+    scale_data = tf.map_fn(rescale_cubes, data, scale_size)
+    aug_data = tf.map_fn(augment_data, scale_data)
     sum_health_img, sum_nodule_img = input_summary(aug_data, labels)
 
     ########################################################
     # Layers
-    input_layer = tf.reshape(aug_data, [-1, patch_size[0], patch_size[1], patch_size[2], 1])
+    input_layer = tf.reshape(aug_data, [-1, scale_size[0], scale_size[1], patch_size[2], 1])
 
     #########################################################
     # Convolutional layers
