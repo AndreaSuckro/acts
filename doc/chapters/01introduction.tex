@@ -18,19 +18,32 @@ The main risk factor has been shown to be the exposure to tobacco smoke, whether
 
 
 \section{Current Medical Approach}
+In the clinical setting the supervising medical staff has additional information available apart from the CT scans. Patients are either in a high risk group (over a certain age and heavy smokers) or present certain syndromes like fatigue, weight loss, cough, dyspnea, hemoptysis and chest pain. Different methods are used to find the underlying cause of these symptoms:
 
-Patients typically present with fatigue, weight loss, cough, dyspnea, hemoptysis, chest pain
-Combination of biopsy and ct scans
-Requirement to analyze X pictures per patient
-current programs (screenshot OsiriX)
+\begin{description}
+\item[Sputum cytology] if patients cough up cells that can be used to check for irregularities in the lung tissue those can be used in analyzing the root of the illness
+\item[Biopsy] taking samples from the irregular lung tissue
+\item[Imaging tests] regular X-Ray vs CT vs LDCT 
+\end{description}
+
+Lung cancer is tricky since the symptoms show up very late in the process of the illness and it is often too late for the patient when those are recognized. Sputum cytology and biopsy are only used when there is already circumstantial evidence (like other symptoms) for lung cancer which may often be too late for a successful treatment. This leaves imaging techniques as the only source for early detection.
+
+Radiologists are requirement to analyze X pictures per patient depending on the slice thickness of the used technique. Medical image viewers like OsiriX \ref{fig:osirix} are assisting in this process and have also been used in this thesis to have a first glimpse on the data.
+
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{Osirix_program.png}
+\caption{Screenshot of the analyzing software OsiriX. It is the most widely used software in the domain of medical image viewers and offers a free trial version that was used for this thesis.}
+\label{fig:osirix}
+\end{figure}
+
+Despite all efforts in this field the process is of course not fail safe and many 
 fallacy rates
 
 \section{Opportunities for Assistance}
 
 Early detection of lung cancer is important in two ways. First it avoids unnecessary scans in the scenario of undetected cancerous material and it improves the error rate of radiologists.
 
-There exist many algorithmic approaches to finding nodules in CT-Scans \cite{papers_classical} and some that
-make use of deep convolutional neural networks to solve related tasks \cite{papers_dnn}\\
+There exist many algorithmic approaches to finding nodules in CT-Scans \cite{papers_classical} and some that make use of deep convolutional neural networks to solve related tasks \cite{papers_dnn}\\
 
 Despite much effort being devoted to the computer-aided nodule detection problem, lung CAD systems remain an ongoing
 research topic [18]. One of the major difficulties is the detection of GGO nodules with low-dose thin-slice CT screening. Another two difficulties are the detection of nodules that are adjacent to vessels or the chest wall when they have very similar density; and the detection of nodules that are nonspherical in shape. In such cases, intensity thresholding or model-based methods might fail to identify those nodules.
