@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 
+
 def conv2d_layer(scope, input, phase, *, num_filters=20, kernel_size=[3, 3],
                  kernel_stride=[1, 1], pool_size=[2, 2], pool_stride=1):
     """
@@ -11,6 +12,7 @@ def conv2d_layer(scope, input, phase, *, num_filters=20, kernel_size=[3, 3],
     :param phase: either test or train
     :param num_filters: number of filter kernels to be used
     :param kernel_size: the size of the filter kernels
+    :param kernel_stride: the stride of the kernel
     :param pool_size: the pooling size
     :param pool_stride: the stride of the pooling kernel
     :return: the activation of the layer
@@ -69,7 +71,7 @@ def dense_layer(scope, input, phase, *, num_neurons=50, activation_fun=tf.nn.rel
                                 activation=activation_fun, name="dense")
         bnd = tf.layers.batch_normalization(dense, center=True, scale=True,
                                             training=phase)
-        dropout = tf.layers.dropout(inputs=bnd, rate=0.1, name="dropout",
+        dropout = tf.layers.dropout(inputs=bnd, rate=0.5, name="dropout",
                                     training=phase)
 
     return dropout
@@ -137,8 +139,8 @@ def network_model(data, labels, scale_size, *, patch_size=(20, 20, 5)):
     #########################################################
     # Fully connected Layer with dropout
 
-    dens1 = dense_layer('dense1', pool3_flat, phase, num_neurons=64, activation_fun = tf.nn.relu)
-    dens2 = dense_layer('dense2', dens1, phase, num_neurons=64, activation_fun = tf.nn.relu)
+    dens1 = dense_layer('dense1', pool3_flat, phase, num_neurons=64, activation_fun=tf.nn.relu)
+    dens2 = dense_layer('dense2', dens1, phase, num_neurons=64, activation_fun=tf.nn.relu)
 
     nodule_class = tf.layers.dense(inputs=dens2, units=2, name="class")
     onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=2)

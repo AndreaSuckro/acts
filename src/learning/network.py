@@ -1,19 +1,17 @@
 import tensorflow as tf
 import numpy as np
 import logging
-from datetime import datetime
 from tools.log import log_args
-import os
 
 from learning.network_structure import network_model
 
 PATCH_SIZE = [50, 50, 5]
 SCALE_SIZE = [32, 32]
 
+
 @log_args
 def train_network(train_data, train_labels, validation_data, validation_labels, *, batch_size=5, epochs=1000,
-                  patch_size=PATCH_SIZE, save_level=100, net_save_path='../logs/acts_network.tf',
-                  test_name='default'):
+                  patch_size=PATCH_SIZE, save_level=100, net_save_path='../logs/acts_network.tf'):
     """
     Trains the network with the given batchsize and for a certain amount of epochs.
 
@@ -39,20 +37,16 @@ def train_network(train_data, train_labels, validation_data, validation_labels, 
     accuracy, sum_train_loss, sum_validation_loss, \
     sum_train_acc, sum_validation_acc, phase, \
     sum_health_img, sum_nodule_img = network_model(train_data_ph, train_labels_ph, SCALE_SIZE,
-                                     patch_size=patch_size)
+                                                   patch_size=patch_size)
 
     log_path = net_save_path
 
     # variables for plotting
     losses = []
     epochs_val = []
-
     global_step = 0
-    #config = tf.ConfigProto(device_count = {'GPU': 0})
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
 
-    with tf.Session(config=config) as sess:
+    with tf.Session() as sess:
 
         writer = tf.summary.FileWriter(log_path, sess.graph)
         writer.add_graph(sess.graph)
@@ -62,13 +56,13 @@ def train_network(train_data, train_labels, validation_data, validation_labels, 
         sess.run(tf.global_variables_initializer())
         for i in range(1, epochs + 1):
 
-            for j in range(1, len(train_data)//batch_size):
+            for j in range(1, len(train_data) // batch_size):
                 # build a batch
                 batch = np.random.permutation(len(train_data))[0:batch_size]
                 batch_scans, batch_labels = train_data[batch], train_labels[batch]
 
                 meta_data = tf.RunMetadata()
-                opts = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE) if global_step%100000 == 0 else None
+                opts = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE) if global_step % 100000 == 0 else None
 
                 sess.run([optimizer, target, network_output],
                          {train_data_ph: batch_scans, train_labels_ph: batch_labels, phase: 1},
@@ -105,7 +99,7 @@ def store_values(sess, train_data, train_labels, validation_data, validation_lab
     batch_train = np.random.permutation(len(train_data))[0:len(train_data)]
     batch_scans_train, batch_labels_train = train_data[batch_train], train_labels[batch_train]
 
-    train_acc, train_loss, train_acc_val,\
+    train_acc, train_loss, train_acc_val, \
     sum_health_val, sum_nodule_val = sess.run([sum_train_acc, sum_train_loss, accuracy, sum_health_img, sum_nodule_img],
                                               {train_data_ph: batch_scans_train,
                                                train_labels_ph: batch_labels_train, phase: 0})
@@ -131,6 +125,7 @@ def store_values(sess, train_data, train_labels, validation_data, validation_lab
     writer.add_summary(sum_health_val, global_step)
     writer.add_summary(sum_nodule_val, global_step)
     saver.save(sess, log_path)
+
 
 if __name__ == "__main__":
     # Todo: think about some tests or func checks
