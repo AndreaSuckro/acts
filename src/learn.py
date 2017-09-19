@@ -63,7 +63,6 @@ if __name__ == "__main__":
                                        batch_size=option.batchsize,
                                        epochs=option.epochs,
                                        save_level=option.save_level,
-                                       net_save_path=option.net_save_path,
-                                       test_name=option.test_name)
+                                       net_save_path=option.net_save_path)
 
     logger.info('Finished training! Check out the log directory for results')

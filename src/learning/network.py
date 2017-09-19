@@ -6,7 +6,7 @@ from tools.log import log_args
 from learning.network_structure import network_model
 
 PATCH_SIZE = [50, 50, 5]
-SCALE_SIZE = [32, 32]
+SCALE_SIZE = [50, 50]
 
 
 @log_args
