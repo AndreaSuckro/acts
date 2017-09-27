@@ -5,7 +5,22 @@ How did the approaches fair?
 How can this be applied?
 What can be learned from the features the network used?
 Can there be a combined approach to the problem of nodule detection?
+\section{Items of future code optimization}
+\begin{description}
+\item[cluster parameters] are at the moment not completely adapted to the optimal need of the learning process and could be further improved.
+\item[input pipeline] the input pipeline is not using queues as suggested in the TensorFlow documentation, but just reads in all the lung ct data.
+\item[preprocessing] further steps in the preprocessing could improve the results, for example a true 3d rotation and different scales of the same patch could be used. The ratio of healthy and nodule patches is at the moment way to high ($50:50$). This could be adjusted to a more reasonable value although this may prolong the training phase.
+\item[Training time] due to the way the institute set up the grid, all users have a walltime which stops training after several hours. One could pick up the training after being shut down from the latest checkpoint.
+\end{description}
 
-
+\section{Items of future investigation}
+\begin{description}
+\item[Fully convolutional network] to eliminate the influence on the performance of the dense layers and keep the location information until the end.
+\item[Optimizers] it would have been nice to check for the influence of different optimizers for this problem.
+\item[Minimal Architecture] how can the number of layers and/or neurons be reduced. What is the optimal distribution for the filter sizes to be used.
+\item[Metrics of one patient] For one patient it would be interesting to see how the network fairs when one cube after the other is selected and fed in to the network. How does the FP rate look for example?
+\end{description}
+\section{Conclusive thoughts}
+Some general remarks about the whole thesis.
 % the end :)
 \end{document}
