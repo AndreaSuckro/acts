@@ -113,7 +113,6 @@ def network_model(data, labels, scale_size, *, patch_size=(20, 20, 5)):
     :return: the loss of the network
     """
     phase = tf.placeholder(tf.bool, name='phase')
-
     scaled_data = tf.image.resize_images(data, scale_size)
     aug_data = tf.map_fn(augment_data, scaled_data)
     sum_health_img, sum_nodule_img = input_summary(aug_data, labels)
