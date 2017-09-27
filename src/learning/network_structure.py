@@ -139,9 +139,9 @@ def network_model(data, labels, scale_size, *, patch_size=(20, 20, 5)):
     # Fully connected Layer with dropout
 
     dens1 = dense_layer('dense1', pool3_flat, phase, num_neurons=64, activation_fun=tf.nn.relu)
-    dens2 = dense_layer('dense2', dens1, phase, num_neurons=64, activation_fun=tf.nn.relu)
+    #dens2 = dense_layer('dense2', dens1, phase, num_neurons=64, activation_fun=tf.nn.relu)
 
-    nodule_class = tf.layers.dense(inputs=dens2, units=2, name="class")
+    nodule_class = tf.layers.dense(inputs=dens1, units=2, name="class")
     onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=2)
 
     #########################################################
