@@ -71,10 +71,10 @@ def dense_layer(scope, input, phase, *, num_neurons=50, activation_fun=tf.nn.rel
                                 activation=activation_fun, name="dense")
         bnd = tf.layers.batch_normalization(dense, center=True, scale=True,
                                             training=phase)
-        dropout = tf.layers.dropout(inputs=bnd, rate=0.5, name="dropout",
-                                    training=phase)
+        #dropout = tf.layers.dropout(inputs=bnd, rate=0.5, name="dropout",
+        #                            training=phase)
 
-    return dropout
+    return bnd
 
 
 def augment_data(input_data):
