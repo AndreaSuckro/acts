@@ -2,29 +2,28 @@
 \documentclass[main.tex]{subfiles}
 \begin{document}
 \chapter{Methods}
-The used model is inspired by the network presented in \ref{huang2017lung} and performs with an accuracy of around 80$\%$. 
+The used model is inspired by the network presented in \cite{huang2017lung} and performs with an accuracy of around 80$\%$. The following sections highlight the used methods and give a rough overview about the used tools. A more extensive explanation to them can be found in the appendix.
 
 
 \section{Software Packages}
 The whole programming is done in Python 3.6. 
-
 Use of conda for the environment management 
-
 TensorFlow for the network architecture and computation
+Sun Grid Engine of the Institute for the calculations on the grid \ref{appendix:oge}.
 
-Sun Grid Engine of the Institute for the calculations on the grid
 
 \section{Convolutional Neural Network}
-The current network structure consists of
+In this thesis the main focus was on using a 3d convolutional network. A convolutional neural network is similar to other artificial neural networks (ANNs) in the sense that it only uses forward connections, has an input and output layer and an arbitrary number of hidden layers in between. The hidden layers in a convolutional network are either convolutional or pooling layers.
 
-Picture of layers
-
-picture of tb?
-
-show the structure
+The convolutional layers
 
 
-\section{Learning}
+
+The structure of the neural network resembles closely the one described in \cite{huang2017lung}. 
+
+
+
+\section{Training}
 Why use batchnorm?
 Why use dropout?
 Compare with and without
