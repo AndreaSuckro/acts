@@ -5,11 +5,12 @@ import matplotlib.pyplot as plt
 import math
 
 
-def get_activations(sess, kernel, placeholder, data):
+def get_activations(sess, kernel, input_data, phase, data):
     """
     Runs the data through the kernel and returns the output in a plot.
     """
-    activations = sess.run(kernel,feed_dict={placeholder.name+":0": data})
+    activations = sess.run("conv2/conv/convolution:0",feed_dict={input_data.name+":0": data, phase.name+":0": 1})
+    print(f'Activations = {activations}')
     plot_nn_filter(activations)
 
 
@@ -60,16 +61,22 @@ def get_conv_kernels(sess):
     A function to get all the convolutional kernels from a graph.
     """
     kernels = [k for k in tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES) if "conv/kernel" in k.name]
-    print(f'Found {len(kernels)} layers with convolutional kernels.')
+    for k in kernels:
+        print(k)
+    print(f'Found {len(kernels)} layers with convolution outputs.')
     return kernels
 
 
 if __name__ == "__main__":
     # First let's load meta graph and restore weights
     saver = tf.train.import_meta_graph('../../data/networks/huang1/acts_2017-09-19T12-37_Huang_no_scaling_50x50.meta')
-
     with tf.Session() as sess:
         saver.restore(sess, '../../data/networks/huang1/acts_2017-09-19T12-37_Huang_no_scaling_50x50')
+
         _, placeholders = inspect_variables(sess)
         kernels = get_conv_kernels(sess)
-        get_activations(sess, kernels[0], placeholders[0], np.ones((1,50,50,5)))
+
+        input_ph = placeholders[0]
+        phase_ph = [k for k in sess.graph.get_operations() if "phase" in k.name][0]
+        print(phase_ph)
+        get_activations(sess, kernels[0], input_ph, phase_ph, np.ones((1,50,50,5)))
