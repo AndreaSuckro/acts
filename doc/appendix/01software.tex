@@ -5,7 +5,35 @@
 This section describes the used software packages in greater detail.
 \section{Oracle Grid Engine}
 \label{appendix:oge}
-Oracle grid cluster , all the computers
+Our institute uses the work stations and additional hardware resources in form of a grid computing system that is managed by the Oracle grid engine (formerly known as Sun Grid Engine). The software manages the distribution of jobs to the nodes in the cluster, based on availability and resource requirements. The following bash script is used in the learning process of the network. 
+
+\begin{lstlisting}[language=bash]
+#!/bin/bash
+#$ -N acts
+#$ -l mem=128G
+#$ -pe default 8
+#$ -j y
+#$ -v TESTNAME,WD,LOG_PATH
+
+export LD_LIBRARY_PATH=$HOME/.local/cuda/lib64/:$LD_LIBRARY_PATH
+export LIBRARY_PATH=$HOME/.local/cuda/lib64/:$LIBRARY_PATH
+export CPATH=$HOME/.local/cuda/include:$CPATH
+export PATH="/net/store/cv/projects/software/conda/bin:${PATH}"
+
+. activate acts-cpu
+
+python3 $WD/acts/src/learn.py \
+        -d /net/store/cv/projects/datasets/image/pub/LIDC-IDRI/ \
+        -l $LOG_PATH \
+        -e 2000 \
+        -s 1 \
+        -b 5 \
+        -n $LOG_PATH \
+        -t $TESTNAME \
+        -p 3000
+\end{lstlisting}
+
+It defines the name of the job and the necessary memory that should be available on the machines. No machine with less memory is considered by the distributor as an execution host for this job. If the memory is set too low for the job, it can not complete the task and fails during execution since no more than the requested memory can be allocated dynamically during run time. It is also defined how many cores should be used on the host machine to run the job in parallel. 
 
 syntax for submitting a job. shell script
 resource alocation
@@ -19,6 +47,10 @@ Describe the used version and why it was used and where it comes from
 
 \section{Tensorflow}
 \label{appendix:tf}
+Tensorflow is a software library developed by Google Brain that aids the development of machine learning applications by expressing computations as a graph and taking care of the underlying optimization and execution. Through this approach it is applicable to many other tasks apart from neural networks.
+
+Tensorflow is usable via API's for Python, C++, Haskell, Java, Go, and Rust. Third party packages are available for C#, Julia, R, and Scala.
+
 How does tensorflow work. describe computational graph and layers package 
 
 
