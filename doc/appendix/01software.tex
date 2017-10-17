@@ -2,12 +2,20 @@
 \documentclass[main.tex]{subfiles}
 \begin{appendices}
 \chapter{Software}
-This section describes the used software packages in greater detail.
+
+\section{Python}
+\label{appendix:py}
+Python is a multi-purpose language, which means that no specific coding paradigma is imposed on the user, but one can use scripting as well as object oriented design alike. This allows for a very flexible style of programming which was used in this project for writing little tools that help with the data preprocessing as well as more complex code for the learning pipeline and the analysis of the network. 
+Python is also widely used by the machine learning community which makes it easier to look up code examples and questions on forums like \href{https://stackoverflow.com/}{Stackoverflow}. 
+
+The version used is 3.6 and all used packages are managed via conda.
+
 \section{Oracle Grid Engine}
 \label{appendix:oge}
-Our institute uses the work stations and additional hardware resources in form of a grid computing system that is managed by the Oracle grid engine (formerly known as Sun Grid Engine). The software manages the distribution of jobs to the nodes in the cluster, based on availability and resource requirements. The following bash script is used in the learning process of the network. 
+Our institute uses the work stations and additional hardware resources in form of a grid computing system that is managed by the Oracle grid engine (formerly known as Sun Grid Engine). The software manages the distribution of jobs to the nodes in the cluster, based on availability and resource requirements. The following bash script \ref{code:cluster} is used in the learning process of the network. It defines the name of the job and the necessary memory that should be available on the machines.
 
-\begin{lstlisting}[language=bash]
+\begin{minipage}[t]{0.9\textwidth}
+\begin{lstlisting}[language=bash, caption={The code for calling the learning script. The parameters in the beginning are the information for the Oracle Grid Engine.}, captionpos=b]
 #!/bin/bash
 #$ -N acts
 #$ -l mem=128G
@@ -32,22 +40,28 @@ python3 $WD/acts/src/learn.py \
         -t $TESTNAME \
         -p 3000
 \end{lstlisting}
+\label{code:cluster}
+\end{minipage}
 
-It defines the name of the job and the necessary memory that should be available on the machines. No machine with less memory is considered by the distributor as an execution host for this job. If the memory is set too low for the job, it can not complete the task and fails during execution since no more than the requested memory can be allocated dynamically during run time. It is also defined how many cores should be used on the host machine to run the job in parallel. 
+No machine with less memory is considered by the distributor as an execution host for this job. If the memory is set too low for the job, it can not complete the task and fails during execution since no more than the requested memory can be allocated dynamically during run time. It is also defined how many cores should be used on the host machine to run the job in parallel. The job can be directly executed via the command line or with a script (which makes more sense if one plans to run the grid job multiple times). The command used for this operation is \emph{qsub}. Since the grid engine works with a concept of different queues it is possible to submit the job also just to specific queues, where one has the maximum execution time for example.
 
-syntax for submitting a job. shell script
-resource alocation
-job termination
+\begin{minipage}[t]{0.9\textwidth}
+\begin{lstlisting}[language=bash, caption={The code for submitting the script to the scheduler.}, captionpos=b]
+#!/bin/bash
+export TESTNAME=Huang_no_scaling_50x50
+export LOG_PATH=/net/store/cv/projects/tmp/asuckro/logs/acts_$(date +%Y-%m-%dT%H-%M)_$TESTNAME
 
+mkdir -p $LOG_PATH
 
-\section{Python}
-\label{appendix:py}
-Describe the used version and why it was used and where it comes from
+qsub -q all.q -o $LOG_PATH/grid.out runActs.sge
+\end{lstlisting}
+\end{minipage}
 
+All jobs are only allowed for a specified maximal amount of time depending on the users setting and the queue the job is transmitted to. All outputs to the console are logged in a file that can be specified with the '-o' variable. 
 
 \section{Tensorflow}
 \label{appendix:tf}
-Tensorflow is a software library developed by Google Brain that aids the development of machine learning applications by expressing computations as a graph and taking care of the underlying optimization and execution. Through this approach it is applicable to many other tasks apart from neural networks.
+Tensorflow is a software library developed by Google Brain that aids the development of machine learning applications by expressing computations as a graph and taking care of the underlying optimization and execution. Through this approach it is applicable to many other tasks apart from neural networks. 
 
 Tensorflow is usable via API's for Python, C++, Haskell, Java, Go, and Rust. Third party packages are available for C\#, Julia, R, and Scala.
 
