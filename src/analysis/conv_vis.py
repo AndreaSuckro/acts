@@ -1,25 +1,30 @@
-import tensorflow as tf
 import time
+import math
 import numpy as np
 import matplotlib.pyplot as plt
-import math
+import tensorflow as tf
+import pandas as pd
+
+from mpl_toolkits.mplot3d import Axes3D
+from sklearn.decomposition import PCA as sklearnPCA
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 
 
 def get_activations(sess, kernel, input_data, phase, data):
     """
     Runs the data through the kernel and returns the output in a plot.
     """
-    activations = sess.run("conv2/conv/convolution:0",feed_dict={input_data.name+":0": data, phase.name+":0": 1})
-    print(f'Activations = {activations}')
-    plot_nn_filter(activations)
+    activations = sess.run("conv1/conv/convolution:0",feed_dict={input_data.name+":0": data, phase.name+":0": 1})
+    print(f'Activations Shape= {activations.shape}')
+    return activations
 
 
-def plot_nn_filter(units, columns=8, figsize=(20,20)):
+def plot_nn_filter(activations, columns=8, figsize=(20,20)):
     """
     Plots the kernel of the conv layer hopefully in a beautiful way.
     """
     print(f'Activations come in shape {units.shape}')
-    filters = units.shape[4]
+    filters = activations.shape[4]
     plt.figure(1, figsize=figsize)
     n_columns = columns
     n_rows = math.ceil(filters / n_columns) + 1
@@ -28,8 +33,7 @@ def plot_nn_filter(units, columns=8, figsize=(20,20)):
     for i in range(filters):
         plt.subplot(n_rows, n_columns, i+1)
         plt.title('Filter ' + str(i+1))
-        #print(units[:,:,:,:,1])
-        plt.imshow(np.squeeze(units[:,:,:,:,i]), interpolation="nearest", cmap="gray")
+        plt.imshow(np.squeeze(units[:,:,:,1,i]), interpolation="nearest", cmap="gray")
     plt.show()
 
 
@@ -67,6 +71,32 @@ def get_conv_kernels(sess):
     return kernels
 
 
+def plot_pca(activations):
+    """
+    plot filters with pca to see if there is a difference between them
+    """
+    activations = np.squeeze(activations)
+    print(f'Activations Shape after squeeze= {activations.shape}')
+    filters = activations.shape[3]
+    activations = np.rollaxis(activations, -1)
+    print(f'Activations Shape after rolling= {activations.shape}')
+
+    activations = np.reshape(activations,(32,12500))
+    print(f'Activations Shape after shaping= {activations.shape}')
+
+    pca = sklearnPCA(n_components=2) # keep 2 components
+    pca.fit(np.array(activations))
+    transformed = pca.transform(activations)
+
+    #transformed = pca.fit_transform(activations)
+    print(f'Explained variance = {pca.explained_variance_ratio_}')
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    for i in range(filters):
+        ax.scatter(transformed[i][0], transformed[i][1], label='Filter '+str(i))
+    plt.show()
+
 if __name__ == "__main__":
     # First let's load meta graph and restore weights
     saver = tf.train.import_meta_graph('../../data/networks/huang1/acts_2017-09-19T12-37_Huang_no_scaling_50x50.meta')
@@ -78,5 +108,10 @@ if __name__ == "__main__":
 
         input_ph = placeholders[0]
         phase_ph = [k for k in sess.graph.get_operations() if "phase" in k.name][0]
-        print(phase_ph)
-        get_activations(sess, kernels[0], input_ph, phase_ph, np.ones((1,50,50,5)))
+        #print(phase_ph)
+        #get_activations(sess, kernels[0], input_ph, phase_ph, np.ones((1,50,50,5)))
+        #get_activations(sess, kernels[0], input_ph, phase_ph, np.zeros((1,50,50,5)))
+        activations = get_activations(sess, kernels[0], input_ph, phase_ph, np.random.rand(1,50,50,5))
+
+        plot_pca(activations)
+        #plot_nn_filter(activations)

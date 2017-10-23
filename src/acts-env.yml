@@ -55,6 +55,7 @@ dependencies:
 - numpy=1.12.1=py36_blas_openblas_200
 - openblas=0.2.19=2
 - opencv=3.2.0=np112py36_blas_openblas_201
+- pandas=0.20.3=py36_1
 - pandoc=1.19.2=0
 - pandocfilters=1.4.1=py36_0
 - pexpect=4.2.1=py36_0
@@ -72,6 +73,8 @@ dependencies:
 - pyzmq=16.0.2=py36_2
 - qt=5.6.2=2
 - qtconsole=4.3.0=py36_0
+- scikit-learn=0.19.1=py36_blas_openblas_200
+- scipy=0.19.1=py36_blas_openblas_202
 - simplegeneric=0.8.1=py36_0
 - sqlite=3.13.0=0
 - terminado=0.6=py36_0
