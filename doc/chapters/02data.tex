@@ -11,9 +11,9 @@ The dataset contains a folder for each patient. These folders contain a full che
 \subsection{Scan Data Structure}
 DICOM (abbreviation for Digital Imaging and COmmunications in Medicine) is a file format for storing medical images with for the use case relevant meta information. It is not only used for CT scans but also for radiography, ultrasonography and MRI data. It was initially introduced by the American College of Radiology (ACR) and National Electrical Manufacturers Association (NEMA) under the name ACR/NEMA 300 in 1985, but further redefined and finally in the third version released under the name DICOM in 1993\cite{pianykh2008}.
 
-The cases that scans are provided for in the dataset fullfill certain criteria. The CT scans are exclusively of the lung only and do not contain other body parts or organs. The  reconstruction interval and collimation are kept at $<3mm$. This means that there are differences in the resolution of the scan data (naturally through the different equipment used during recording), but that it is limited with an upper bound. Still one can find patients with 124-529 recorded images in the data. The scan data may also include noise or other disruptive factors like metal (heart pacers etc.) as well as other pathological features as long as those do not interfere with the visibility of the nodules in a drastic sense.
+The cases that scans are provided for in the dataset fullfill certain criteria. The CT scans are exclusively of the lung only and do not contain other body parts or organs. The  reconstruction interval and collimation are kept at $<3$mm. This means that there are differences in the resolution of the scan data (naturally through the different equipment used during recording), but that it is limited with an upper bound. Still one can find patients with 124-529 recorded images in the data. The scan data may also include noise or other disruptive factors like metal (heart pacers etc.) as well as other pathological features as long as those do not interfere with the visibility of the nodules in a drastic sense.
 
-The included cases have between 0 and 6 nodules with a longest diameter between 3-30mm. The term nodule refers to a brought spectrum of tissue abnormalities and can represent not only lung cancer but also other metastatic diseases or non-cancerous processes or lesions that have a nodular morphology. Typical slices from the data can be seen in 
+The included cases have between 0 and 6 nodules with a longest diameter between 3-30 mm. The term nodule refers to a brought spectrum of tissue abnormalities and can represent not only lung cancer but also other metastatic diseases or non-cancerous processes or lesions that have a nodular morphology. Typical slices from the data can be seen in 
 
 \begin{figure}[!tbp]
 \centering
@@ -28,7 +28,7 @@ The included cases have between 0 and 6 nodules with a longest diameter between 
 \end{figure}
 
 \subsection{Annotation Structure}
-Two different types of nodules are encoded in the data: nodules with a diameter of $>=$ 3mm and nodules smaller than that. The big nodules have extensive information stored with them: a rich edge map which outlines a complete contour for them in all sections \ref{fig:bigNod} and a measure for their characteristics (like their subtlety and malignancy on a scale from 1 to 5). Those extra information have not been used in the learning process for this thesis.
+Two different types of nodules are encoded in the data: nodules with a diameter of $>=3$ mm and nodules smaller than that. The big nodules have extensive information stored with them: a rich edge map which outlines a complete contour for them in all sections \ref{fig:bigNod} and a measure for their characteristics (like their subtlety and malignancy on a scale from 1 to 5). Those extra information have not been used in the learning process for this thesis.
 
 \lstset{
   language=XML,
