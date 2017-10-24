@@ -11,7 +11,7 @@ set -x JOB_ID local
 All dependencies for this project can be installed via pip with `make install` in the projects root directory.
 
 ### Using Conda
-If you prefer using conda: there is also an environment [yml file](https://github.com/AndreaSuckro/acts/tree/master/src/acts-env.yml) available. Just replace the `{PATH-TO-ENV}` with your destination folder and run: `make conda-env`.
+If you prefer using conda: there is also an environment [yml file](https://github.com/AndreaSuckro/acts/tree/master/src/acts-env.yml) available. Just replace the `{PATH-TO-ENV}` with your destination folder and run: `make conda-env`. For mac there are unfortunately some packages not available. It is recommended to use a linux system instead.
 
 ### Data
 The Lung CT Scans should be downloaded from the [Cancer Imaging Archive](https://wiki.cancerimagingarchive.net/display/Public/LIDC-IDRI). And stored in th `raw` folder under the data directory. At the moment the split into test, train and validation set is done manually such that in the end one should have the patient data for example stored in a path similar to this: `data/raw/train/LIDC-IDRI-0666/`.
