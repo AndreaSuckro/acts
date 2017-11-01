@@ -19,24 +19,6 @@ def get_activations(sess, kernel, input_data, phase, data):
     return activations
 
 
-def plot_nn_filter(activations, columns=8, figsize=(20,20)):
-    """
-    Plots the kernel of the conv layer hopefully in a beautiful way.
-    """
-    print(f'Activations come in shape {units.shape}')
-    filters = activations.shape[4]
-    plt.figure(1, figsize=figsize)
-    n_columns = columns
-    n_rows = math.ceil(filters / n_columns) + 1
-    print(f'Number of filters is {filters}, displaying in {n_columns}x{n_rows}')
-
-    for i in range(filters):
-        plt.subplot(n_rows, n_columns, i+1)
-        plt.title('Filter ' + str(i+1))
-        plt.imshow(np.squeeze(units[:,:,:,1,i]), interpolation="nearest", cmap="gray")
-    plt.show()
-
-
 def inspect_variables(sess, full=False):
     """
     Inspects the variables stored in the session and prints out
@@ -95,6 +77,24 @@ def plot_pca(activations):
 
     for i in range(filters):
         ax.scatter(transformed[i][0], transformed[i][1], label='Filter '+str(i))
+    plt.show()
+
+
+def plot_nn_filter(activations, columns=8, figsize=(20,20)):
+    """
+    Plots the kernel of the conv layer hopefully in a beautiful way.
+    """
+    print(f'Activations come in shape {units.shape}')
+    filters = activations.shape[4]
+    plt.figure(1, figsize=figsize)
+    n_columns = columns
+    n_rows = math.ceil(filters / n_columns) + 1
+    print(f'Number of filters is {filters}, displaying in {n_columns}x{n_rows}')
+
+    for i in range(filters):
+        plt.subplot(n_rows, n_columns, i+1)
+        plt.title('Filter ' + str(i+1))
+        plt.imshow(np.squeeze(units[:,:,:,1,i]), interpolation="nearest", cmap="gray")
     plt.show()
 
 if __name__ == "__main__":
