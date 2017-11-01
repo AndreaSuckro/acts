@@ -8,6 +8,7 @@ import pandas as pd
 from mpl_toolkits.mplot3d import Axes3D
 from sklearn.decomposition import PCA as sklearnPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+from enthought.mayavi import mlab
 
 
 def get_activations(sess, kernel, input_data, phase, data):
@@ -136,6 +137,18 @@ def save_3d_to_disk(matrix, file_path):
     print(f'Wrote file successfully to {file_path}')
 
 
+def plot_3d_surface():
+    """
+    """
+    x,y,z = np.ogrid[-10:10:20j, -10:10:20j, -10:10:20j]
+    s = np.sin(x*y*z)/(x*y*z)
+    src = mlab.pipeline.scalarfield(s)
+
+    mlab.pipline.iso_surface(src, contours=[s.max()+0.1*d.ptp(), ], opacity=0.3)
+    mlab.show()
+
+
+
 if __name__ == "__main__":
     # First let's load meta graph and restore weights
     saver = tf.train.import_meta_graph('../../data/networks/huang1/acts_2017-09-19T12-37_Huang_no_scaling_50x50.meta')
@@ -150,9 +163,11 @@ if __name__ == "__main__":
         #print(phase_ph)
         activations = get_activations(sess, kernels[0], input_ph, phase_ph, np.random.rand(1,50,50,5))
 
-        plot_pca(activations)
-        plot_nn_filter(activations)
-        print(activations)
-        save_3d_to_disk(activations, '/net/home/student/a/asuckro/master/acts/src/analysis/test.txt')
+        #plot_pca(activations)
+        #plot_nn_filter(activations)
+        #print(activations)
+        #save_3d_to_disk(activations, '/net/home/student/a/asuckro/master/acts/src/analysis/test.txt')
+
+        plot_3d_surface()
         # to ensure that everything only closes when it's done
         #input()
