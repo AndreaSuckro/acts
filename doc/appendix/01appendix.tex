@@ -74,4 +74,42 @@ This section describes the used hardware for this thesis.
 On which machine was the training done
 \section{workstation}
 conda environments and resources of the university workstations.
+
+
+
+\chapter{Data}
+\label{appendix:data}
+\section{LIDC-IDRI Dataset}
+\label{appendix:lidc}
+The database as it is available now is the result of a long process that began in April 2000. The National Cancer Institute (NCI) - the U.S. federal government's principal agency for cancer research and training submitted RFAs to create guidelines of how such a combined reference database could look like. The Lung Image Database Consortium (LIDC) was formed by the Weill Cornell Medical College, University of California, Los Angeles, University of Chicago, University of Iowa and University of Michigan in 2001. There task was to develop a web-accessible resource for CT scans with attached meta information (like the slice thickness, tube current and other technical specifications as well as patient information) and nodule information based on expert knowledge. The initiative was further advanced in 2004 by the Foundation for the National Institutes of Health (FNIH) which founded the Image Database Resource Initiative (IDRI). They brought two additional medical centers (MD Anderson Cancer Center and Memorial Sloan-Kettering Cancer Center) and eight imaging companies (AGFA Healthcare, Carestream Health, Inc., Fuji Photo Film Co., GE Healthcare, iCAD, Inc., Philips Healthcare, Riverain Medical, and Siemens Medical Solutions) to the initiative. The new members contributed significantly to the whole database and since the process of data aquisition and annotation was streamlined to the previous recorded data the whole set is referred to as the LIDC-IDRI Database. It's aim is to further develop, improve and evaluate automated methods for lung cancer detection and diagnosis and it is comparable to other public datasets in the medical data community like the Digital Database for Screening Mammography (DDSM) which contains roughly 3000 mammograms - a pioneer in the field of public medical imaging datasets.
+
+\section{CT Scanner Technology}
+CT scanners 
+
+How does a CT Scanner work?
+
+Tube with rays absorbtion making a 
+
+
+
+\section{CT Specifications}
+\label{appendix:scanner}
+A range of scanner manufacturers and models was used to generate the data. The models and the number of samples they provided in the database are listed in the following table:
+
+\begin{center}
+\begin{tabular}{|||p{3,5cm}|p{3,5cm}|p{3,5cm}|p{3,5cm}|||} 
+ \hline
+ GE Medical Systems LightSpeed & Philips Brilliance & Siemens Definition, Emotion, Sensation & Toshiba Aquilion \\ [0.5ex] 
+ \hline
+ 670 & 74 & 205 & 69 \\ [1ex] 
+ \hline
+\end{tabular}
+\captionof{table}{The distribution of the 1018 samples among each CT scanner model. Vaules are taken from \cite{armato2011lung}}.
+\end{center}
+
+The tube peak potential energies used for scan acquisition were as follows: 120 kVp , 130 kVp , 135 kVp and 140 kVp. Tube current ranged from 40 to 627 mA (mean: 222.1 mA). 
+
+The number of images per patient depend on the body size but also on the slice thickness which was 0.6 mm, 0.75 mm, 0.9 mm, 1.0 mm, 1.25 mm, 1.5 mm, 2.0 mm, 2.5 mm, 3.0 mm, 4.0 mm and 5.0 mm and the reconstruction interval that ranged from 0.45 to 5.0 mm (mean: 1.74 mm) \cite{armato2011lung}.
+
+The number of pixels for each scan slice depends on the in plane resolution which ranged from 0.461 to 0.977 mm per pixel(mean: 0.688 mm). While the convolution kernels used for image reconstruction differ among manufacturers, these convolution kernels may be classified broadly as “soft” (67) math formula, “standard/nonenhancing” (n=560), “slightly enhancing” (n=264), and “overenhancing” (n=127) (in order of increasing spatial frequencies accentuated by each class).
 \end{appendices}
