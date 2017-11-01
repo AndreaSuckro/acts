@@ -102,18 +102,39 @@ def plot_nn_filter(activations, columns=8, figsize=(20,20)):
     """
     Plots the kernel of the conv layer hopefully in a beautiful way.
     """
-    print(f'Activations come in shape {units.shape}')
+    print(f'Activations come in shape {activations.shape}')
     filters = activations.shape[4]
     plt.figure(1, figsize=figsize)
     n_columns = columns
     n_rows = math.ceil(filters / n_columns) + 1
     print(f'Number of filters is {filters}, displaying in {n_columns}x{n_rows}')
 
+    fig = plt.figure()
     for i in range(filters):
         plt.subplot(n_rows, n_columns, i+1)
         plt.title('Filter ' + str(i+1))
-        plt.imshow(np.squeeze(units[:,:,:,1,i]), interpolation="nearest", cmap="gray")
-    plt.show()
+        plt.imshow(np.squeeze(activations[:,:,:,1,i]), interpolation="nearest", cmap="gray")
+    fig.show()
+
+
+def save_3d_to_disk(matrix, file_path):
+    """
+    Saving a 3d matrix to disk since np.savetxt doesn't support
+    more than 2 dimensions.
+    """
+    activations = np.squeeze(matrix)
+    filters = activations.shape[3]
+    # now bring it to format filterxXxYxZ
+    activations = np.rollaxis(activations, -1)
+    filter1 = activations[1,:,:,:]
+    print(f'Filter 1 shape for saving {filter1.shape}')
+    with open(file_path, "w") as f:
+        for i in range(filter1.shape[0]):
+            for j in range(filter1.shape[1]):
+                for k in range(filter1.shape[2]):
+                    f.write(f'{i},{j},{k},{filter1[i,j,k]}\n')
+    print(f'Wrote file successfully to {file_path}')
+
 
 if __name__ == "__main__":
     # First let's load meta graph and restore weights
@@ -131,5 +152,7 @@ if __name__ == "__main__":
 
         plot_pca(activations)
         plot_nn_filter(activations)
+        print(activations)
+        save_3d_to_disk(activations, '/net/home/student/a/asuckro/master/acts/src/analysis/test.txt')
         # to ensure that everything only closes when it's done
-        plt.show()
+        #input()
