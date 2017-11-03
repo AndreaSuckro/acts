@@ -8,10 +8,10 @@
 This master thesis centers around the automated detection of nodules in lung region CT scans. The introduction will cover the medical context necessary to understand the problem and motivate the use of Deep Neural Networks to assist in the task of nodule detection. It also explains the research question at hand and the structure of the thesis with an overview of the sections to come.
 
 \section{Medical Context}
-In 2012 34,490 men and 18,030 women in Germany were diagnosed with an illness corresponding to the ICD-10 code C33-34 \cite{koch2015krebs}. This code describes malignant tumors in the breathable tract more generally summarized as lung cancer. 43,499 people died from this illness, which makes it one of the most dangerous types of cancer in Germany. The international comparison shows that other countries too suffer under its impact \ref{fig:cancInt}.
+In 2012 34,490 men and 18,030 women in Germany were diagnosed with an illness corresponding to the ICD-10 code C33-34 \cite{koch2015krebs}. This code describes malignant tumors in the breathable tract more generally summarized as lung cancer. 43,499 people died from this illness, which makes it one of the most dangerous types of cancer in Germany. The international comparison shows that other countries too suffer under its impact (see Figure~\ref{fig:cancInt}).
 
 \begin{figure}[ht]
-\includegraphics[width=\textwidth]{cancerInternational.png}
+\includegraphics[width=\textwidth]{cancer_international.png}
 \caption{International comparison of age-standardized incidence and mortality rates for lung cancer in the year 2012}
 \label{fig:cancInt}
 \end{figure}
@@ -28,10 +28,10 @@ In the clinical setting, the supervising medical staff has additional informatio
 \item[Imaging tests] different imaging techniques are available for analyzing the lung: a regular X-Ray scan, but also MRI. The data used in this thesis stems from LDCT scans which stand for \emph{low-dose computed tomography}. The radiation used in this method lies around 2.35 mSv which corresponds to roughly 80$\%$ less radiation then regular CT scans \cite{ono2013low}.
 \end{description}
 
-Lung cancer is tricky to detect since the symptoms show up very late in the process of the illness and it is often too late for the patient when those are recognized. Sputum cytology and biopsy are only used when there is already circumstantial evidence (like other symptoms) for lung cancer which may often be too late in the development of the illness for a successful treatment. This makes imaging techniques the only source for early detection. Radiologists are required to analyze roughly 100-600 pictures per patient depending on the slice thickness of the used technique and the body height of the patient. Medical image viewers like OsiriX \ref{fig:osirix} are assisting in this process and have also been used in this thesis to analyze the image data.
+Lung cancer is tricky to detect since the symptoms show up very late in the process of the illness and it is often too late for the patient when those are recognized. Sputum cytology and biopsy are only used when there is already circumstantial evidence (like other symptoms) for lung cancer which may often be too late in the development of the illness for a successful treatment. This makes imaging techniques the only source for early detection. Radiologists are required to analyze roughly 100-600 pictures per patient depending on the slice thickness of the used technique and the body height of the patient. Medical image viewers like OsiriX (Figure~\ref{fig:osirix}) are assisting in this process and have also been used in this thesis to analyze the image data.
 
 \begin{figure}[ht]
-\includegraphics[width=\textwidth]{Osirix_program.png}
+\includegraphics[width=\textwidth]{osirix_program.png}
 \caption{Screenshot of the analyzing software OsiriX. It is the most widely used software in the domain of medical image viewers and offers a free trial version that was used for this thesis.}
 \label{fig:osirix}
 \end{figure}
@@ -54,6 +54,6 @@ In this thesis, a Deep Neural Network will be developed that uses 3D CT scan inf
 
 
 \section{Structure of this thesis}
-This thesis is structured in the following way: in chapter \ref{chap:02data} the used dataset is described as well as it's preprocessing for the learning algorithm. The methods chapter (\ref{chap:03methods}) contains information about the used software packages that were necessary to implement the algorithms as well as information about Convolutional Neural Networks and the learned model that is analyzed in chapter \ref{chap:04results}. That chapter focuses on extracting the features from the convolutional kernels and compares them to traditional approaches. In chapter \ref{chap:05discussion} the results are revised and items for further investigation and optimization are presented together with a more general outlook on the topic of analyzing Neural Networks to gain insights into problems and not just as solutions to them. 
+This thesis is structured in the following way: in chapter~\ref{chap:02data} the used dataset is described as well as it's preprocessing for the learning algorithm. The methods chapter (\ref{chap:03methods}) contains information about the used software packages that were necessary to implement the algorithms as well as information about Convolutional Neural Networks and the learned model that is analyzed in chapter~\ref{chap:04results}. That chapter focuses on extracting the features from the convolutional kernels and compares them to traditional approaches. In chapter~\ref{chap:05discussion} the results are revised and items for further investigation and optimization are presented together with a more general outlook on the topic of analyzing Neural Networks to gain insights into problems and not just as solutions to them. 
 
 \end{document}
