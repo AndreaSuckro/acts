@@ -104,8 +104,7 @@ def store_values(sess, train_data, train_labels, validation_data, validation_lab
                                               {train_data_ph: batch_scans_train,
                                                train_labels_ph: batch_labels_train, phase: 0})
 
-    # be bold and take whole validation set
-    # batch_validation = np.random.permutation(len(validation_data))[0:batch_size]
+
     batch_validation = np.random.permutation(len(validation_data))[0:len(validation_data)]
     batch_scans_validation, batch_labels_validation = validation_data[batch_validation], \
                                                       validation_labels[batch_validation]
