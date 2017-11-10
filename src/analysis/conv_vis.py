@@ -3,55 +3,11 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
-import pandas as pd
 
 from mpl_toolkits.mplot3d import Axes3D
 from sklearn.decomposition import PCA as sklearnPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
-from enthought.mayavi import mlab
-
-
-def get_activations(sess, kernel, input_data, phase, data):
-    """
-    Runs the data through the kernel and returns the output in a plot.
-    """
-    activations = sess.run("conv1/conv/convolution:0",feed_dict={input_data.name+":0": data, phase.name+":0": 1})
-    print(f'Activations Shape= {activations.shape}')
-    return activations
-
-
-def inspect_variables(sess, full=False):
-    """
-    Inspects the variables stored in the session and prints out
-    information for the trainable variables as well as the placeholders.
-    """
-    print('#####List of all TRAINABLE variables#####\n')
-    kernels = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)
-    print(f'Found {len(kernels)} trainable variables in the graph:\n')
-    for var in kernels:
-        print(var)
-        if full:
-            print(var.eval())
-
-    print('\n#####List of placeholders#####\n')
-    placeholders = [x for x in sess.graph.get_operations() if "Placeholder" in x.name]
-    print(f'Found {len(placeholders)} placeholders in the graph:\n')
-    for ph in placeholders:
-        print(ph.name)
-        print(ph.get_attr("shape"))
-
-    return kernels, placeholders
-
-
-def get_conv_kernels(sess):
-    """
-    A function to get all the convolutional kernels from a graph.
-    """
-    kernels = [k for k in tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES) if "conv/kernel" in k.name]
-    for k in kernels:
-        print(k)
-    print(f'Found {len(kernels)} layers with convolution outputs.')
-    return kernels
+from read_network import get_conv_kernels, get_activations, inspect_variables, load_graph
 
 
 def plot_nn_filter(activations, columns=8, figsize=(20,20)):
@@ -99,75 +55,16 @@ def plot_pca(activations):
     fig.show()
 
 
-def plot_nn_filter(activations, columns=8, figsize=(20,20)):
-    """
-    Plots the kernel of the conv layer hopefully in a beautiful way.
-    """
-    print(f'Activations come in shape {activations.shape}')
-    filters = activations.shape[4]
-    plt.figure(1, figsize=figsize)
-    n_columns = columns
-    n_rows = math.ceil(filters / n_columns) + 1
-    print(f'Number of filters is {filters}, displaying in {n_columns}x{n_rows}')
-
-    fig = plt.figure()
-    for i in range(filters):
-        plt.subplot(n_rows, n_columns, i+1)
-        plt.title('Filter ' + str(i+1))
-        plt.imshow(np.squeeze(activations[:,:,:,1,i]), interpolation="nearest", cmap="gray")
-    fig.show()
-
-
-def save_3d_to_disk(matrix, file_path):
-    """
-    Saving a 3d matrix to disk since np.savetxt doesn't support
-    more than 2 dimensions.
-    """
-    activations = np.squeeze(matrix)
-    filters = activations.shape[3]
-    # now bring it to format filterxXxYxZ
-    activations = np.rollaxis(activations, -1)
-    filter1 = activations[1,:,:,:]
-    print(f'Filter 1 shape for saving {filter1.shape}')
-    with open(file_path, "w") as f:
-        for i in range(filter1.shape[0]):
-            for j in range(filter1.shape[1]):
-                for k in range(filter1.shape[2]):
-                    f.write(f'{i},{j},{k},{filter1[i,j,k]}\n')
-    print(f'Wrote file successfully to {file_path}')
-
-
-def plot_3d_surface():
-    """
-    """
-    x,y,z = np.ogrid[-10:10:20j, -10:10:20j, -10:10:20j]
-    s = np.sin(x*y*z)/(x*y*z)
-    src = mlab.pipeline.scalarfield(s)
-
-    mlab.pipline.iso_surface(src, contours=[s.max()+0.1*d.ptp(), ], opacity=0.3)
-    mlab.show()
-
-
-
 if __name__ == "__main__":
-    # First let's load meta graph and restore weights
-    saver = tf.train.import_meta_graph('../../data/networks/huang1/acts_2017-09-19T12-37_Huang_no_scaling_50x50.meta')
+    saver = load_graph()
     with tf.Session() as sess:
         saver.restore(sess, '../../data/networks/huang1/acts_2017-09-19T12-37_Huang_no_scaling_50x50')
 
-        _, placeholders = inspect_variables(sess)
         kernels = get_conv_kernels(sess)
+        input_data = np.random.rand(1,50,50,5)
+        activations = get_activations(sess, kernels[0], input_data)
 
-        input_ph = placeholders[0]
-        phase_ph = [k for k in sess.graph.get_operations() if "phase" in k.name][0]
-        #print(phase_ph)
-        activations = get_activations(sess, kernels[0], input_ph, phase_ph, np.random.rand(1,50,50,5))
+        plot_pca(activations)
+        plot_nn_filter(activations)
 
-        #plot_pca(activations)
-        #plot_nn_filter(activations)
-        #print(activations)
-        #save_3d_to_disk(activations, '/net/home/student/a/asuckro/master/acts/src/analysis/test.txt')
-
-        plot_3d_surface()
-        # to ensure that everything only closes when it's done
-        #input()
+        plt.show()

@@ -104,8 +104,7 @@ def store_values(sess, train_data, train_labels, validation_data, validation_lab
                                               {train_data_ph: batch_scans_train,
                                                train_labels_ph: batch_labels_train, phase: 0})
 
-    # be bold and take whole validation set
-    # batch_validation = np.random.permutation(len(validation_data))[0:batch_size]
+
     batch_validation = np.random.permutation(len(validation_data))[0:len(validation_data)]
     batch_scans_validation, batch_labels_validation = validation_data[batch_validation], \
                                                       validation_labels[batch_validation]
@@ -116,6 +115,9 @@ def store_values(sess, train_data, train_labels, validation_data, validation_lab
 
     epochs_val.append(global_step)
     losses.append(train_acc)
+
+    if validation_acc_val > 0.82:
+            saver.save(sess, log_path+str(validation_acc_val)+'_BEST')
 
     logger.info('Step: %s, Acc Train: %s, Acc validation: %s', global_step, train_acc_val, validation_acc_val)
     writer.add_summary(train_acc, global_step)
