@@ -26,8 +26,8 @@ def conv3d_layer(scope, input, phase, *, num_filters=20, kernel_size=[5, 5, 3],
                                 name="conv")
         bn = tf.layers.batch_normalization(conv, center=True, scale=True,
                                            training=phase)
-        dropout = tf.layers.dropout(inputs=bn, rate=0.01, name="dropout", training=phase)
-        pool = tf.layers.max_pooling3d(inputs=dropout, pool_size=pool_size,
+        #dropout = tf.layers.dropout(inputs=bn, rate=0.01, name="dropout", training=phase)
+        pool = tf.layers.max_pooling3d(inputs=bn, pool_size=pool_size,
                                        strides=pool_stride, name='pool')
     return pool
 
@@ -41,7 +41,7 @@ def dense_layer(scope, input, phase, *, num_neurons=50, activation_fun=tf.nn.rel
                                 activation=activation_fun, name="dense")
         bnd = tf.layers.batch_normalization(dense, center=True, scale=True,
                                             training=phase)
-        dropout = tf.layers.dropout(inputs=bnd, rate=0.5, name="dropout",
+        dropout = tf.layers.dropout(inputs=bnd, rate=0.02, name="dropout",
                                     training=phase)
     return dropout
 

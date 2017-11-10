@@ -116,6 +116,9 @@ def store_values(sess, train_data, train_labels, validation_data, validation_lab
     epochs_val.append(global_step)
     losses.append(train_acc)
 
+    if validation_acc_val > 0.82:
+            saver.save(sess, log_path+str(validation_acc_val)+'_BEST')
+
     logger.info('Step: %s, Acc Train: %s, Acc validation: %s', global_step, train_acc_val, validation_acc_val)
     writer.add_summary(train_acc, global_step)
     writer.add_summary(train_loss, global_step)
