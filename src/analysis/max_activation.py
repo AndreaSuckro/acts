@@ -4,7 +4,7 @@ import itertools
 from multiprocessing import Pool
 import tensorflow as tf
 from vispy import app, visuals, scene, io
-from read_network import get_conv_kernels, get_activations, load_graph
+from read_network import get_conv_kernels, get_activations, load_graph, inspect_variables
 
 
 def draw_kernel(args):
@@ -20,28 +20,25 @@ def draw_kernel(args):
     app.run()
 
 if __name__ == "__main__":
-    saver = load_graph()
 
     with tf.Session() as sess:
+        saver = tf.train.import_meta_graph('../../data/networks/huang1/acts_2017-09-19T12-37_Huang_no_scaling_50x50.meta')
         saver.restore(sess, '../../data/networks/huang1/acts_2017-09-19T12-37_Huang_no_scaling_50x50')
+
+        graph = tf.get_default_graph()
+        _, placeholders = inspect_variables(sess, verbose=False)
+        print(placeholders)
+        input_ph = graph.get_tensor_by_name(placeholders[0].name+":0")
+        label_ph = graph.get_tensor_by_name(placeholders[1].name+":0")
+        phase_ph = graph.get_tensor_by_name(placeholders[2].name+":0")
+
+        feed_dict = {input_ph:np.random.rand(1,50,50,5), label_ph:[False], phase_ph:False}
+
+        op_to_restore = graph.get_tensor_by_name("ArgMax_1:0")
+
         kernels = get_conv_kernels(sess)
-        kern_num = kernels[0].shape[4]
+        kern_num = kernels[2].shape[4]
+        print(f'Number of Kernels {kern_num}')
 
-        input_data = np.random.rand(kern_num,1,50,50,5)
-
-        sigma = 0.1
-        kernel_num = 3
-
-        for i in range(500):
-            for j in range(kern_num):
-                activation = get_activations(sess, kernels[0], input_data[j])[...,j]
-                #update step- change the data accordingly
-                derivative = activation - input_data[j]
-                input_data[j] = input_data[j] + sigma*derivative
-
-#plot the input data
-print(input_data.shape)
-
-arguments = itertools.zip_longest(range(5),[],fillvalue=input_data)
-with Pool(5) as p:
-    p.map(draw_kernel, arguments)
+        print('And the result is.....')
+        print(sess.run(op_to_restore,feed_dict))

@@ -44,7 +44,7 @@ def inspect_variables(sess, full=False, verbose=True):
 
     kernels = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)
 
-    placeholders = [x for x in sess.graph.get_operations() if "Placeholder" in x.name]
+    placeholders = [x for x in sess.graph.get_operations() if "Placeholder" in x.name or "phase" in x.name]
 
     if verbose:
         print('\n#####List of all TRAINABLE variables#####\n')
