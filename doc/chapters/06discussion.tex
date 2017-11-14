@@ -1,10 +1,13 @@
 \documentclass[main.tex]{subfiles}
 \begin{document}
 \chapter{Discussion}\label{chap:discussion}
-How did the approaches fair?
-How can this be applied?
-What can be learned from the features the network used?
-Can there be a combined approach to the problem of nodule detection?
+
+This thesis started out with two research questions: First: can a 3D CNN be trained to perform the task of nodule detection and second, how can it's learned features be extracted and used for understanding the solution? 
+
+To the first question: it was shown that it is possible to train a network with promising results upon which further optimization could be applied. The performance of the learned network was at XXX $\%$ which is surprising for it's simple structure. With more time and computational power it seems very possible to increase the performance further. Ways forward could include more samples from the database and a richer augmentation of the samples which allow for training even deeper networks. Other network parameters could easily be systematically varied and tested for effectiveness, allowing for further optimization.
+
+The code for this thesis is openly available on \hyperref[GitHub]{''https://github.com/AndreaSuckro/acts''}. 
+
 \section{Items of future code optimization}
 \begin{description}
 \item[cluster parameters] are at the moment not completely adapted to the optimal need of the learning process and could be further improved.
@@ -20,7 +23,6 @@ Can there be a combined approach to the problem of nodule detection?
 \item[Minimal Architecture] how can the number of layers and/or neurons be reduced. What is the optimal distribution for the filter sizes to be used.
 \item[Metrics of one patient] For one patient it would be interesting to see how the network fairs when one cube after the other is selected and fed in to the network. How does the FP rate look for example?
 \end{description}
-\section{Conclusive thoughts}
-Some general remarks about the whole thesis.
+
 % the end :)
 \end{document}
