@@ -12,7 +12,7 @@ Writing a program for solving the task of nodule detection with neural networks 
 \begin{center}
 \includegraphics[scale=0.7]{deeplearning_frameworks.png}
 \end{center}
-\caption{Number of commits for the different deep learning frameworks. This figure is taken from \cite{shapiro2017}}.
+\caption{Number of commits for the different deep learning frameworks. This figure is taken from Shapiro \cite{shapiro2017}.}
 \label{fig:frameworks}
 \end{figure}
 
@@ -32,18 +32,17 @@ The convolutional layer consists of $1..n$ kernels that are represented through 
 \label{fig:conv_layer}
 \end{figure}
 
-As the layers of convolution stack the simple extracted features from the first layer (like bars in the 2 dimensional case) are combined to more complex shapes.
+As the layers of convolution stack the extracted features from the first layer are combined to more complex shapes. The layers contain also a batchnormalization step as described in \cite{ioffe2015batch} that was implemented in the Tensorflow layers class. Batchnormalization is scaling the activation of the layer to become normally distributed in each dimension of the features, but has additional parameters that can be learned to shift and scale these values again. Batchnormalization should bring several advantages like: reducing the dependence of the initialization method and allowing for higher learning rates. The batchnormalization is followed by a max pooling layer which is applying a max-filter of size $(2,2,2)$ to the normalized activations.
 
-
-\subsection{Pooling Layers}
 
 \subsection{Dense Layers}
+The activations from the last convolutional layer are flattened into a $(1 \times n)$ vector and fed to the neurons of the fully connected layer. The network has two dense layers with $64$ neurons each. The activation function of the rectified linear unit is a simple maximum of the weighted inputs.
 
 \begin{figure}
 \begin{center}
 \includegraphics[scale=0.5]{net_struct.png}
 \end{center}
-\caption{Architecture of the neural network. Each of the convolutional layers is composed of a 3D convolution layer with the respective filter size followed by a batchnormalization and a pooling layer. The pool size is $(2,2,2)$ with a stride $1$. The structure of the neural network resembles closely the one described in \cite{huang2017lung}.}
+\caption{Architecture of the neural network. Each of the convolutional layers is composed of a 3D convolution layer with the respective filter size followed by a batchnormalization and a pooling layer. The pool size is $(2,2,2)$ with a stride of $(1,1,1)$. The structure of the neural network resembles closely the one described by Huang~\cite{huang2017lung}.}
 \label{fig:net_struct}
 \end{figure}
 
