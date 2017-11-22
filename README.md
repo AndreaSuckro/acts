@@ -35,3 +35,8 @@ Visualizes the patient with number `0005` by playing it's slices after one anoth
 `make plot ARGS="-t p -d data/ -p 0005"`
 
 Visualizes the data from the preprocessed folder and shows the cubes that are used for learning the network.
+
+## Analysis
+The `analysis` folder contains a collection of scribes that measure the performance of the
+network or visualize some of it's features. They can be directly called by Python with the
+respective parameters.
