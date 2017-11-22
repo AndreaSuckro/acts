@@ -1,10 +1,6 @@
 # Training Parameters
 JOB_ID ?= local
 
-# configure project
-#.PHONY: configure
-#configure:
-
 # install dependencies for the project with pip
 .PHONY: install
 install: src/requirements.txt
