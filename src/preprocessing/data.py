@@ -38,14 +38,28 @@ def get_train_data(data_dir, *, patch_number=100, tumor_rate=0.5):
 
 def get_validation_data(data_dir, *, patch_number=100, tumor_rate=0.5):
     """
-    Returns all data under the test directory.
+    Returns all data under the validation directory.
+
+    :param data_dir: the directory that contains a folder for the validation data
+    :param patch_number: the number of patches that should be retrieved
+    :param tumor_rate: the fraction of tumors that should be contained in the patches
+    :return: data with nodules and without
+    """
+    return get_patches(os.path.join(data_dir, 'processed', 'validation'),
+                       patch_number=patch_number,
+                       tumor_rate=tumor_rate)
+
+
+def get_test_data(data_dir, *, patch_number=100, tumor_rate=0.5):
+    """
+    Reads all test data as specified in the training data.
 
     :param data_dir: the directory that contains a folder for the test data
     :param patch_number: the number of patches that should be retrieved
     :param tumor_rate: the fraction of tumors that should be contained in the patches
     :return: data with nodules and without
     """
-    return get_patches(os.path.join(data_dir, 'processed', 'validation'),
+    return get_patches(os.path.join(data_dir, 'processed', 'test'),
                        patch_number=patch_number,
                        tumor_rate=tumor_rate)
 
