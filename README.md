@@ -14,6 +14,8 @@ If you prefer using conda: there is an environment [yml file](https://github.com
 ### Data
 The Lung CT Scans should be downloaded from the [Cancer Imaging Archive](https://wiki.cancerimagingarchive.net/display/Public/LIDC-IDRI). And stored in the `raw` folder under the data directory. The data can be automatically split into test, training and validation set with the `make split` command. The patient data will then be split according to a ratio you define and stored in a path similar to this for example: `data/raw/train/LIDC-IDRI-0666/`.
 
+At the moment this folder contains a few sample data points to get you started. It also contains the trained network that can be analyzed with the scripts in `src/analysis`.
+
 ## Learning
 First the data needs to be preprocessed. For this use the following command (there are many more commands, but the location of the data directory and the number of patches per patient are the most interesting ones):
 
