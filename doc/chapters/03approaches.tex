@@ -31,53 +31,36 @@ Juxtapleural nodules can pose a problem in this scenario since they lie closely 
 
 
 \subsection{Candidate Selection}
-From the segmented lung region nodule candidates are selected. Nodule candidates should be distinct from blood vessels due to several morphological differences. 
+From the segmented lung region nodule candidates are selected. This selection can be done either by intensity- or model-based methods. The following text describes exemplary one method for each of the two types of algorithms and highlights concerns or limits of those. Armato et al.~\cite{armato1999computerized} use a multiple thresholding of the slices to obtain a set of $15$ CT scans that only contain pixels above an increasing threshold. Now the 10 neighborhood of all on-pixels is used to group pixels together in structures, which are then classified by their volume. All structures that have a volume less than $14.1cm^3$ are nodule candidates and the others are disregarded.
 
-- adaption of model parameters depending on a priori knowledge about the vessel density and the location of the slices
+Another approach involves using a predefined geometrical model to find the nodule candidates. Ye et al.~\cite{ye2009shape} use for example a shape index as defined in Equation~\ref{eq:SI} (this index is basically just a rescaled version of the original shape index that produces values between $-1,1$ to $0,1$) to classify candidates based on the shape of their surface. $k(p)$ are the values of the principal curvature in a point of interest $p$. Nodules obtain a higher score (closer to $1$) compared to blood vessels, which have a prolonged shape. 
 
-- candidates by intensity thresholding OR model fitting (geometrical or intensity models)
+\begin{equation} \label{eq:SI}
+SI(p)=\frac{1}{2}-\frac{1}{\pi}arctan\frac{k_1(p)+k_2(p)}{k_1(p)-k_2(p)}
+\end{equation}
 
-- sphericity might be a problem for juxtapleural nodules
-
-- a multiple gray-level thresholding procedure, grouping pixels with similar intensity value and counting pixels in a connected neighborhood
+Using sphericity as a strong nodule indicator may lead to a model that is highly sensitive to only one type of nodules while ignoring nodules that lie close to the chest wall and are not perfectly round or GGO nodules that are more diffuse in their morphology. Model-based algorithms on the other hand have the advantage of being able to incorporate a priori knowledge more easily. Different model parameters for example can be fine tuned due to the vessel density in a region of the lung - e.g. blood vessels are more common in the central region of the lung. The extracted nodule candidates can now be further processed in the classification step.
 
 
 \subsection{Classification}
-The candidates have to be classified to separate cancerous nodules from non-malicious nodules. 
-
-- LDA to distinguish the two classes
-
-Link and describe in greater detail the approaches found in the classic filter selection pipelines.
-
-Algorithm in this step would allow everyone of those to be
-
-
-
-Firmino et.al~\cite{firmino2014computer} provide a very rich comparison of different CAD methods and their performance, which can be seen in Figure~\ref{fig:firmino_comp}
+The candidates have to be classified to separate nodules between cancerous and non-malicious types. The classification itself can again be split into several steps, but this section will only highlight a few examples to give an overview. Armato et al.~\cite{armato1999computerized} and Gurcan et al.~\cite{gurcan2002lung} use a linear discriminant analysis classifier along several nodule features like volume, sphericity, radius of equivalent sphere and more to separate real nodules from other structures which have been found by the before described selection process. Firmino et.al~\cite{firmino2014computer} provide a very rich comparison of different CAD methods and their performance, which can be seen in Figure~\ref{fig:firmino_comp}.
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{firmino_comparison.png}
-\caption{This table is taken from Firmino et.al's paper ``Computer-aided detection system for lung cancer in computed tomography scans: Review and future prospects''~\cite{firmino2014computer} and shows the performance of different algorithms.}
+\caption{This table is taken from Firmino et.al's paper ``Computer-aided detection system for lung cancer in computed tomography scans: Review and future prospects''~\cite{firmino2014computer} and shows the performance of different algorithms. It is noticable how the number nodules used for training differ widely between the cases.}
 \label{fig:firmino_comp}
 \end{figure}
 
-\section{Deep Learning Approaches}
-Papers that deal with the neural network approach are explained here.
 
-Mixture of approaches, taking the candidate selection and making the classification with statistical methods like neural networks (for this sake also LDA etc.)
+\section{Deep Learning Approaches}
+A deep learning approach as defined for this thesis is any approach that utilizes in at least one of the above explained steps a neural network with more than $2$ layers. All of the found papers use a mixed strategy: using more classical candidate selection strategys and using the neural network only in the final classification step. Only two other papers use 3D Convolutional Neural Networks: Anirudh et al.~\cite{anirudh2016lung} and Huang et al.~\cite{huang2017lung}. 
+
+
 
 \section{This Thesis}
-Where can this thesis be positioned in the field of Lung CT analysis and nodule detection? Several  
+Where can this thesis be positioned in the field of Lung CT analysis and nodule detection? Given the sections above it is clear that it is part of the deep learning approaches, but differs in the sense that no prior candidate selection is performed on the data. The classification is based on raw ct scan patches that are fed to the network as is. The amount of data used for the training process also differs compared to the more classical papers. $NUMBER_NODULES$ nodules are used for the classification and $NUMBER_HEALTH$ for healthy patches. This means that no further features of the nodule can be determined like there malignancy score for example.
 
-
-Question: can lung nodule detection be done by neural networks? Can it be done by 3d convolutional neural networks? Can any further insight be gained from it?
-
-Network only approach.
-
-3D kernels for network. 
-
-Nodule detection in the sense of yes/no not classification of other features like malignancy.
 
 
 \end{document}

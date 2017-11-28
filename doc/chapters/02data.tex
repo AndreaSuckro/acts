@@ -80,7 +80,7 @@ Nodules with a smaller diameter have less information stored with them. They onl
 \end{figure}
 
 \section{Preprocessing}
-The data is available in the form of sub-folders for each patient that contain the CT scan results in DICOM file format and the annotation data as XML files. The following sections describe the read in and preprocessing of the data.
+The data is available in the form of sub-folders for each patient that contain the CT scan results in DICOM file format and the annotation data as XML files. The following sections describe the read in and slicing of the data.
 
 \subsection{Reading in the data}
 The whole dataset was randomly distributed to 3 folders in a $60:20:20$ split ratio: train, validation and test. The training dataset is used during the learning process of the neural network. The validation dataset is used to measure the performance of the network while it is trained on the train dataset. See Figure~\ref{fig:ttdist} for a distribution of values for the two classes.
