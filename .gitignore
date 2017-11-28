@@ -1,6 +1,4 @@
 # Project specific files and folders
-/data/*
-!/data/README.md
 
 /doc/library/*
 !/doc/library/README.md
