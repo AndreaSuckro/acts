@@ -2,11 +2,20 @@
 \documentclass[main.tex]{subfiles}
 \begin{document}
 \chapter{Results}\label{chap:results}
-Write about what the final network and it's performance.
+This chapter presents the result of the training process. The final network performances are evaluated and compared to other papers. The network's extracted features are further analyzed and a way forward is sketched.
 
 \section{The trained Network}
-The used model is inspired by the network presented in \cite{huang2017lung} and performs with an accuracy of around 76$\%$ on the validation set the false positive rate is $0.1$ per sample.
-Show performance of the network and all metrics about number of epochs etc.
+The used model is inspired by the network presented in \cite{huang2017lung} and performs with a sensitivity of around 81$\%$ on the validation set and a false positive rate of $0.192$ per sample. This is already a better result than Xu et al.~\cite{xu1997development}, Armato et al.~\cite{armato1999computerized}, Lee et al.~\cite{lee2001automated}, Suzuki et al.~\cite{suzuki2003massive} and Teramoto et al.~\cite{teramoto2013fast} approaches.
+
+
+
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.5]{validation_process.png}
+\end{center}
+\caption{Learning process of the network - the graph shows the developement of the accuracy of the network on the validation set. The darker line represents the smoothed values of the lighter line. Since the training is performed on the CPU (GPU can not be utilized since the network was too big.), it takes several days.}
+\label{fig:validation}
+\end{figure}
 
 
 \section{Analyzing the Network}
