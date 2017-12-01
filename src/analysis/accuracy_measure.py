@@ -3,7 +3,7 @@ import numpy as np
 import itertools
 import tensorflow as tf
 from read_network import get_conv_kernels, get_activations, load_graph, inspect_variables
-
+from optparse import OptionParser
 # I am sorry python but you let me no choice ...
 import os
 import sys
@@ -12,7 +12,7 @@ if module_path not in sys.path:
     sys.path.append(module_path)
 
 from preprocessing.data import get_test_data
-from optparse import OptionParser
+
 
 
 def get_commandline_args():
@@ -33,8 +33,6 @@ if __name__ == "__main__":
     (option, args) = get_commandline_args()
     test_data = option.data_dir
 
-    # ../../data/networks/huang1/acts_2017-09-19T12-37_Huang_no_scaling_50x50
-
     test_data_raw, test_labels_raw = get_test_data(test_data, patch_number=500)
 
     with tf.Session() as sess:
@@ -48,13 +46,11 @@ if __name__ == "__main__":
         label_ph = graph.get_tensor_by_name(placeholders[1].name + ":0")
         phase_ph = graph.get_tensor_by_name(placeholders[2].name + ":0")
 
-
         feed_dict = {input_ph:test_data_raw, label_ph:test_labels_raw, phase_ph:False}
 
         pred = graph.get_tensor_by_name("ArgMax_1:0")
         true_labels = graph.get_tensor_by_name("ArgMax:0")
         accuracy = graph.get_tensor_by_name("Mean:0")
-
 
         test_acc, test_pred, test_labels = sess.run([accuracy, pred, true_labels], feed_dict)
 
@@ -65,7 +61,7 @@ if __name__ == "__main__":
 
         for label, prediction in zip(test_labels, test_pred):
             tp += label and prediction
-            tn +=  (not label) and (not prediction)
+            tn += (not label) and (not prediction)
             fp += (not label) and prediction
             fn += label and (not prediction)
 

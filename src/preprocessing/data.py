@@ -154,7 +154,7 @@ def get_rand_samples(path, number):
     """
     Reads n different sample numpy arrays from the specified folder.
 
-    :param path: the path thi the patches
+    :param path: the path to the patches
     :param number: the number of patches that should be read
     :return: a list of patches
     """
@@ -162,7 +162,8 @@ def get_rand_samples(path, number):
 
     files = random.sample(os.listdir(path), int(number))
     for file in files:
-        data.append(np.load(os.path.join(path, file)))
+        if file.endswith('.npy'):
+            data.append(np.load(os.path.join(path, file)))
 
     return data
 

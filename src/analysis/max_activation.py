@@ -20,10 +20,11 @@ def draw_kernel(args):
     app.run()
 
 if __name__ == "__main__":
+    folder_name = 'acts_2017-11-21T10-04_dropout_05_more_kernel_and_batch'
+    saver = tf.train.import_meta_graph('../../data/networks/' + folder_name + '/' + folder_name + '.meta')
 
     with tf.Session() as sess:
-        saver = tf.train.import_meta_graph('../../data/networks/huang1/acts_2017-09-19T12-37_Huang_no_scaling_50x50.meta')
-        saver.restore(sess, '../../data/networks/huang1/acts_2017-09-19T12-37_Huang_no_scaling_50x50')
+        saver.restore(sess, '../../data/networks/' + folder_name + '/' + folder_name)
 
         graph = tf.get_default_graph()
         _, placeholders = inspect_variables(sess, verbose=False)
@@ -32,7 +33,7 @@ if __name__ == "__main__":
         label_ph = graph.get_tensor_by_name(placeholders[1].name+":0")
         phase_ph = graph.get_tensor_by_name(placeholders[2].name+":0")
 
-        feed_dict = {input_ph:np.random.rand(1,50,50,5), label_ph:[False], phase_ph:False}
+        feed_dict = {input_ph: np.random.rand(1, 50, 50, 5), label_ph: [False], phase_ph: False}
 
         op_to_restore = graph.get_tensor_by_name("ArgMax_1:0")
 
@@ -41,4 +42,4 @@ if __name__ == "__main__":
         print(f'Number of Kernels {kern_num}')
 
         print('And the result is.....')
-        print(sess.run(op_to_restore,feed_dict))
+        print(sess.run(op_to_restore, feed_dict))

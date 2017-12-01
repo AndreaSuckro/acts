@@ -1,7 +1,7 @@
 import tensorflow as tf
+import numpy as np
 
-
-GRAPH_PATH = '../../data/networks/huang1/acts_2017-09-19T12-37_Huang_no_scaling_50x50.meta'
+GRAPH_PATH = '../../data/networks/acts_2017-11-21T10-04_dropout_05_more_kernel_and_batch/acts_2017-11-21T10-04_dropout_05_more_kernel_and_batch.meta'
 
 def load_graph():
     """
