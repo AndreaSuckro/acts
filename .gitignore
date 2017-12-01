@@ -27,16 +27,3 @@ pip-delete-this-directory.txt
 # virtualenv
 venv/
 ENV/
-
-# doc related stuff
-*.loa
-*.lof
-*.out
-*.toc
-*.aux
-*.blg
-*.log
-*.bbl
-*.synctex.gz
-
-*.pdf
