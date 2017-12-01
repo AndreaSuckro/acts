@@ -1,0 +1,64 @@
+2017-11-21 10:05:32,329 - root - INFO - Reading in the Lung CT data, 3000 training and 300 validation
+2017-11-21 10:05:32,329 - root - INFO - Read ct scan data from /net/store/cv/projects/datasets/image/pub/LIDC-IDRI/processed/train
+2017-11-21 10:05:32,330 - root - INFO - With patch_number of 3000 and tumor_rate of 0.50
+2017-11-21 10:06:38,299 - root - INFO - Read ct scan data in 65 seconds.
+2017-11-21 10:06:38,300 - root - INFO - Successfully read in 3000 lung patches.
+2017-11-21 10:06:38,385 - root - INFO - Read ct scan data from /net/store/cv/projects/datasets/image/pub/LIDC-IDRI/processed/validation
+2017-11-21 10:06:38,385 - root - INFO - With patch_number of 300 and tumor_rate of 0.50
+2017-11-21 10:06:44,173 - root - INFO - Read ct scan data in 5 seconds.
+2017-11-21 10:06:44,173 - root - INFO - Successfully read in 300 lung patches.
+2017-11-21 10:06:44,182 - root - INFO - Finished reading data
+2017-11-21 10:06:44,280 - root - INFO - Start training of the network
+2017-11-21 10:06:44,280 - root - INFO - Calling `train_network` with args: {'batch_size': 10, 'epochs': 2000, 'save_level': 1, 'net_save_path': '/net/store/cv/projects/tmp/asuckro/logs/acts_2017-11-21T10-04_dropout_05_more_kernel_and_batch'}
+2017-11-21 11:39:58,045 - root - INFO - Step: 299, Acc Train: 0.514, Acc validation: 0.513333
+2017-11-21 13:11:01,026 - root - INFO - Step: 598, Acc Train: 0.500333, Acc validation: 0.5
+2017-11-21 14:53:14,969 - root - INFO - Step: 897, Acc Train: 0.561, Acc validation: 0.553333
+2017-11-21 16:46:19,669 - root - INFO - Step: 1196, Acc Train: 0.572667, Acc validation: 0.576667
+2017-11-21 19:00:16,498 - root - INFO - Step: 1495, Acc Train: 0.598, Acc validation: 0.596667
+2017-11-21 21:32:58,913 - root - INFO - Step: 1794, Acc Train: 0.558, Acc validation: 0.526667
+2017-11-21 23:42:58,857 - root - INFO - Step: 2093, Acc Train: 0.669333, Acc validation: 0.64
+2017-11-22 01:39:57,077 - root - INFO - Step: 2392, Acc Train: 0.500333, Acc validation: 0.5
+2017-11-22 03:35:15,725 - root - INFO - Step: 2691, Acc Train: 0.486, Acc validation: 0.473333
+2017-11-22 05:32:10,884 - root - INFO - Step: 2990, Acc Train: 0.508333, Acc validation: 0.523333
+2017-11-22 07:30:26,457 - root - INFO - Step: 3289, Acc Train: 0.602, Acc validation: 0.596667
+2017-11-22 09:19:39,181 - root - INFO - Step: 3588, Acc Train: 0.696333, Acc validation: 0.68
+2017-11-22 10:59:41,705 - root - INFO - Step: 3887, Acc Train: 0.599, Acc validation: 0.6
+2017-11-22 12:41:20,885 - root - INFO - Step: 4186, Acc Train: 0.577, Acc validation: 0.55
+2017-11-22 14:20:07,377 - root - INFO - Step: 4485, Acc Train: 0.691, Acc validation: 0.676667
+2017-11-22 15:56:17,712 - root - INFO - Step: 4784, Acc Train: 0.549667, Acc validation: 0.516667
+2017-11-22 17:28:09,601 - root - INFO - Step: 5083, Acc Train: 0.619333, Acc validation: 0.64
+2017-11-22 18:59:52,121 - root - INFO - Step: 5382, Acc Train: 0.538, Acc validation: 0.513333
+2017-11-22 20:31:25,512 - root - INFO - Step: 5681, Acc Train: 0.663667, Acc validation: 0.683333
+2017-11-22 22:02:49,353 - root - INFO - Step: 5980, Acc Train: 0.545667, Acc validation: 0.516667
+2017-11-22 23:11:45,577 - root - INFO - Step: 6279, Acc Train: 0.609333, Acc validation: 0.6
+2017-11-23 00:08:59,385 - root - INFO - Step: 6578, Acc Train: 0.791, Acc validation: 0.833333
+2017-11-23 01:03:00,852 - root - INFO - Step: 6877, Acc Train: 0.706333, Acc validation: 0.706667
+2017-11-23 01:55:57,718 - root - INFO - Step: 7176, Acc Train: 0.786, Acc validation: 0.81
+2017-11-23 02:51:46,243 - root - INFO - Step: 7475, Acc Train: 0.705333, Acc validation: 0.733333
+2017-11-23 03:48:09,107 - root - INFO - Step: 7774, Acc Train: 0.626333, Acc validation: 0.666667
+2017-11-23 04:41:44,596 - root - INFO - Step: 8073, Acc Train: 0.788333, Acc validation: 0.82
+2017-11-23 05:36:46,476 - root - INFO - Step: 8372, Acc Train: 0.612333, Acc validation: 0.62
+2017-11-23 06:29:58,689 - root - INFO - Step: 8671, Acc Train: 0.672333, Acc validation: 0.713333
+2017-11-23 07:26:07,143 - root - INFO - Step: 8970, Acc Train: 0.793333, Acc validation: 0.79
+2017-11-23 08:17:34,494 - root - INFO - Step: 9269, Acc Train: 0.79, Acc validation: 0.79
+2017-11-23 09:09:05,861 - root - INFO - Step: 9568, Acc Train: 0.682333, Acc validation: 0.723333
+2017-11-23 10:03:32,512 - root - INFO - Step: 9867, Acc Train: 0.550333, Acc validation: 0.553333
+2017-11-23 11:00:18,965 - root - INFO - Step: 10166, Acc Train: 0.644, Acc validation: 0.656667
+2017-11-23 11:56:14,751 - root - INFO - Step: 10465, Acc Train: 0.739, Acc validation: 0.76
+2017-11-23 12:53:28,914 - root - INFO - Step: 10764, Acc Train: 0.756333, Acc validation: 0.746667
+2017-11-23 13:49:42,937 - root - INFO - Step: 11063, Acc Train: 0.750333, Acc validation: 0.756667
+2017-11-23 14:42:43,031 - root - INFO - Step: 11362, Acc Train: 0.644, Acc validation: 0.663333
+2017-11-23 15:37:01,794 - root - INFO - Step: 11661, Acc Train: 0.801333, Acc validation: 0.83
+2017-11-23 16:28:45,507 - root - INFO - Step: 11960, Acc Train: 0.817333, Acc validation: 0.8
+2017-11-23 17:20:53,159 - root - INFO - Step: 12259, Acc Train: 0.520333, Acc validation: 0.513333
+2017-11-23 18:12:37,060 - root - INFO - Step: 12558, Acc Train: 0.783333, Acc validation: 0.816667
+2017-11-23 19:16:42,332 - root - INFO - Step: 12857, Acc Train: 0.755333, Acc validation: 0.823333
+2017-11-23 20:47:52,948 - root - INFO - Step: 13156, Acc Train: 0.818, Acc validation: 0.85
+2017-11-23 22:20:13,225 - root - INFO - Step: 13455, Acc Train: 0.681333, Acc validation: 0.676667
+2017-11-23 23:51:34,858 - root - INFO - Step: 13754, Acc Train: 0.831, Acc validation: 0.856667
+2017-11-24 01:23:29,247 - root - INFO - Step: 14053, Acc Train: 0.8, Acc validation: 0.826667
+2017-11-24 02:56:10,709 - root - INFO - Step: 14352, Acc Train: 0.655333, Acc validation: 0.693333
+2017-11-24 04:28:42,689 - root - INFO - Step: 14651, Acc Train: 0.765333, Acc validation: 0.803333
+2017-11-24 06:00:50,960 - root - INFO - Step: 14950, Acc Train: 0.821667, Acc validation: 0.863333
+2017-11-24 07:32:24,508 - root - INFO - Step: 15249, Acc Train: 0.777667, Acc validation: 0.816667
+2017-11-24 09:05:33,911 - root - INFO - Step: 15548, Acc Train: 0.806333, Acc validation: 0.83
