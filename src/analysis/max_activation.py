@@ -1,7 +1,4 @@
-import time
 import numpy as np
-import itertools
-from multiprocessing import Pool
 import tensorflow as tf
 from vispy import app, visuals, scene, io
 from read_network import get_conv_kernels, get_activations, load_graph, inspect_variables
@@ -21,10 +18,10 @@ def draw_kernel(args):
 
 if __name__ == "__main__":
     folder_name = 'acts_2017-11-21T10-04_dropout_05_more_kernel_and_batch'
-    saver = tf.train.import_meta_graph('../../data/networks/' + folder_name + '/' + folder_name + '.meta')
+    saver = tf.train.import_meta_graph('../../data/networks/final/' + folder_name + '.meta')
 
     with tf.Session() as sess:
-        saver.restore(sess, '../../data/networks/' + folder_name + '/' + folder_name)
+        saver.restore(sess, '../../data/networks/final/' + folder_name)
 
         graph = tf.get_default_graph()
         _, placeholders = inspect_variables(sess, verbose=False)

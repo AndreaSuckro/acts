@@ -1,12 +1,9 @@
-import time
 import math
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
 
-from mpl_toolkits.mplot3d import Axes3D
 from sklearn.decomposition import PCA as sklearnPCA
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from read_network import get_conv_kernels, get_activations, inspect_variables, load_graph
 
 import os
@@ -29,7 +26,7 @@ def plot_nn_filter(activations, columns=5, figsize=(15, 15), title='All the Acti
     print(f'{n_columns}x{n_rows}')
     print(f'Number of filters is {filters}, displaying in {n_columns}x{n_rows}')
     fig = plt.figure(title, figsize=figsize)
-    for i in range(filters-20):
+    for i in range(filters):
         plt.subplot(n_rows, n_columns, i+1)
         plt.title('Filter ' + str(i+1))
         plt.imshow(np.squeeze(activations[:,:,:,1,i]), interpolation="nearest", cmap="gray")
@@ -64,16 +61,45 @@ def plot_pca(activations, title='PCA of kernel activation of the first layer'):
     fig.show()
 
 
-if __name__ == "__main__":
-    data_root = '../../data'
-    folder_name = 'acts_2017-11-21T10-04_dropout_05_more_kernel_and_batch'
-    saver = tf.train.import_meta_graph(data_root+'/networks/'+folder_name+'/'+folder_name+'.meta')
+def plot_layer_activations(sess, kernels, nod_patch, health_patch, layer=0):
+    """
+    Get's the mean activation for nodule patches and health patches for a
+    specified layer and plots them.
 
-    test_data_raw, test_labels_raw = get_test_data(data_root, patch_number=10)
+    :param sess:
+    :param kernels:
+    :param layer:
+    :return:
+    """
+    first_layer_nodules = get_activations(sess, kernels[layer], nod_patch)
+    first_layer_health = get_activations(sess, kernels[layer], health_patch)
+
+    # mean activation over first dimension for batch
+    # first layer:  1, 50, 50, 5, 40
+    # second layer: 1, 49, 49, 4, 20
+
+    mean_act_nod = np.mean(first_layer_nodules, axis=0)
+    mean_act_nod = mean_act_nod[np.newaxis, :]
+
+    mean_act_health = np.mean(first_layer_health, axis=0)
+    mean_act_health = mean_act_health[np.newaxis, :]
+
+    plot_nn_filter(mean_act_nod, title='Nodule Activation in Layer '+str(layer))
+    plot_nn_filter(mean_act_health, title='Health Activation in Layer '+str(layer))
+
+    plt.show()
+
+
+if __name__ == "__main__":
+    data_root = '../../data/networks/final/'
+    net_name = 'acts_2017-11-21T10-04_dropout_05_more_kernel_and_batch'
+    saver = tf.train.import_meta_graph(data_root+net_name+'.meta')
+
+    test_data_raw, test_labels_raw = get_test_data('../../data/', patch_number=10)
 
     with tf.Session() as sess:
 
-        saver.restore(sess, '../../data/networks/'+folder_name+'/'+folder_name)
+        saver.restore(sess, data_root+net_name)
 
         kernels = get_conv_kernels(sess)
         # Step 1: get a nodule patch
@@ -88,17 +114,5 @@ if __name__ == "__main__":
             else:
                 health_patch.append(patch)
 
-        first_layer_nodules = get_activations(sess, kernels[0], nod_patch)
-        first_layer_health = get_activations(sess, kernels[0], health_patch)
-
-        # mean activation over first dimension for batch
-        mean_act_nod = np.mean(first_layer_nodules, axis=0)
-        mean_act_nod = mean_act_nod[np.newaxis, :]
-
-        mean_act_health = np.mean(first_layer_health, axis=0)
-        mean_act_health = mean_act_health[np.newaxis, :]
-
-        plot_nn_filter(mean_act_nod, title='Nodule Activation')
-        plot_nn_filter(mean_act_health, title='Health Activation')
-
+        plot_layer_activations(sess, kernels, nod_patch, health_patch, layer=1)
         plt.show()

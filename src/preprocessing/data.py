@@ -3,7 +3,6 @@ import os
 import time
 import random
 import logging
-from cvloop import cvloop
 import re
 
 
@@ -36,20 +35,6 @@ def get_train_data(data_dir, *, patch_number=100, tumor_rate=0.5):
                        tumor_rate=tumor_rate)
 
 
-def get_validation_data(data_dir, *, patch_number=100, tumor_rate=0.5):
-    """
-    Returns all data under the validation directory.
-
-    :param data_dir: the directory that contains a folder for the validation data
-    :param patch_number: the number of patches that should be retrieved
-    :param tumor_rate: the fraction of tumors that should be contained in the patches
-    :return: data with nodules and without
-    """
-    return get_patches(os.path.join(data_dir, 'processed', 'validation'),
-                       patch_number=patch_number,
-                       tumor_rate=tumor_rate)
-
-
 def get_test_data(data_dir, *, patch_number=100, tumor_rate=0.5):
     """
     Reads all test data as specified in the training data.
@@ -60,6 +45,20 @@ def get_test_data(data_dir, *, patch_number=100, tumor_rate=0.5):
     :return: data with nodules and without
     """
     return get_patches(os.path.join(data_dir, 'processed', 'test'),
+                       patch_number=patch_number,
+                       tumor_rate=tumor_rate)
+
+
+def get_validation_data(data_dir, *, patch_number=100, tumor_rate=0.5):
+    """
+    Returns all data under the test directory.
+
+    :param data_dir: the directory that contains a folder for the test data
+    :param patch_number: the number of patches that should be retrieved
+    :param tumor_rate: the fraction of tumors that should be contained in the patches
+    :return: data with nodules and without
+    """
+    return get_patches(os.path.join(data_dir, 'processed', 'validation'),
                        patch_number=patch_number,
                        tumor_rate=tumor_rate)
 
@@ -154,7 +153,7 @@ def get_rand_samples(path, number):
     """
     Reads n different sample numpy arrays from the specified folder.
 
-    :param path: the path to the patches
+    :param path: the path thi the patches
     :param number: the number of patches that should be read
     :return: a list of patches
     """
@@ -169,7 +168,7 @@ def get_rand_samples(path, number):
 
 
 if __name__ == "__main__":
-
+    from cvloop import cvloop
     train_data, labels = get_train_data('../../data/', patch_number=10, tumor_rate=0.5)
 
     print('Labels: {}'.format(str(labels)))
