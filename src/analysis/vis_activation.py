@@ -8,6 +8,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from sklearn.decomposition import PCA as sklearnPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from read_network import get_conv_kernels, get_activations, inspect_variables, load_graph
+from vispy import app,  visuals, scene, io
 
 import os
 import sys
@@ -29,7 +30,7 @@ def plot_nn_filter(activations, columns=5, figsize=(15, 15), title='All the Acti
     print(f'{n_columns}x{n_rows}')
     print(f'Number of filters is {filters}, displaying in {n_columns}x{n_rows}')
     fig = plt.figure(title, figsize=figsize)
-    for i in range(filters-20):
+    for i in range(filters):
         plt.subplot(n_rows, n_columns, i+1)
         plt.title('Filter ' + str(i+1))
         plt.imshow(np.squeeze(activations[:,:,:,1,i]), interpolation="nearest", cmap="gray")
@@ -64,16 +65,36 @@ def plot_pca(activations, title='PCA of kernel activation of the first layer'):
     fig.show()
 
 
-if __name__ == "__main__":
-    data_root = '../../data'
-    folder_name = 'acts_2017-11-21T10-04_dropout_05_more_kernel_and_batch'
-    saver = tf.train.import_meta_graph(data_root+'/networks/'+folder_name+'/'+folder_name+'.meta')
+def draw_kernel(activations, filter_num):
 
-    test_data_raw, test_labels_raw = get_test_data(data_root, patch_number=10)
+    input_data = np.squeeze(activations[0,:,:,:,filter_num])
+
+    print(f'Activation was in form {activations.shape}')
+    print(f'Input was in form {input_data.shape}')
+
+    canvas = scene.SceneCanvas(title='Filter '+str(filter_num),keys='interactive', show=True)
+
+    view = canvas.central_widget.add_view()
+    cam = scene.cameras.FlyCamera(parent=view.scene, fov=60.0, name='FlyCam')
+    view.camera = cam
+
+    volume = scene.visuals.Volume(vol=input_data, cmap='grays', parent=view.scene)
+    axis = scene.visuals.XYZAxis(parent=view.scene)
+    app.run()
+
+
+if __name__ == "__main__":
+    data_root = ''
+    net_name = 'acts_2017-11-21T10-04_dropout_05_more_kernel_and_batch'
+    saver = tf.train.import_meta_graph('../../data/networks/final/'+net_name+'.meta')
+
+    test_data_raw, test_labels_raw = get_test_data('/net/store/cv/projects/datasets/image/pub/LIDC-IDRI/', patch_number=500)
+
+    plot3D = True # should the output be just one random nodule kernel in 3D?
+    layer_no = 1  # which layer number should be investigated?
 
     with tf.Session() as sess:
-
-        saver.restore(sess, '../../data/networks/'+folder_name+'/'+folder_name)
+        saver.restore(sess, '../../data/networks/final/'+net_name)
 
         kernels = get_conv_kernels(sess)
         # Step 1: get a nodule patch
@@ -82,14 +103,13 @@ if __name__ == "__main__":
         health_patch = []
         for idx, label in enumerate(test_labels_raw):
             patch = np.array(test_data_raw[idx], copy=True)
-            patch.resize((50, 50, 5))
             if label > 0:
                 nod_patch.append(patch)
             else:
                 health_patch.append(patch)
 
-        first_layer_nodules = get_activations(sess, kernels[0], nod_patch)
-        first_layer_health = get_activations(sess, kernels[0], health_patch)
+        first_layer_nodules = get_activations(sess, kernels[layer_no], nod_patch)
+        first_layer_health = get_activations(sess, kernels[layer_no], health_patch)
 
         # mean activation over first dimension for batch
         mean_act_nod = np.mean(first_layer_nodules, axis=0)
@@ -98,7 +118,10 @@ if __name__ == "__main__":
         mean_act_health = np.mean(first_layer_health, axis=0)
         mean_act_health = mean_act_health[np.newaxis, :]
 
-        plot_nn_filter(mean_act_nod, title='Nodule Activation')
-        plot_nn_filter(mean_act_health, title='Health Activation')
-
-        plt.show()
+        if not plot3D:
+            plot_nn_filter(mean_act_nod, title='Nodule Activation')
+            plot_nn_filter(mean_act_health, title='Health Activation')
+            plt.show()
+        else:
+            filter_num = np.random.randint(0, mean_act_nod.shape[4])
+            draw_kernel(mean_act_nod, filter_num)
